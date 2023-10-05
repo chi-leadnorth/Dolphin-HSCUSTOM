@@ -1,0 +1,4273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-02 13:58:12">
+<Class name="HS.Local.IHE.XDSb.AddHeader.Process">
+<Description>
+Adds XDSb Provide and Register Header to CCDA XML messages received via file transfer</Description>
+<ClassType>persistent</ClassType>
+<IncludeCode>HS.IHE.XDSb,HS.IHE.ATNA,HS.HC</IncludeCode>
+<Super>Ens.BusinessProcess,HS.HC.Util.Trace.Helper</Super>
+<TimeChanged>66740,4143.438993</TimeChanged>
+<TimeCreated>66738,22498.4997178</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="HSDEPLOY">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="SETTINGS">
+<Default><![CDATA[TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId},SOAPAction:Basic,RepositoryOperations,RegistryOperations,ProvidePostProcessor,XDSbRetrieveConsentTarget,ProvidePreProcessor,ValidateSizeAndHash,ProvideAndRegisterToRegisterTransform,RegisterResponseTransform,TextToRetrieveDocumentResponseTransform,RemoveDocumentsTransform,RemoveDocumentsTarget]]></Default>
+</Parameter>
+
+<UDLText name="T">
+<Content><![CDATA[/* Required header values exposed as properties */
+]]></Content>
+</UDLText>
+
+<Property name="TargetConfigNames">
+<Description>
+Configuration items to which to send Documents</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Property name="SOAPAction">
+<Type>%String</Type>
+<InitialExpression>"urn:ihe:iti:2007:ProvideAndRegisterDocumentSet-b"</InitialExpression>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="DocumentContentType">
+<Type>%String</Type>
+<InitialExpression>"text/xml"</InitialExpression>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="DocumentDescription">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="DocumentFormatCode">
+<Type>%String</Type>
+<InitialExpression>"2.16.840.1.113883.10.20.1"</InitialExpression>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="DocumentFormatScheme">
+<Type>%String</Type>
+<InitialExpression>"2.16.840.1.113883.3.88"</InitialExpression>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="DocumentName">
+<Type>%String</Type>
+<InitialExpression><![CDATA[">Continuity of Care Document (Transition of Care)"]]></InitialExpression>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="RepositoryOperations">
+<Description>
+Host which will handle the Storage of the document.  Typically the HS.IHE.XDSb.Repository.Operations host.</Description>
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.IHE.XDSb.Repository.Operations"</InitialExpression>
+</Property>
+
+<Property name="RegistryOperations">
+<Description>
+Host which will handle the Registration of the document.  Typically the HS.IHE.XDSb.Repository.Operations host.
+In a situation where the Repository and Registry were in the same production this value would be the HS.IHE.XDSb.Registry.Operations</Description>
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.IHE.XDSb.Repository.Operations"</InitialExpression>
+</Property>
+
+<Property name="RemoveDocumentsTarget">
+<Description>
+Host which will handle the RemoveDocument request.  Typically the HS.IHE.XDSb.Repository.Operations host.</Description>
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.IHE.XDSb.Repository.Operations"</InitialExpression>
+</Property>
+
+<Property name="IHEVersion">
+<Type>%Integer</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="Transformer">
+<Type>HS.Util.XSLTTransformer</Type>
+</Property>
+
+<Property name="ValidateSizeAndHash">
+<Description>
+Checks the size and hash values provided against calculated values 
+and alerts the user to discrepancies. Disabling this option silences 
+the alert. Whether this option is enabled or disabled, the calculated 
+values are used for registration.</Description>
+<Type>%Boolean</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="Errors">
+<Description>
+Property to hold errors generated while processing the message</Description>
+<Type>HS.Types.IHE.Errors</Type>
+</Property>
+
+<Property name="RepositoryOID">
+<Description>
+Internal value while processing for this repository, obtained at startup</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="64"/>
+</Property>
+
+<Property name="ProvidePreProcessor">
+<Description>
+Pre Processor for XDSb_ProvideAndRegisterDocumentSet</Description>
+<Type>Ens.DataType.ConfigName</Type>
+</Property>
+
+<Property name="ProvidePostProcessor">
+<Description><![CDATA[
+Additional processing for documents with a given format code after document registration/store.
+Will not execute if registration or store failed. Failure of the post processor will not
+rollback document store.
+<p>The value is a delimeted list: formatCode^^formatScheme^^targetHost||formatCode^^formatScheme^^targetHost...
+<p>For example: urn:nhin:names:acp:XACML^^1.3.6.1.4.1.19376.1.2.3^^HS.Consent.XACML.Importer]]></Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="XDSbRetrieveConsentTarget">
+<Description>
+ConfigName of the business host for consent evaluation for retrieve responses.
+By default, consent is not evaluated for retrieve.</Description>
+<Type>Ens.DataType.ConfigName</Type>
+</Property>
+
+<Property name="ProvideAndRegisterToRegisterTransform">
+<Description>
+Stylesheet used to generate the Registry request</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/ProvideAndRegisterToRegister.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="RegisterResponseTransform">
+<Description>
+Stylesheet used to generate the Provide And Register response</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/RegisterResponse.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="TextToRetrieveDocumentResponseTransform">
+<Description>
+Stylesheet used to build the Retrieve Response</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/TextToRetrieveDocumentResponse.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="RemoveDocumentsTransform">
+<Description>
+Stylesheet used to build the DeleteDocumentSetRequest</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/RMDRequestToRequest.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Method name="OnRequest">
+<FormalSpec>pRequest:%Persistent,*pResponse:%Persistent</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	
+	Try {
+		Set ..Errors = ##class(HS.Types.IHE.Errors).%New()
+		$$$GetTransformer(..Transformer)
+		
+		Set pResponse = ##class(HS.Message.XMLMessage).%New()
+
+		If pRequest.%IsA("Ens.StreamContainer") {
+			
+			
+			//CNR: Add the minimal Provide and Register Header to pass on to Document Source Operation
+			Set tSC = ..AddProvideAndRegisterHeader(pRequest, .pResponse) 
+
+	
+
+			Set tRequest = pResponse
+
+			For iTarget=1:1:$L(..TargetConfigNames, ",") { Set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
+				Set tSC1=..SendRequestSync(tOneTarget,tRequest, .pResponse)
+				If $$$ISERR(tSC1) Set tSC=$$$ADDSC(tSC,tSC1)
+			}
+			
+		}
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		Do ..Errors.logError("XDSbRepository","Error",$system.Status.GetErrorText(tSC))
+	}
+	If ..Errors.Errors.Count() {
+		$$$HSTRACE("Errors","Errors",..Errors)
+		Set tErrorText="",tWarningText=""
+		For tIdx=1:1:..Errors.Errors.Count() {
+			Set tError = ..Errors.Errors.GetAt(tIdx)
+			If tError.Severity="Error" {
+				Set tErrorText = tErrorText _ "["_tError.Description_ "]"
+			} Else {
+				Set tWarningText = tWarningText _ "["_tError.Description_ "]"
+			}
+		}
+		If tErrorText]"" $$$LOGERROR(tErrorText)
+		If tWarningText]"" $$$LOGWARNING(tWarningText)
+	}
+	#; if the message is an erorr, and we have not reported the problem (contentstream is empty) report the problem
+	If $$$ISERR(tSC) && (pResponse.ContentStream.Size=0) {
+		Do ##class(HS.IHE.XDSb.Util).ErrorResponse(tSC,pResponse.Name,.pResponse,..Transformer)
+		Set tSC=$$$OK
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="OnResponse">
+<Description>
+OnResponse must be overridden here to avoid error upon response from async request.</Description>
+<FormalSpec><![CDATA[pRequest:Ens.Request,&pResponse:Ens.Response,pCallrequest:Ens.Request,pCallresponse:Ens.Response,pCompletionKey:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="AddProvideAndRegisterHeader">
+<Description>
+CNR: Swimming through ObjectScript samples to find the easiest way to attach a header
+grabbing code from the IHE tester classes now</Description>
+<FormalSpec><![CDATA[pRequest:Ens.StreamContainer,&pResponse:HS.Message.IHE.XDSb.ProvideAndRegisterRequest]]></FormalSpec>
+<Implementation><![CDATA[
+	
+	try {
+		set tSC = $$$OK
+
+		set tStream =pRequest.Stream
+		
+		If '$isObject(tStream) || (tStream.Size=0) { 
+			$$$LOGERROR("ContentStream is empty")
+			Quit
+		}
+		
+		//Define MRN and AssigningAuthorityOID using XPATH 
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:id","@extension",.tMRN,.tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:id","@root",.tSourceOID,.tDocObject))
+		Set tPatientId = tMRN_"^^^&"_tSourceOID_"&ISO"
+		
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:family","text()",.tPatientSourceLastName, .tDocObject)) 
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:given","text()",.tPatientSourceFirstName, .tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:birthTime", "@value", .tPatientSourceDOB, .tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:administrativeGenderCode","@code",.tPatientSourceSex, .tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr/hl7:streetAddressLine","text()", .tPatientSourceAddressStreetLine1, .tDocObject)) 
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr/hl7:city", "text()", .tPatientSourceAddressCity, .tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr/hl7:state", "text()", .tPatientSourceAddressState, .tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr/hl7:zip", "text()", .tPatientSourceAddressZip, .tDocObject))
+		$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr/hl7:country", "text()", .tPatientSourceAddressCountry, .tDocObject))
+	
+
+	
+		#; Put together a ProviderAndRegisterRequest
+		Set tRequest = ##class(HS.Message.IHE.XDSb.ProvideAndRegisterRequest).%New()
+		Set tRequest.SOAPAction = ..SOAPAction
+		Set tRequest.PatientId=tPatientId
+		Set tRequest.SourcePatientId = tPatientId
+		
+	
+	
+		Set tRequest.SourceId=tSourceOID
+		Set tDocument = ##class(HS.Message.IHE.XDSb.Document).%New()
+
+		set tAuthor = ##class(HS.IHE.XDSb.Types.Author).%New()
+    	set tAuthor.AuthorPerson = "^Smitty^Gerald^^^"
+		set tSC= tDocument.Author.Insert(tAuthor)
+		Do tRequest.Author.Insert(tAuthor)
+		Set tDocument.SourcePatientId=tPatientId
+		
+		//CNR: Let's just create and set this
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("ContentTypeCode", .tCodedContentEntry)
+		Set tRequest.ContentTypeCode = tCodedContentEntry
+
+																		
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("ConfidentialityCode", .tConfidentialityCodeEntry)
+		
+		Set tCode = tConfidentialityCodeEntry.Code
+		Set tScheme = tConfidentialityCodeEntry.Scheme
+		Set tDescription = tConfidentialityCodeEntry.Description
+		// Document-level confidentialityCode could Local be nullFlavor.  If so, default in N for Normal.
+		If tCode="",tScheme="" Set tCode="N",tScheme="2.16.840.1.113883.5.25",tDescription="Normal"
+
+		Do tDocument.ConfidentialityCode.Insert(##class(HS.IHE.XDSb.Types.CodedValue).%New(tCode,tScheme,tDescription))
+
+
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("FormatCode", .tCodedFormatEntry)
+		Set tDocument.FormatCode = tCodedFormatEntry
+
+
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("HealthcareFacilityTypeCode", .tCodedHealthFacilityEntry)
+		Set tDocument.HealthcareFacilityTypeCode = tCodedHealthFacilityEntry
+
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("PracticeSettingCode", .tCodedPracticeEntry)
+		Set tDocument.PracticeSettingCode = tCodedPracticeEntry
+
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("TypeCode", .tCodedTypeEntry)
+		Set tDocument.TypeCode = tCodedTypeEntry
+		
+		do ##class(HS.Local.Util.CCDHelper).GetCodedEntryDefaultValue("ClassCode", .tCodedClassEntry)
+		Set tDocument.ClassCode = tCodedClassEntry
+		$$$LOGINFO("About to copy tStream")
+
+		//copy stream to Body property
+		Do tDocument.Body.CopyFrom(tStream)
+		Do tDocument.Body.Rewind()
+		If tDocument.CreationTime="" Set tDocument.CreationTime=##class(HS.Util.XSLTHelper).xmltimestampToUTC($tr($zdt($h,8),": "))
+		Set:tDocument.LanguageCode="" tDocument.LanguageCode="en-US"
+
+		// write new message
+		Set tDocument.MimeType=..DocumentContentType
+
+		
+		Set tDocument.Availability=1
+		Do tRequest.Documents.Insert(tDocument)
+			
+		//Set pResponse.Name = "XDSb_ProvideAndRegisterRequest"
+		//attempt to convert tRequest to a stream
+		//$$$ThrowOnError(tRequest.XMLExportToStream(.tRequestStream,"ProvideAndRegisterRequest"))
+		//Do pResponse.ContentStream.CopyFrom(tRequestStream)
+		//Do pResponse.AdditionalInfo.SetAt(..SOAPAction, "SOAPAction")
+		
+
+		$$$LOGINFO("Getting to the end")			
+		Set pResponse = tRequest
+	}
+	catch ex {
+		Set tSC = ex.AsStatus()
+		$$$LOGERROR(tSC)
+	}
+
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="OnGetConnections">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*pArray:%String,item:Ens.Config.Item</FormalSpec>
+<Implementation><![CDATA[
+
+	Do ##super(.pArray,pItem)
+	If pItem.GetModifiedSetting("TargetConfigNames",.tValue) {
+		For i=1:1:$L(tValue,",") { Set tOne=$ZStrip($P(tValue,",",i),"<>W")  Continue:""=tOne  Set pArray(tOne)="" }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PrepareAndSendAsync">
+<FormalSpec><![CDATA[pRequest:HS.Message.XMLMessage,&pResponse:HS.Message.XMLMessage,*pWebServiceResponse]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try{
+		If '$IsObject($G(pResponse)) $$$ThrowStatus($$$ERROR($$$GeneralError,"XDSb repository did not return a response"))
+		Set tReplyTo = pRequest.AdditionalInfo.GetAt("ReplyAddress")
+		$$$HSTRACE("reply to","tReplyTo",tReplyTo)
+		Do pResponse.AdditionalInfo.SetAt(tReplyTo,"ReplyAddress")
+		Do pResponse.AdditionalInfo.SetAt(pRequest.AdditionalInfo.GetAt("RelatesTo"),"RelatesTo")
+		Set tSC = ..SendRequestSync(..RepositoryOperations,pResponse)
+	}
+	Catch ex{
+		Set tSC = ex.AsStatus
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DefaultData>ProcessDefaultData</DefaultData>
+<Data name="ProcessDefaultData">
+<Subscript>"Process"</Subscript>
+<Value name="1">
+<Value>TraceOperations</Value>
+</Value>
+<Value name="2">
+<Value>RepositoryOperations</Value>
+</Value>
+<Value name="3">
+<Value>RegistryOperations</Value>
+</Value>
+<Value name="4">
+<Value>RemoveDocumentsTarget</Value>
+</Value>
+<Value name="5">
+<Value>IHEVersion</Value>
+</Value>
+<Value name="6">
+<Value>Transformer</Value>
+</Value>
+<Value name="7">
+<Value>ValidateSizeAndHash</Value>
+</Value>
+<Value name="8">
+<Value>Errors</Value>
+</Value>
+<Value name="9">
+<Value>RepositoryOID</Value>
+</Value>
+<Value name="10">
+<Value>ProvidePreProcessor</Value>
+</Value>
+<Value name="11">
+<Value>ProvidePostProcessor</Value>
+</Value>
+<Value name="12">
+<Value>XDSbRetrieveConsentTarget</Value>
+</Value>
+<Value name="13">
+<Value>ProvideAndRegisterToRegisterTransform</Value>
+</Value>
+<Value name="14">
+<Value>RegisterResponseTransform</Value>
+</Value>
+<Value name="15">
+<Value>TextToRetrieveDocumentResponseTransform</Value>
+</Value>
+<Value name="16">
+<Value>RemoveDocumentsTransform</Value>
+</Value>
+<Value name="17">
+<Value>SOAPAction</Value>
+</Value>
+<Value name="18">
+<Value>DocumentContentType</Value>
+</Value>
+<Value name="19">
+<Value>DocumentDescription</Value>
+</Value>
+<Value name="20">
+<Value>DocumentFormatCode</Value>
+</Value>
+<Value name="21">
+<Value>DocumentFormatScheme</Value>
+</Value>
+<Value name="22">
+<Value>DocumentName</Value>
+</Value>
+<Value name="23">
+<Value>TargetConfigNames</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="HS.Local.IHE.XDSb.ContentConsumer.Operations">
+<Description>
+Custom ContentConsumer with Accelerator Code
+Implements the functionality needed to consume documents created by XDS-MS, XDS-LAB, XPHR, and other documents created by content creators defined in IHE's PCC domain</Description>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>HS.Util.SOAPClient.Operations,HS.Util.XSLTTransformer,HS.Util.Trace.Helper</Super>
+<TimeChanged>66744,41063.7606526</TimeChanged>
+<TimeCreated>66738,22498.4684848</TimeCreated>
+<Inheritance>right</Inheritance>
+
+<Property name="Target">
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.Gateway.ECR.Manager"</InitialExpression>
+</Property>
+
+<Property name="PreprocessorXsltPath">
+<Type>%String</Type>
+<InitialExpression>"CUSTOM/CDA/CDAPreprocessor.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="500"/>
+</Property>
+
+<Property name="CdaToSdaXsltPath">
+<Type>%String</Type>
+<InitialExpression>"SDA3/CCDA-to-SDA.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="500"/>
+</Property>
+
+<Property name="IsDebug">
+<Type>%Boolean</Type>
+<InitialExpression>"0"</InitialExpression>
+</Property>
+
+<Property name="DebugFileLocation">
+<Type>%String</Type>
+</Property>
+
+<Parameter name="SETTINGS">
+<Default>Target,IsDebug:Debug,DebugFileLocation:Debug,PreprocessorXsltPath:XSLT,CdaToSdaXsltPath:XSLT,AlwaysAddPatient:Patient,TransformDoc:Transformation,UpdateEncounterWard:ENCOUNTER,FilterDataBeforeDate:FILTER/DELETE,IgnoreExternalID:FILTER/DELETE,UpdateEncounterNumbers:ENCOUNTER,DeleteProbEncounter:FILTER/DELETE,DeleteProcedureEncounter:FILTER/DELETE,DeleteObsEncounter:FILTER/DELETE,RemoveEncounterReason:FILTER/DELETE,RemoveEmptyEncounter:FILTER/DELETE,MoveObsToProcedures:OBSERVATIONS,RemoveEmptyProblems:FILTER/DELETE,FixFacilityCodeInDocument:TRANSFORMATION,FixFacilityCodeInHeader:TRANSFORMATION,NonConsSections:FILTER/DELETE,GenerateVaccineID:VACCINATIONS,DeleteVacEncounter:VACCINATIONS,DeleteVitSignEncounter:FILTER/DELETE,ECRTarget,StoreUsingGlobalPatientIdentifier,DebugOutputFile,CopyPatientIdentifierToSDATransform</Default>
+</Parameter>
+
+<Property name="ECRTarget">
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.Gateway.ECR.Manager"</InitialExpression>
+</Property>
+
+<Property name="StoreUsingGlobalPatientIdentifier">
+<Description>
+When consuming a document, that document's patient ID can in theory be different than the global patient identifier found in the XDSb RegisterDocumentSet header.
+Set this to 'True' to force HealthShare to use the XDSb RegisterDocumentSet header's patient ID, guaranteeing that the ECR and Patient Registry are 'linked' by the same patient ID.</Description>
+<Type>%Boolean</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="DebugOutputFile">
+<Description>
+If set to a valid, fully-qualified file name (path + file), HealthShare will output the source document (ie, CCD) to this file before it attempts to consume it.</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="CopyPatientIdentifierToSDATransform">
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/CopyPatientIdentifierToSDA.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Transformation parameters
+
+]]></Content>
+</UDLText>
+
+<Property name="AlwaysAddPatient">
+<Description>
+Always Add Patient from XDS</Description>
+<Type>%Boolean</Type>
+<InitialExpression>"0"</InitialExpression>
+</Property>
+
+<Property name="FilterDataBeforeDate">
+<Description>
+Any data before this date will be filtered</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="TransformDoc">
+<Description>
+If the facility is on the list, then the lookup table will be used to know what transform to do</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="UpdateEncounterWard">
+<Description>
+Update the encounter ward</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="DeleteProbEncounter">
+<Description>
+When Set, encounter number from problems will be removed</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="IgnoreExternalID">
+<Description>
+When set, ExternalIds will be removed from all objects in the CDA. External IDs are only imported to SDA from CDA if ImportProfile.xsl configuration item $generalImportConfiguration/sdaActionCodes/overrideExternalId is set to 1</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="UpdateEncounterNumbers">
+<Description>
+Updates encounter number to use the effectiveDate_NPI, if NPI is blank or not present, effectiveDate will be used </Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="DeleteObsEncounter">
+<Description>
+When set, observation encounter is removed</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="DeleteProcedureEncounter">
+<Description>
+When set, encounter number from procedures will be removed</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="FixFacilityCodeInDocument">
+<Description>
+Determines whether or not to use the identifier information from the header in the document</Description>
+<Type>%Integer</Type>
+<InitialExpression>"0"</InitialExpression>
+</Property>
+
+<Property name="FixFacilityCodeInHeader">
+<Description>
+Use the identifier information from the document and not the header</Description>
+<Type>%Integer</Type>
+<InitialExpression>"0"</InitialExpression>
+</Property>
+
+<Property name="MoveObsToProcedures">
+<Description>
+When set, observations will be copied into procedures</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="RemoveEmptyEncounter">
+<Description>
+Removes empty encounters</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="RemoveEmptyProblems">
+<Description>
+Removes empty problems</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="RemoveEncounterReason">
+<Description>
+remove Encounter.EncounterCodedType. which is displayed as Reason for Visit</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="NonConsSections">
+<Description>
+SDA Sections to not consume. This is a bit of a misnomer as the sections are consumed from the CDA, but are removed from the SDA. Options included (as a list): Patient,Encounter,Alert,AdvanceDirective,Allergy,IllnessHistory,SocialHistory,FamilyHistory,Guarantor, Problem,Diagnosis,Observation,ObservationGroup,Problem,PhysicalExam,Procedure,Document,LabOrder,RadOrder, OtherOrder,Medication,Vaccination,Appointment,Referral,ClinicalRelationship,ProgramMembership,MemberEnrollment, MedicalClaim,GenomicsOrder,CarePlan,HealthConcern,Goal,SocialDeterminant. If all sections are to be included, leave blank. </Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="GenerateVaccineID">
+<Description>
+Generate Vaccine IDs for Placer and Filler IDs, based on OrderItem.Code and Date Administered if it's blank. Uses the order code and the vaccine FromTime (with punctuation removed).</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="DeleteVacEncounter">
+<Description>
+When set, encounter number from vaccination will be removed</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="DeleteVitSignEncounter">
+<Description>
+Delete encounter IDs from Observations that have Observation Codes that are the LOINC Codes listed. </Description>
+<Type>%String</Type>
+<InitialExpression>"34566-0,8867-4,9279-1,,8480-6,8462-4,8310-5,8302-2,8361-8,80339-5"</InitialExpression>
+<Parameter name="MAXLEN" value="500"/>
+</Property>
+
+<Method name="OnInit">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+	
+	Try {
+		Set tStatus = $$$OK
+
+		#; Invoke super class's version of OnInit() first, and throw an error (if any)
+		$$$ThrowOnError(##super())
+		
+		  //params are used by the XSLT transformation. 
+        #; SET PARAMS HERE - DO NOT REMOVE THIS COMMENT. USED FOR AUTOMATIC ADDITION OF NEW PARAMETER/PROPERTY. IF IT MUST BE CHANGED/REMOVED, UPDATE CODE IN HS.LOCAL.DTA.PRODPROPERTYHELPER.CLS
+
+
+        Set params("FixFacilityCodeInHeader")= ..FixFacilityCodeInHeader
+        Set params("FixFacilityCodeInDocument")= ..FixFacilityCodeInDocument
+        Set params("RemoveEmptyProblems")= ..RemoveEmptyProblems
+        Set params("MoveObsToProcedures")= ..MoveObsToProcedures
+        Set params("RemoveEmptyEncounter")= ..RemoveEmptyEncounter
+        Set params("RemoveEncounterReason")= ..RemoveEncounterReason
+        Set params("DeleteObsEncounter")= ..DeleteObsEncounter
+        Set params("DeleteProcedureEncounter")= ..DeleteProcedureEncounter
+        Set params("DeleteProbEncounter")= ..DeleteProbEncounter
+        Set params("UpdateEncounterNumbers")= ..UpdateEncounterNumbers
+        Set params("FilterDataBeforeDate")= ..FilterDataBeforeDate
+        Set params("UpdateEncounterWard")= ..UpdateEncounterWard
+        Set params("TransformDoc")= ..TransformDoc
+        Set params("AlwaysAddPatient")= ..AlwaysAddPatient 
+
+	}
+	Catch eException {		
+		Set tStatus = eException.AsStatus()
+	}
+	
+	Quit tStatus
+]]></Implementation>
+</Method>
+
+<Method name="OnMessage">
+<FormalSpec>pRequest:HS.Message.XMLMessage,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+	
+	Set tStatus = $$$OK
+	
+	Try {
+		Set pResponse = ##class(HS.Message.XMLMessage).%New()
+
+		If pRequest.%IsA("HS.Message.XMLMessage") {
+			If (pRequest.Name = "XDSb_ConsumeAndStoreRequest") {
+				Set tStatus = ..ConsumeDocument(pRequest, .tConsumeReponse) $$$ThrowOnError(tStatus)
+				Set tStatus = ..StoreSDA(tConsumeReponse, .pResponse) $$$ThrowOnError(tStatus)
+			}
+			ElseIf (pRequest.Name = "XDSb_ConsumeRequest") {
+				Set tStatus = ..ConsumeDocument(pRequest, .pResponse) $$$ThrowOnError(tStatus)
+			}
+			Else {
+				Set tStatus = $$$ERROR($$$GeneralError, "Request type not handled:  " _ pRequest.Name) $$$ThrowOnError(tStatus)
+			}
+		}
+		Else {
+			Set tStatus = $$$ERROR($$$GeneralError, "Request type not handled:  " _ pRequest.%ClassName(1)) $$$ThrowOnError(tStatus)
+		}
+		
+	
+		
+	}
+	Catch eException {
+		Set pResponse.Name = $Replace(pRequest.Name, "Request", "Response")
+		Do pResponse.ContentStream.Write("<Error>" _ eException.DisplayString() _ "</Error>")
+		
+		Set tStatus = eException.AsStatus()
+	}
+	
+	Quit tStatus
+]]></Implementation>
+</Method>
+
+<Method name="ConsumeDocument">
+<FormalSpec>pRequest:HS.Message.XMLMessage,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+	
+	Set tStatus = $$$OK
+	
+	Try {
+		Set pResponse = ##class(HS.Message.XMLMessage).%New()
+		Set pResponse.Name = "XDSb_ConsumeResponse"
+
+		If 'pRequest.StreamCollection.Count() Set tStatus = $$$ERROR($$$GeneralError, "No documents found in input request") $$$ThrowOnError(tStatus)
+		If 'pRequest.StreamCollection.GetAt(1).Body.Size Set tStatus = $$$ERROR($$$GeneralError, "Empty document found in input request") $$$ThrowOnError(tStatus)
+
+		#; Get document body
+		Set tDocumentStream = pRequest.StreamCollection.GetAt(1).Body
+		
+		#; If there's a debug file configured, output document body to it
+		If (..DebugOutputFile ] "") {
+			Open ..DebugOutputFile:"WNS":1
+			If '$Test $$$ThrowStatus($$$ERROR($$$GeneralError, "Unable to open debug file:  " _ ..DebugOutputFile))
+
+			Set tDevice = $IO Use ..DebugOutputFile Do tDocumentStream.Rewind(), tDocumentStream.OutputToDevice() Write ! Use tDevice
+
+			Close ..DebugOutputFile
+		}
+
+		#; Transform document body to SDA
+		///Set tStatus = ##class(HS.IHE.CodedEntry).GetFormatToSDA(pRequest.AdditionalInfo.GetAt("documentFormatCode"), pRequest.AdditionalInfo.GetAt("documentFormatScheme"), .tTransform) $$$ThrowOnError(tStatus)
+		///If (tTransform = "") $$$ThrowStatus($$$ERROR($$$GeneralError, "No SDA transformation defined for format code '" _ pRequest.AdditionalInfo.GetAt("documentFormatCode") _ "'"))
+		///Set tStatus = ..Transform(tDocumentStream, tTransform, .tSDAStream) $$$ThrowOnError(tStatus)
+
+		///Set pResponse.ContentStream = tSDAStream
+		
+			/// ********* Process CDA Code ************
+		
+		Set cdaStream = ##class(%Stream.TmpCharacter).%New()
+        $$$ThrowOnError(cdaStream.CopyFrom(tDocumentStream))
+        $$$ThrowOnError(cdaStream.Rewind())
+
+		
+		  Set transformer = ##class(HS.Util.XSLTTransformer).%New()
+
+        //do the transformation using the XSLT specified in the properties. This is the XSLT that gets updated when creating a new property. 
+        //$$$ThrowOnError(transformer.Transform(cdaStream, ..PreprocessorXsltPath, .processedCda, .params))
+
+        //Trace to view the pre/post XSLT transform. 
+        //$$$HSTRACE("CDA Preprocessor Content", "Original,Preprocessed", cdaStream, processedCda)
+        //send the Processed CDA to a file. DEBUGGING ONLY.
+        If ..IsDebug {
+            Set file=##class(%Stream.FileBinary).%New()
+            Set file.Filename=..DebugFileLocation_"1-CDA_PostXSLT.xml"
+            $$$ThrowOnError(cdaStream.Rewind())
+            Do file.CopyFromAndSave(cdaStream)
+        }
+
+        //transform from CDA to SDA, results are put into a ##class(%Stream.TmpCharacter)
+        //$$$ThrowOnError(transformer.Transform(processedCda, ..CdaToSdaXsltPath, .tSDAStream))
+		$$$ThrowOnError(transformer.Transform(cdaStream, ..CdaToSdaXsltPath, .tSDAStream))
+
+        Set tSDA=##class(EnsLib.EDI.XML.Document).ImportFromLibraryStream(tSDAStream)
+   
+        $$$HSTRACE("SDA PreProcess", "SDA",tSDA)
+                //send the Processed CDA to a file. DEBUGGING ONLY.
+        If ..IsDebug {
+            Set file=##class(%Stream.FileBinary).%New()
+            Set file.Filename=..DebugFileLocation_"2-SDA_BeforeDTL.xml"
+            Set tSDAPreDTL=##class(%Stream.TmpCharacter).%New()
+            Set tSC=tSDA.OutputToLibraryStream(.tSDAPreDTL)
+           // $$$ThrowOnError(tSDA.Rewind())
+            Do file.CopyFromAndSave(tSDAPreDTL)
+        }          
+
+        
+        //build aux for DTL. 
+        Set aux = ##class(%ArrayOfDataTypes).%New()
+        //aux.SetAt(value,key) Key is DTL full name. Value is whatever the value is for the DTL class (not for the parent dtl). 1/0 or a string
+        #; SET AUX FOR DTl HERE 
+        Do aux.SetAt(..DeleteVitSignEncounter,"DeleteVitSignEncounter")
+        Do aux.SetAt(..DeleteVacEncounter,"DeleteVacEncounter")
+        Do aux.SetAt(..GenerateVaccineID,"GenerateVaccineID")
+        Do aux.SetAt(..NonConsSections,"NonConsSections")
+        Do aux.SetAt(..IgnoreExternalID,"IgnoreExternalID")
+
+		//CNR: Had to comment out because don't have the RAJHelper classes loaded
+        //check aux:
+        //Set tAuxStr = ##class(HS.Local.RAJHelperClasses.Helpers).printArrayObjectAsJSONString(aux)
+        //$$$HSTRACE("SDA PostProcess","Aux",tAuxStr)
+      
+        //call parent DTL.  
+
+        Set tSDAAfterDTL = ##class(EnsLib.EDI.XML.Document).%New()
+        //Set tSC=##class(HS.Local.DTA.DTL.ParentDTL).Transform(tSDA,.tSDASAfterDTL,.aux)
+
+        //$$$ThrowOnError($CLASSMETHOD("HS.Local.DTA.DTL.ParentDTL", "Transform", tSDA, .tSDASAfterDTL, .aux))
+        Set tSC = $CLASSMETHOD("HS.Local.DTA.DTL.ParentDTL", "Transform", tSDA, .tSDAAfterDTL, .aux)
+        $$$HSTRACE("SDA PostProcess1", "SDA1",tSDAAfterDTL)
+
+        
+        //Back to stream - Copying what's in HS.Gateway.SDA3.InboundProcess.
+        Set tSDAAfterDTLStream=##class(%Stream.TmpCharacter).%New()
+       // Set sdaStream = ##class(%Stream.TmpCharacter).%New()
+        //Set tSC= tSDAAfterDTL.XMLExportToStream(.tSDAAfterDTLStream)
+        Set tSC=tSDAAfterDTL.OutputToLibraryStream(.tSDAAfterDTLStream)
+        $$$HSTRACE("SDA PostProcess2", "SDA2",tSDAAfterDTLStream)
+
+
+		Set pResponse.ContentStream = tSDAAfterDTLStream
+      	
+
+    	//send the SDA to a file. DEBUGGING ONLY.
+      	If ..IsDebug {
+        	Set file=##class(%Stream.FileBinary).%New()
+        	Set file.Filename=..DebugFileLocation_"3-SDA_Final.xml"
+        	$$$ThrowOnError(tSDAAfterDTLStream.Rewind())
+        	Do file.CopyFromAndSave(tSDAAfterDTLStream)
+      	}
+		
+		//CNR: resume standard code
+		Set pResponse.AdditionalInfo = pRequest.AdditionalInfo
+		Set pResponse.SAMLData = pRequest.SAMLData.%ConstructClone()
+	}
+	Catch eException {
+		Set tStatus = eException.AsStatus()
+	}
+	
+	Quit tStatus
+]]></Implementation>
+</Method>
+
+<Method name="StoreSDA">
+<FormalSpec>pRequest:HS.Message.XMLMessage,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+	
+	Set tStatus = $$$OK
+	
+	Try {
+		Set pResponse = ##class(HS.Message.XMLMessage).%New()
+		Set pResponse.Name = "XDSb_ConsumeAndStoreResponse"
+		
+		If (..StoreUsingGlobalPatientIdentifier = 1) {
+			Set tXSLArguments("patientGlobalAssigningAuthority") = "'" _ pRequest.AdditionalInfo.GetAt("patientGlobalAssigningAuthority") _ "'"
+			Set tXSLArguments("patientGlobalID") = "'" _ pRequest.AdditionalInfo.GetAt("patientGlobalID") _ "'"
+			Set tXSLArguments("repositoryOID") = "'" _ pRequest.AdditionalInfo.GetAt("repositoryOID") _ "'"
+			// Transform XDSb Consume and Store Request to extract Patient Identifiers to SDA
+			Set tStatus = ..Transform(pRequest.ContentStream, ..CopyPatientIdentifierToSDATransform /*"IHE/XDSb/Version1/CopyPatientIdentifierToSDA.xsl"*/, .tSDAStream, .tXSLArguments) $$$ThrowOnError(tStatus)
+		}
+		Else { Set tSDAStream = pRequest.ContentStream }
+		
+		#dim tECRRequest as HS.Message.ECRUpdateRequest
+		Set tECRRequest = ##class(HS.Message.ECRUpdateRequest).%New()
+		Set tECRRequest.ContentStream = tSDAStream
+		Set tECRRequest.StreamContentType="SDA3"
+		
+		#dim tECRResponse As HS.Message.ECRUpdateResponse
+		Set tStatus = ..SendRequestSync(..ECRTarget, tECRRequest, .tECRResponse) $$$ThrowOnError(tStatus)
+		
+		#; ECRResponse is always null.  Need long-term fix, but for now force success
+		Set tECRResponse.PatientID = 1
+		Do pResponse.ContentStream.Write("<Status>" _ $Case(tECRResponse.PatientID = "", 0:"success", :"failure") _ "</Status>")
+	}
+	Catch eException {
+		Do pResponse.ContentStream.Write("<Status>failure</Status>")
+		
+		Set tStatus = eException.AsStatus()
+	}
+	
+	Quit tStatus
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="HS.Local.IHE.XDSb.DocumentSource.Operations">
+<Description>
+IHE XDSb Document Source Actor 
+Given a CDA stream extract relevant data and build ProvideAndRegister transaction</Description>
+<IncludeCode>HS.IHE.ATNA</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>HS.IHE.XDSb.DocumentSource.Abstract,HS.Util.SOAPClient.Operations</Super>
+<TimeChanged>66738,22498.5014774</TimeChanged>
+<TimeCreated>66738,22498.5014774</TimeCreated>
+<Inheritance>right</Inheritance>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Parameter name="SETTINGS">
+<Default><![CDATA[XDSbRepositoryServiceName:Basic:selector?Select=1&context={HS.Util.ContextSearch/ServiceNameItems},XDSbRegistryServiceName:Basic:selector?Select=1&context={HS.Util.ContextSearch/ServiceNameItems},PIXv3ConsumerOperations,MPIOperations,DocumentTransform,XDSbConsumerOperations,DocumentsInline,AddNewPatients]]></Default>
+</Parameter>
+
+<Property name="XDSbRepositoryServiceName">
+<Description>
+The XDS.b Repository actor from the HealthShare Service Registry.</Description>
+<Type>%String</Type>
+<InitialExpression>"XDSb.Repository"</InitialExpression>
+</Property>
+
+<Property name="XDSbRegistryServiceName">
+<Description>
+The XDS.b Registry actor from the HealthShare Service Registry.</Description>
+<Type>%String</Type>
+<InitialExpression>"XDSb.Registry"</InitialExpression>
+</Property>
+
+<Property name="PIXv3ConsumerOperations">
+<Description>
+The PIXv3 Consumer operation - if the patientId is not defined in the request use the sourceId and query the pix manager</Description>
+<Type>%String</Type>
+<InitialExpression>"HS.IHE.PIXv3.Consumer.Operations"</InitialExpression>
+</Property>
+
+<Property name="XDSbConsumerOperations">
+<Description>
+The XDSb Consumer operation - if the document(s) is replacing an other document locate the existing document using a query with the ReplacementContext</Description>
+<Type>%String</Type>
+<InitialExpression>"HS.IHE.XDSb.Consumer.Operations"</InitialExpression>
+</Property>
+
+<Property name="DocumentTransform">
+<Description>
+See %HSHOME%/csp/xslt/IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl for an example</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="255"/>
+</Property>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+	<MapItem MessageType="HS.Message.IHE.XDSb.RegisterRequest"> 
+		<Method>XDSbRegisterRequest</Method>
+	</MapItem>
+	<MapItem MessageType="HS.Message.IHE.XDSb.ProvideAndRegisterRequest"> 
+		<Method>XDSbProvideAndRegisterRequest</Method>
+	</MapItem>
+</MapItems>
+]]></Data>
+</XData>
+
+<Method name="OnMessage">
+<Description>
+If doing any security related signing the request comes and generated (with a security document 
+as a placeholder), the caller then adds the security document and calls the source again, 
+this time it will be audited and sent to the repository</Description>
+<FormalSpec>pRequest:HS.Message.XMLMessage,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+		
+		
+		Set tXPathNamespaces = ##class(HS.IHE.Util).XPathNamespaces()
+		Set tSC = ##class(%XML.XPATH.Document).CreateFromStream(pRequest.ContentStream, .tDocument, , , , , tXPathNamespaces) $$$ThrowOnError(tSC)
+		Set tSC = ..ParseRegistrationHeaderForSourceId(tDocument, .tSourceId)
+
+		///XMLMessage/ContentStream/xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:RegistryPackage/rim:ExternalIdentifier/@value
+		//$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:RegistryPackage/rim:ExternalIdentifier","@value",.tSubSet,.tDocObject))
+		$$$LOGINFO("tSourceId is: " _ tSourceId)
+		#; when using custom soap headers we might need a different type of request
+		Set tWebRequest = pRequest.AdditionalInfo.GetAt("WebRequest")
+		Set:tWebRequest="" tWebRequest=##class(%SOAP.WebRequest).%New()
+		Set tSC = ..AddDirectHeader(tWebRequest,pRequest) Quit:$$$ISERR(tSC)
+		Set tAction=pRequest.AdditionalInfo.GetAt("SOAPAction")
+		
+		If tAction = $$$XDSbProvideAndRegisterAction(1) && '..DocumentsInline Set tWebRequest.MTOMRequired=1
+		$$$LOGINFO("OnMessage Invoke WebSErvice: "_tWebRequest.Location)
+		Set tSC = ..InvokeWebService(tWebRequest,, tAction, pRequest, .pResponse,+pRequest.AdditionalInfo.GetAt("OneWay")) $$$HSThrowErrors(tSC)
+		If pRequest.AdditionalInfo.GetAt("SOAPAction") = $$$XDSbProvideAndRegisterAction(1) {
+			Do $$$ATNAEvent("XDSbSource",pRequest,pResponse,tSC)
+		}
+	}
+	Catch ex {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="ParseRegistrationHeaderForSourceId">
+<FormalSpec><![CDATA[pDocument:%XML.XPATH.Document,&pResults:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+
+	Try {
+		Set tSC = $$$OK
+		
+		Kill pResults
+		
+		Set tXPathRoot = "/xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:RegistryPackage"
+		
+		#; Iterate over document collection
+		Set tSC = pDocument.EvaluateExpression(tXPathRoot, "name()", .tDocumentList) $$$ThrowOnError(tSC)
+		For tDocumentIndex = 1:1:tDocumentList.Count() {
+			Set tObject = tXPathRoot _ "[" _ tDocumentIndex _ "]"
+			Set tSC = pDocument.EvaluateExpression(tObject, "@id", .tResults) $$$ThrowOnError(tSC)
+			Throw:(tResults.Count()=0) ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"Missing document identifier: "_tXPathRoot_"[@id]"))
+			Kill tDocId
+			Set tDocId = tResults.GetAt(1).Value
+						
+			#; Get sourceId
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:ExternalIdentifier[rim:Name/rim:LocalizedString[@value='XDSSubmissionSet.sourceId']]", "@value", .tResults) $$$ThrowOnError(tSC)
+			$$$LOGINFO("In here")
+			$$$LOGINFO("tResults is: " _ tResults)
+			Set pResults = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+		}
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		$$$LOGSTATUS(tSC)
+	}	
+
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetSourceId">
+<Description>
+Brute force - Get the SourceId and set the ServiceName</Description>
+<FormalSpec>pRequest:HS.Message.XMLMessage</FormalSpec>
+<Implementation><![CDATA[
+
+	//XPATH the heck out of this
+	set tStream = pRequest.ContentStream
+	$$$ThrowOnError(##class(HS.IHE.Util).GetXPathValue(tStream,"xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:RegistryPackage/rim:ExternalIdentifier/rim:Name/rim:LocalizedString","@value",.tSubSet,.tDocObject))
+	$$$LOGINFO("SubSet is: " _ tSubSet)
+]]></Implementation>
+</Method>
+
+<Method name="XDSbProvideAndRegisterRequest">
+<Description><![CDATA[
+The provide request can set GenerateProvideAndRegisterOnly=1 which will make the response.contentstream have the value which would be sent to the repository
+this enables using the P&R request for signatures.]]></Description>
+<FormalSpec>pRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest,*pResponse:HS.Message.XMLMessage,pWebRequest:%SOAP.WebRequest=##class(%SOAP.WebRequest).%New()</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try {
+		Set tSOAPAction = $$$XDSbProvideAndRegisterAction(1),tOnDemand=0
+		For tIdx=1:1:pRequest.Documents.Count() {
+			If pRequest.Documents.GetAt(tIdx).ObjectType="OnDemand" {Set tOnDemand=1}
+		}
+		If tOnDemand Set tSC=$$$ERROR($$$GeneralError,"Use register requests for ondemand documents") Quit
+		Set tOutboundRequest = ##class(HS.Message.XMLMessage).%New()
+		Set tOutboundRequest.Name=$$$XDSbProvideAndRegisterRequest
+		Set tOutboundRequest.AdditionalInfo=pRequest.AdditionalInfo.%ConstructClone()
+		Set tOutboundRequest.SAMLData=pRequest.SAMLData.%ConstructClone()
+		Do tOutboundRequest.AdditionalInfo.SetAt(pRequest.DirectFrom,"Direct:FROM")
+		Do ##class(HS.Types.RequestInfo).RequestInfoToXMLMessage(pRequest, tOutboundRequest)  ///SAML/User Auth
+		Set tDirectTo="" For tIdx=1:1:pRequest.DirectTo.Count() {Set tDirectTo=tDirectTo_";"_pRequest.DirectTo.GetAt(tIdx)} Set tDirectTo=$e(tDirectTo,2,*)
+		Do tOutboundRequest.AdditionalInfo.SetAt(tDirectTo,"Direct:TO")
+		///Service Name should default to parameter value  in this version
+		Set tService=..XDSbRepositoryServiceName
+		Set:tService="" tService=..ServiceName
+
+		//This will be the ServiceName
+		Set tServiceName = pRequest.AdditionalInfo.GetAt("ServiceName")
+		$$$LOGINFO("ServiceName: "_tServiceName)
+		//This will be the target Name
+		$$$LOGINFO("TargetName: "_tService)
+		do tOutboundRequest.AdditionalInfo.SetAt(tServiceName, "TargetName")
+		do tOutboundRequest.AdditionalInfo.SetAt(tService, "ServiceName")
+
+		//CNR: Customize - Send to configured ServiceName
+
+		#; Fetch missing information from CDA (if required)
+		Set tSC = ..BuildRequest(pRequest,tOutboundRequest,.tUpdatedRequest) Quit:$$$ISERR(tSC)
+
+		$$$HSTRACE("Provide And Register Request","tOutboundRequest,pRequest.GenerateProvideAndRegisterOnly",tOutboundRequest,pRequest.GenerateProvideAndRegisterOnly)
+
+		If 'pRequest.GenerateProvideAndRegisterOnly {
+			Do tOutboundRequest.AdditionalInfo.SetAt(pWebRequest,"WebRequest")
+			Set tSC = ..OnMessage(tOutboundRequest,.pResponse)
+		} Else {
+			Set pResponse=tOutboundRequest
+		}
+	} Catch ex { Set tSC=ex.AsStatus() }
+	If $$$ISERR(tSC) $$$HSTRACE("error","tSC",tSC)
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="AddDirectHeader">
+<FormalSpec>pWebRequest,pRequest</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	try {
+		Set tFrom=pRequest.AdditionalInfo.GetAt("Direct:FROM")
+		#; list needs to be converted to / from list to string to list for passing in the additional info
+		Set tTo=pRequest.AdditionalInfo.GetAt("Direct:TO")
+		If tFrom]"",tTo]"" {
+			Set tHeader=##class(HS.IHE.XDSb.Types.AddressBlockHeader).%New()
+			Set tHeader.from=tFrom
+			For tIdx=1:1:$l(tTo,";") Do tHeader.to.Insert($p(tTo,";",tIdx))
+			Set tHeader.role="urn:direct:addressing:destination"
+			Do pWebRequest.HeadersOut.SetAt(tHeader,"addressBlock")
+			Set tHeader=##class(HS.IHE.XDSb.Types.MetadataLevelHeader).%New()
+			Set tHeader.Level="XDS"
+			Do pWebRequest.HeadersOut.SetAt(tHeader,"metadata-level")
+		}
+	} catch ex {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="BuildRequest">
+<Description>
+Take the inbound request fetch any missing values and build outbound request</Description>
+<FormalSpec><![CDATA[pInboundRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest,pOutboundRequest:HS.Message.XMLMessage,&pUpdatedRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		#; if the request is CDA we may need to extract values from the document and update the request
+		#; for this reason tUpdatedRequest is used so that the original transaction is not updated
+		Set tSC =..GetUpdatedProvideRequest(pInboundRequest,.pUpdatedRequest)
+		$$$HSTRACE("patientid and tsc","patientid,tSC,",pInboundRequest.PatientId,tSC)
+		Quit:$$$ISERR(tSC)
+		#; Move attachments into outbound message 
+		#;  need to do this before transforming this as we'll move documents around
+		Set tSC = ..AttachDocuments(pUpdatedRequest,pOutboundRequest) Quit:$$$ISERR(tSC)
+
+		/// 
+		#; convert message to ProvideAndRegister
+		Set:pUpdatedRequest.SourcePatientId="" pUpdatedRequest.SourcePatientId=pUpdatedRequest.PatientId
+		If pUpdatedRequest.PatientId="" Set tSC=$$$ERROR($$$GeneralError,"Unknown patient ID") Quit
+		Set tSC = pUpdatedRequest.XMLExportToStream(.tStream,"ProvideAndRegisterRequest")
+		$$$HSTRACESTARTCALL
+		Set tSC=..Transform(tStream, ..DocumentTransform /*"IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl"*/,.tMessage) Quit:$$$ISERR(tSC)
+		$$$HSTRACEENDCALL
+		Do pOutboundRequest.ContentStream.CopyFrom(tMessage)
+		Do tMessage.Rewind(),tStream.Rewind()
+		$$$HSTRACE("OutboundRequest","pOutboundRequest,tMessage,tStream",pOutboundRequest,tMessage.Read(),tStream)
+	} catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="XDSbRegisterRequest">
+<FormalSpec>pRequest:HS.Message.IHE.XDSb.RegisterRequest,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try {
+		Set tSOAPAction = $$$XDSbRegisterAction(1),tStable=0,tOnDemand=0
+		For tIdx=1:1:pRequest.Documents.Count() {
+			If pRequest.Documents.GetAt(tIdx).ObjectType="OnDemand" {
+				Set tSOAPAction = $$$XDSbRegisterOnDemandAction(1),tOnDemand=1
+			} Else {
+				Set tStable=1
+			}
+		}
+		If tStable && tOnDemand Set tSC=$$$ERROR($$$GeneralError,"Either submit stable or ondemand documents, but not both") Quit
+		#; Even though there is no document GetUpdatedProvideRequest may fill in some blanks and handle replacement contexts		
+		Set tSC =..GetUpdatedProvideRequest(pRequest,.tUpdatedRequest)
+		$$$HSTRACE("patientid and tsc","patientid,tSC,",pRequest.PatientId,tSC)
+		/// 
+		#; convert message to RegisterRequest
+		Set:tUpdatedRequest.SourcePatientId="" tUpdatedRequest.SourcePatientId=tUpdatedRequest.PatientId
+		If tUpdatedRequest.PatientId="" Set tSC=$$$ERROR($$$GeneralError,"Unknown patient ID") Quit
+		Set tSC = tUpdatedRequest.XMLExportToStream(.tStream)
+		$$$HSTRACE("tUpdatedRequest","tUpdatedRequest,Stream",tUpdatedRequest,tStream)
+		Set tSC=..Transform(tStream, ..DocumentTransform /*"IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl"*/,.tMessage) Quit:$$$ISERR(tSC)
+		Set tRequest = ##class(HS.Message.XMLMessage).%New()
+		Do ##class(HS.Types.RequestInfo).RequestInfoToXMLMessage(pRequest, tRequest)  ///SAML/User Auth
+		Set tRequest.Name=$S(tOnDemand:$$$XDSbRegisterOnDemandRequest,1:$$$XDSbRegisterRequest)
+		Do tRequest.ContentStream.CopyFrom(tMessage)
+		Set tRequest.AdditionalInfo=pRequest.AdditionalInfo.%ConstructClone()
+		Set tRequest.SAMLData=pRequest.SAMLData.%ConstructClone()
+		Do tRequest.AdditionalInfo.SetAt(pRequest.DirectFrom,"Direct:FROM")
+		Set tDirectTo="" For tIdx=1:1:pRequest.DirectTo.Count() {Set tDirectTo=tDirectTo_";"_pRequest.DirectTo.GetAt(tIdx)} Set tDirectTo=$e(tDirectTo,2,*)
+		Do tRequest.AdditionalInfo.SetAt(tDirectTo,"Direct:TO")
+		Set tService = pRequest.AdditionalInfo.GetAt("ServiceName")
+		Set:tService="" tService=..XDSbRegistryServiceName
+		Do tRequest.AdditionalInfo.SetAt(tService,"ServiceName")
+		Do tRequest.AdditionalInfo.SetAt(tSOAPAction,"SOAPAction")
+		$$$HSTRACE("Register Request","tRequest",tRequest)
+		Set tSC = ..OnMessage(tRequest,.pResponse)
+	} Catch ex { Set tSC=ex.AsStatus() }
+	If $$$ISERR(tSC) $$$HSTRACE("error","tSC",tSC)
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="AddDemographics">
+<FormalSpec>pUpdatedRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest,pAddRequest:HS.Message.AddUpdateHubRequest,pDocument:HS.Message.IHE.XDSb.Document,pDocObject:%XML.XPATH.Document</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:given","text()",.tValue,.pDocObject)
+		Set pAddRequest.FirstName=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:family","text()",.tValue,.pDocObject)
+		Set pAddRequest.LastName=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:middle","text()",.tValue,.pDocObject)
+		Set pAddRequest.MiddleName=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:administrativeGenderCode","@code",.tValue,.pDocObject)
+		Set pAddRequest.Sex="M"
+		#; BirthDate
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:birthTime","@value",.tValue,.pDocObject)
+		Set pAddRequest.DOB=$zdh($e(tValue,1,8),8,,,,,,,"")
+		Set pAddRequest.Facility=pAddRequest.AssigningAuthority
+		Set tAddr=##class(HS.Types.Address).%New()
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:streetAddressLine","text()",.tValue,.pDocObject)
+		Set tAddr.StreetLine=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:city","text()",.tValue,.pDocObject)
+		Set tAddr.City=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:state","text()",.tValue,.pDocObject)
+		Set tAddr.State=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:postalCode","text()",.tValue,.pDocObject)
+		Set tAddr.PostalCode=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]","@use",.tValue,.pDocObject)
+		Set tAddr.Use=$Case(tValue,"":"HP","H":"HP","W":"WP",:tValue)
+		Do pAddRequest.Addresses.Insert(tAddr)
+		Set tSC= ..SendRequestSync("HS.IHE.PIXv3.Source.Operations",pAddRequest,.pAddResponse)
+		Set tSC = ..FindPatientID(pAddRequest.MRN,pAddRequest.AssigningAuthority,.tSearchResponse)
+		Set pUpdatedRequest.PatientId=tSearchResponse.Results.GetAt(1).MPIID_"^^^&"_$$$AffinityDomainOID_"&ISO"
+	} catch ex {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetReplacementId">
+<FormalSpec>pDocument:HS.Message.IHE.XDSb.Document,pPatientId</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		$$$HSTRACE("in GetReplacementId")
+		Set tReplacementQuery=##class(HS.Message.IHE.XDSb.QueryRequest).%New(),tHavePatientID=0,tHaveStatus=0
+		Set tReplacementQuery.ReturnType="LC"  //needs to be LC so consumer can filter on custom slots
+		If pDocument.ReplacementContext.Count()=1,pDocument.ReplacementContext.GetAt(1).ItemName="$XDSDocumentEntryUniqueId" {
+			Set tReplacementQuery.QueryType="GetDocuments"
+			Do tReplacementQuery.Parameters.Insert(##class(HS.Message.IHE.XDSb.QueryItem).SingleParam(pDocument.ReplacementContext.GetAt(1).Values.GetAt(1),"$XDSDocumentEntryUniqueId"))
+		} else {
+			For tIdx=1:1:pDocument.ReplacementContext.Count() {
+				Set tItem = pDocument.ReplacementContext.GetAt(tIdx)
+				Do tReplacementQuery.Parameters.Insert(tItem)
+				If tItem.ItemName="$XDSDocumentEntryPatientId" Set tHavePatientID=1
+				If tItem.ItemName="$XDSDocumentEntryStatus" Set tHaveStatus=1
+			}
+			If 'tHaveStatus Do tReplacementQuery.Parameters.Insert(##class(HS.Message.IHE.XDSb.QueryItem).StatusValues("Approved"))
+			If 'tHavePatientID Do tReplacementQuery.Parameters.Insert(##class(HS.Message.IHE.XDSb.QueryItem).PatientId(pPatientId))
+		}
+
+		Set tSC = ..SendRequestSync(..XDSbConsumerOperations,tReplacementQuery,.tReplacementResponse)
+		If $$$ISERR(tSC) $$$LOGSTATUS(tSC) Quit
+		Set tCount=tReplacementResponse.Documents.Count()
+		If tCount>1 $$$LOGWARNING("Registry returned more than one document with the same context, unable to issue replacement using document "_pDocument.EntryUUID) Quit
+		Set:tCount pDocument.ReplaceSource=$p(tReplacementResponse.Documents.GetAt(1).EntryUUID,"urn:uuid:",2)
+	} Catch ex { Set tSC=ex.AsStatus() }
+	Quit tSC
+/// 	$XDSDocumentEntryEntryUUID
+///		$XDSDocumentEntryUniqueId
+///		$XDSDocumentEntryPracticeSettingCode
+///		$XDSDocumentEntryClassificationNode
+///		$XDSDocumentEntryClassCode
+///		$XDSDocumentEntryConfidentialityCode
+///		$XDSDocumentEntryEventCodeList
+///		$XDSDocumentEntryFormatCode
+///		$XDSDocumentEntryHealthcareFacilityTypeCode
+///		$XDSDocumentEntryTypeCode
+///		$XDSDocumentEntryType
+///		$XDSDocumentEntryPatientId
+///		$XDSDocumentEntryAuthorPerson
+///		$XDSDocumentEntryServiceStartTimeFrom
+///		$XDSDocumentEntryServiceStartTimeTo
+///		$XDSDocumentEntryServiceStopTimeFrom
+///		$XDSDocumentEntryServiceStopTimeTo
+///		$XDSDocumentEntryStatus (will default to Approved)
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="HS.Local.IHE.XDSb.DocumentSourceRouter">
+<Description>
+IHE XDSb Document Source Router
+Acts like HS.IHE.XDSb.DocumentSource.Operations with the option to Route Based on the Source Id 
+Source Id is found in the Provide and Register message at location:
+/rim:ExternalIdentifier[rim:Name/rim:LocalizedString[@value='XDSSubmissionSet.sourceId']]/@value
+Given a CDA stream extract relevant data and build ProvideAndRegister transaction</Description>
+<IncludeCode>HS.IHE.ATNA</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>HS.IHE.XDSb.DocumentSource.Abstract,HS.Util.SOAPClient.Operations</Super>
+<TimeChanged>66739,85584.8237364</TimeChanged>
+<TimeCreated>66739,85584.8237364</TimeCreated>
+<Inheritance>right</Inheritance>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Parameter name="SETTINGS">
+<Default><![CDATA[RouteBasedOnSourceId:Basic,XDSbRepositoryServiceName:Basic:selector?Select=1&context={HS.Util.ContextSearch/ServiceNameItems},XDSbRegistryServiceName:Basic:selector?Select=1&context={HS.Util.ContextSearch/ServiceNameItems},PIXv3ConsumerOperations,MPIOperations,DocumentTransform,XDSbConsumerOperations,DocumentsInline,AddNewPatients]]></Default>
+</Parameter>
+
+<Property name="RouteBasedOnSourceId">
+<Description>
+The XDS.b Repository actor from the Service Registry.</Description>
+<Type>%Boolean</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="XDSbRepositoryServiceName">
+<Description>
+The XDS.b Repository actor from the HealthShare Service Registry.</Description>
+<Type>%String</Type>
+<InitialExpression>"XDSb.Repository"</InitialExpression>
+</Property>
+
+<Property name="XDSbRegistryServiceName">
+<Description>
+The XDS.b Registry actor from the HealthShare Service Registry.</Description>
+<Type>%String</Type>
+<InitialExpression>"XDSb.Registry"</InitialExpression>
+</Property>
+
+<Property name="PIXv3ConsumerOperations">
+<Description>
+The PIXv3 Consumer operation - if the patientId is not defined in the request use the sourceId and query the pix manager</Description>
+<Type>%String</Type>
+<InitialExpression>"HS.IHE.PIXv3.Consumer.Operations"</InitialExpression>
+</Property>
+
+<Property name="XDSbConsumerOperations">
+<Description>
+The XDSb Consumer operation - if the document(s) is replacing an other document locate the existing document using a query with the ReplacementContext</Description>
+<Type>%String</Type>
+<InitialExpression>"HS.IHE.XDSb.Consumer.Operations"</InitialExpression>
+</Property>
+
+<Property name="DocumentTransform">
+<Description>
+See %HSHOME%/csp/xslt/IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl for an example</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="255"/>
+</Property>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+	<MapItem MessageType="HS.Message.IHE.XDSb.RegisterRequest"> 
+		<Method>XDSbRegisterRequest</Method>
+	</MapItem>
+	<MapItem MessageType="HS.Message.IHE.XDSb.ProvideAndRegisterRequest"> 
+		<Method>XDSbProvideAndRegisterRequest</Method>
+	</MapItem>
+</MapItems>
+]]></Data>
+</XData>
+
+<Method name="OnMessage">
+<Description>
+If doing any security related signing the request comes and generated (with a security document 
+as a placeholder), the caller then adds the security document and calls the source again, 
+this time it will be audited and sent to the repository</Description>
+<FormalSpec>pRequest:HS.Message.XMLMessage,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+		
+		#; Check for option to route based on Source Id
+        If ..RouteBasedOnSourceId {
+            $$$ThrowOnError(..ParseRegistrationHeaderForFacilityId(pRequest,.tFacilityId))
+            do pRequest.AdditionalInfo.SetAt(tFacilityId_".XDSb.Repository", "ServiceName")            
+        }
+
+		#; when using custom soap headers we might need a different type of request
+		Set tWebRequest = pRequest.AdditionalInfo.GetAt("WebRequest")
+		Set:tWebRequest="" tWebRequest=##class(%SOAP.WebRequest).%New()
+		Set tSC = ..AddDirectHeader(tWebRequest,pRequest) Quit:$$$ISERR(tSC)
+		Set tAction=pRequest.AdditionalInfo.GetAt("SOAPAction")
+		
+		If tAction = $$$XDSbProvideAndRegisterAction(1) && '..DocumentsInline Set tWebRequest.MTOMRequired=1
+		$$$LOGINFO("OnMessage Invoke WebSErvice: "_tWebRequest.Location)
+		Set tSC = ..InvokeWebService(tWebRequest,, tAction, pRequest, .pResponse,+pRequest.AdditionalInfo.GetAt("OneWay")) $$$HSThrowErrors(tSC)
+		If pRequest.AdditionalInfo.GetAt("SOAPAction") = $$$XDSbProvideAndRegisterAction(1) {
+			Do $$$ATNAEvent("XDSbSource",pRequest,pResponse,tSC)
+		}
+	}
+	Catch ex {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Custom method to parse the FacilityId and use for routing
+
+]]></Content>
+</UDLText>
+
+<Method name="ParseRegistrationHeaderForFacilityId">
+<FormalSpec><![CDATA[pRequest:HS.Message.XMLMessage,&pResults:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    
+	Set tXPathNamespaces = ##class(HS.IHE.Util).XPathNamespaces()
+	Set tSC = ##class(%XML.XPATH.Document).CreateFromStream(pRequest.ContentStream, .tDocument, , , , , tXPathNamespaces) $$$ThrowOnError(tSC)
+		
+	#dim eException As %Exception.AbstractException
+
+	Try {
+		Set tSC = $$$OK
+		
+		Kill pResults
+		
+		Set tXPathRoot = "/xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:RegistryPackage"
+		
+		#; Iterate over document collection
+		Set tSC = tDocument.EvaluateExpression(tXPathRoot, "name()", .tDocumentList) $$$ThrowOnError(tSC)
+		For tDocumentIndex = 1:1:tDocumentList.Count() {
+			Set tObject = tXPathRoot _ "[" _ tDocumentIndex _ "]"
+			Set tSC = tDocument.EvaluateExpression(tObject, "@id", .tResults) $$$ThrowOnError(tSC)
+			Throw:(tResults.Count()=0) ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"Missing document identifier: "_tXPathRoot_"[@id]"))
+			Kill tDocId
+			Set tDocId = tResults.GetAt(1).Value
+						
+			#; Get sourceId
+			Set tSC = tDocument.EvaluateExpression(tObject _ "/rim:ExternalIdentifier[rim:Name/rim:LocalizedString[@value='XDSSubmissionSet.sourceId']]", "@value", .tResults) $$$ThrowOnError(tSC)
+
+			Set tSourceId = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+            //Use the results to get the FacilityId
+            Set pResults = ##class(HS.Data.OIDMap).GetCodeForOID(tSourceId)
+            If pResults=tSourceId {
+                $$$ThrowStatus($$$ERROR($$$GeneralError, $$$CurrentMethod_": No Facility found for <"_tSourceId_">. Cannot route to EDGE."))        
+            }            
+		}
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		$$$LOGSTATUS(tSC)
+	}	
+
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="XDSbProvideAndRegisterRequest">
+<Description><![CDATA[
+The provide request can set GenerateProvideAndRegisterOnly=1 which will make the response.contentstream have the value which would be sent to the repository
+this enables using the P&R request for signatures.]]></Description>
+<FormalSpec>pRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest,*pResponse:HS.Message.XMLMessage,pWebRequest:%SOAP.WebRequest=##class(%SOAP.WebRequest).%New()</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try {
+		Set tSOAPAction = $$$XDSbProvideAndRegisterAction(1),tOnDemand=0
+		For tIdx=1:1:pRequest.Documents.Count() {
+			If pRequest.Documents.GetAt(tIdx).ObjectType="OnDemand" {Set tOnDemand=1}
+		}
+		If tOnDemand Set tSC=$$$ERROR($$$GeneralError,"Use register requests for ondemand documents") Quit
+		Set tOutboundRequest = ##class(HS.Message.XMLMessage).%New()
+		Set tOutboundRequest.Name=$$$XDSbProvideAndRegisterRequest
+		Set tOutboundRequest.AdditionalInfo=pRequest.AdditionalInfo.%ConstructClone()
+		Set tOutboundRequest.SAMLData=pRequest.SAMLData.%ConstructClone()
+		Do tOutboundRequest.AdditionalInfo.SetAt(pRequest.DirectFrom,"Direct:FROM")
+		Do ##class(HS.Types.RequestInfo).RequestInfoToXMLMessage(pRequest, tOutboundRequest)  ///SAML/User Auth
+		Set tDirectTo="" For tIdx=1:1:pRequest.DirectTo.Count() {Set tDirectTo=tDirectTo_";"_pRequest.DirectTo.GetAt(tIdx)} Set tDirectTo=$e(tDirectTo,2,*)
+		Do tOutboundRequest.AdditionalInfo.SetAt(tDirectTo,"Direct:TO")
+		///Service Name should default to parameter value  in this version
+		Set tService=..XDSbRepositoryServiceName
+		Set:tService="" tService=..ServiceName
+
+		//This will be the ServiceName
+		Set tServiceName = pRequest.AdditionalInfo.GetAt("ServiceName")
+		$$$LOGINFO("ServiceName: "_tServiceName)
+		//This will be the target Name
+		$$$LOGINFO("TargetName: "_tService)
+		do tOutboundRequest.AdditionalInfo.SetAt(tServiceName, "TargetName")
+		do tOutboundRequest.AdditionalInfo.SetAt(tService, "ServiceName")
+
+		//CNR: Customize - Send to configured ServiceName
+
+		#; Fetch missing information from CDA (if required)
+		Set tSC = ..BuildRequest(pRequest,tOutboundRequest,.tUpdatedRequest) Quit:$$$ISERR(tSC)
+
+		$$$HSTRACE("Provide And Register Request","tOutboundRequest,pRequest.GenerateProvideAndRegisterOnly",tOutboundRequest,pRequest.GenerateProvideAndRegisterOnly)
+
+		If 'pRequest.GenerateProvideAndRegisterOnly {
+			Do tOutboundRequest.AdditionalInfo.SetAt(pWebRequest,"WebRequest")
+			Set tSC = ..OnMessage(tOutboundRequest,.pResponse)
+		} Else {
+			Set pResponse=tOutboundRequest
+		}
+	} Catch ex { Set tSC=ex.AsStatus() }
+	If $$$ISERR(tSC) $$$HSTRACE("error","tSC",tSC)
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="AddDirectHeader">
+<FormalSpec>pWebRequest,pRequest</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	try {
+		Set tFrom=pRequest.AdditionalInfo.GetAt("Direct:FROM")
+		#; list needs to be converted to / from list to string to list for passing in the additional info
+		Set tTo=pRequest.AdditionalInfo.GetAt("Direct:TO")
+		If tFrom]"",tTo]"" {
+			Set tHeader=##class(HS.IHE.XDSb.Types.AddressBlockHeader).%New()
+			Set tHeader.from=tFrom
+			For tIdx=1:1:$l(tTo,";") Do tHeader.to.Insert($p(tTo,";",tIdx))
+			Set tHeader.role="urn:direct:addressing:destination"
+			Do pWebRequest.HeadersOut.SetAt(tHeader,"addressBlock")
+			Set tHeader=##class(HS.IHE.XDSb.Types.MetadataLevelHeader).%New()
+			Set tHeader.Level="XDS"
+			Do pWebRequest.HeadersOut.SetAt(tHeader,"metadata-level")
+		}
+	} catch ex {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="BuildRequest">
+<Description>
+Take the inbound request fetch any missing values and build outbound request</Description>
+<FormalSpec><![CDATA[pInboundRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest,pOutboundRequest:HS.Message.XMLMessage,&pUpdatedRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		#; if the request is CDA we may need to extract values from the document and update the request
+		#; for this reason tUpdatedRequest is used so that the original transaction is not updated
+		Set tSC =..GetUpdatedProvideRequest(pInboundRequest,.pUpdatedRequest)
+		$$$HSTRACE("patientid and tsc","patientid,tSC,",pInboundRequest.PatientId,tSC)
+		Quit:$$$ISERR(tSC)
+		#; Move attachments into outbound message 
+		#;  need to do this before transforming this as we'll move documents around
+		Set tSC = ..AttachDocuments(pUpdatedRequest,pOutboundRequest) Quit:$$$ISERR(tSC)
+
+		/// 
+		#; convert message to ProvideAndRegister
+		Set:pUpdatedRequest.SourcePatientId="" pUpdatedRequest.SourcePatientId=pUpdatedRequest.PatientId
+		If pUpdatedRequest.PatientId="" Set tSC=$$$ERROR($$$GeneralError,"Unknown patient ID") Quit
+		Set tSC = pUpdatedRequest.XMLExportToStream(.tStream,"ProvideAndRegisterRequest")
+		$$$HSTRACESTARTCALL
+		Set tSC=..Transform(tStream, ..DocumentTransform /*"IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl"*/,.tMessage) Quit:$$$ISERR(tSC)
+		$$$HSTRACEENDCALL
+		Do pOutboundRequest.ContentStream.CopyFrom(tMessage)
+		Do tMessage.Rewind(),tStream.Rewind()
+		$$$HSTRACE("OutboundRequest","pOutboundRequest,tMessage,tStream",pOutboundRequest,tMessage.Read(),tStream)
+	} catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="XDSbRegisterRequest">
+<FormalSpec>pRequest:HS.Message.IHE.XDSb.RegisterRequest,*pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try {
+		Set tSOAPAction = $$$XDSbRegisterAction(1),tStable=0,tOnDemand=0
+		For tIdx=1:1:pRequest.Documents.Count() {
+			If pRequest.Documents.GetAt(tIdx).ObjectType="OnDemand" {
+				Set tSOAPAction = $$$XDSbRegisterOnDemandAction(1),tOnDemand=1
+			} Else {
+				Set tStable=1
+			}
+		}
+		If tStable && tOnDemand Set tSC=$$$ERROR($$$GeneralError,"Either submit stable or ondemand documents, but not both") Quit
+		#; Even though there is no document GetUpdatedProvideRequest may fill in some blanks and handle replacement contexts		
+		Set tSC =..GetUpdatedProvideRequest(pRequest,.tUpdatedRequest)
+		$$$HSTRACE("patientid and tsc","patientid,tSC,",pRequest.PatientId,tSC)
+		/// 
+		#; convert message to RegisterRequest
+		Set:tUpdatedRequest.SourcePatientId="" tUpdatedRequest.SourcePatientId=tUpdatedRequest.PatientId
+		If tUpdatedRequest.PatientId="" Set tSC=$$$ERROR($$$GeneralError,"Unknown patient ID") Quit
+		Set tSC = tUpdatedRequest.XMLExportToStream(.tStream)
+		$$$HSTRACE("tUpdatedRequest","tUpdatedRequest,Stream",tUpdatedRequest,tStream)
+		Set tSC=..Transform(tStream, ..DocumentTransform /*"IHE/XDSb/Version1/DocumentToProvideAndRegister.xsl"*/,.tMessage) Quit:$$$ISERR(tSC)
+		Set tRequest = ##class(HS.Message.XMLMessage).%New()
+		Do ##class(HS.Types.RequestInfo).RequestInfoToXMLMessage(pRequest, tRequest)  ///SAML/User Auth
+		Set tRequest.Name=$S(tOnDemand:$$$XDSbRegisterOnDemandRequest,1:$$$XDSbRegisterRequest)
+		Do tRequest.ContentStream.CopyFrom(tMessage)
+		Set tRequest.AdditionalInfo=pRequest.AdditionalInfo.%ConstructClone()
+		Set tRequest.SAMLData=pRequest.SAMLData.%ConstructClone()
+		Do tRequest.AdditionalInfo.SetAt(pRequest.DirectFrom,"Direct:FROM")
+		Set tDirectTo="" For tIdx=1:1:pRequest.DirectTo.Count() {Set tDirectTo=tDirectTo_";"_pRequest.DirectTo.GetAt(tIdx)} Set tDirectTo=$e(tDirectTo,2,*)
+		Do tRequest.AdditionalInfo.SetAt(tDirectTo,"Direct:TO")
+		Set tService = pRequest.AdditionalInfo.GetAt("ServiceName")
+		Set:tService="" tService=..XDSbRegistryServiceName
+		Do tRequest.AdditionalInfo.SetAt(tService,"ServiceName")
+		Do tRequest.AdditionalInfo.SetAt(tSOAPAction,"SOAPAction")
+		$$$HSTRACE("Register Request","tRequest",tRequest)
+		Set tSC = ..OnMessage(tRequest,.pResponse)
+	} Catch ex { Set tSC=ex.AsStatus() }
+	If $$$ISERR(tSC) $$$HSTRACE("error","tSC",tSC)
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="AddDemographics">
+<FormalSpec>pUpdatedRequest:HS.Message.IHE.XDSb.ProvideAndRegisterRequest,pAddRequest:HS.Message.AddUpdateHubRequest,pDocument:HS.Message.IHE.XDSb.Document,pDocObject:%XML.XPATH.Document</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:given","text()",.tValue,.pDocObject)
+		Set pAddRequest.FirstName=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:family","text()",.tValue,.pDocObject)
+		Set pAddRequest.LastName=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:middle","text()",.tValue,.pDocObject)
+		Set pAddRequest.MiddleName=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:administrativeGenderCode","@code",.tValue,.pDocObject)
+		Set pAddRequest.Sex="M"
+		#; BirthDate
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:birthTime","@value",.tValue,.pDocObject)
+		Set pAddRequest.DOB=$zdh($e(tValue,1,8),8,,,,,,,"")
+		Set pAddRequest.Facility=pAddRequest.AssigningAuthority
+		Set tAddr=##class(HS.Types.Address).%New()
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:streetAddressLine","text()",.tValue,.pDocObject)
+		Set tAddr.StreetLine=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:city","text()",.tValue,.pDocObject)
+		Set tAddr.City=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:state","text()",.tValue,.pDocObject)
+		Set tAddr.State=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]/hl7:postalCode","text()",.tValue,.pDocObject)
+		Set tAddr.PostalCode=tValue
+		Set tSC = ##class(HS.IHE.Util).GetXPathValue(pDocument.BodyCharacter,"/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:addr[1]","@use",.tValue,.pDocObject)
+		Set tAddr.Use=$Case(tValue,"":"HP","H":"HP","W":"WP",:tValue)
+		Do pAddRequest.Addresses.Insert(tAddr)
+		Set tSC= ..SendRequestSync("HS.IHE.PIXv3.Source.Operations",pAddRequest,.pAddResponse)
+		Set tSC = ..FindPatientID(pAddRequest.MRN,pAddRequest.AssigningAuthority,.tSearchResponse)
+		Set pUpdatedRequest.PatientId=tSearchResponse.Results.GetAt(1).MPIID_"^^^&"_$$$AffinityDomainOID_"&ISO"
+	} catch ex {
+		Set tSC = ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetReplacementId">
+<FormalSpec>pDocument:HS.Message.IHE.XDSb.Document,pPatientId</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		$$$HSTRACE("in GetReplacementId")
+		Set tReplacementQuery=##class(HS.Message.IHE.XDSb.QueryRequest).%New(),tHavePatientID=0,tHaveStatus=0
+		Set tReplacementQuery.ReturnType="LC"  //needs to be LC so consumer can filter on custom slots
+		If pDocument.ReplacementContext.Count()=1,pDocument.ReplacementContext.GetAt(1).ItemName="$XDSDocumentEntryUniqueId" {
+			Set tReplacementQuery.QueryType="GetDocuments"
+			Do tReplacementQuery.Parameters.Insert(##class(HS.Message.IHE.XDSb.QueryItem).SingleParam(pDocument.ReplacementContext.GetAt(1).Values.GetAt(1),"$XDSDocumentEntryUniqueId"))
+		} else {
+			For tIdx=1:1:pDocument.ReplacementContext.Count() {
+				Set tItem = pDocument.ReplacementContext.GetAt(tIdx)
+				Do tReplacementQuery.Parameters.Insert(tItem)
+				If tItem.ItemName="$XDSDocumentEntryPatientId" Set tHavePatientID=1
+				If tItem.ItemName="$XDSDocumentEntryStatus" Set tHaveStatus=1
+			}
+			If 'tHaveStatus Do tReplacementQuery.Parameters.Insert(##class(HS.Message.IHE.XDSb.QueryItem).StatusValues("Approved"))
+			If 'tHavePatientID Do tReplacementQuery.Parameters.Insert(##class(HS.Message.IHE.XDSb.QueryItem).PatientId(pPatientId))
+		}
+
+		Set tSC = ..SendRequestSync(..XDSbConsumerOperations,tReplacementQuery,.tReplacementResponse)
+		If $$$ISERR(tSC) $$$LOGSTATUS(tSC) Quit
+		Set tCount=tReplacementResponse.Documents.Count()
+		If tCount>1 $$$LOGWARNING("Registry returned more than one document with the same context, unable to issue replacement using document "_pDocument.EntryUUID) Quit
+		Set:tCount pDocument.ReplaceSource=$p(tReplacementResponse.Documents.GetAt(1).EntryUUID,"urn:uuid:",2)
+	} Catch ex { Set tSC=ex.AsStatus() }
+	Quit tSC
+/// 	$XDSDocumentEntryEntryUUID
+///		$XDSDocumentEntryUniqueId
+///		$XDSDocumentEntryPracticeSettingCode
+///		$XDSDocumentEntryClassificationNode
+///		$XDSDocumentEntryClassCode
+///		$XDSDocumentEntryConfidentialityCode
+///		$XDSDocumentEntryEventCodeList
+///		$XDSDocumentEntryFormatCode
+///		$XDSDocumentEntryHealthcareFacilityTypeCode
+///		$XDSDocumentEntryTypeCode
+///		$XDSDocumentEntryType
+///		$XDSDocumentEntryPatientId
+///		$XDSDocumentEntryAuthorPerson
+///		$XDSDocumentEntryServiceStartTimeFrom
+///		$XDSDocumentEntryServiceStartTimeTo
+///		$XDSDocumentEntryServiceStopTimeFrom
+///		$XDSDocumentEntryServiceStopTimeTo
+///		$XDSDocumentEntryStatus (will default to Approved)
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="HS.Local.IHE.XDSb.Repository.Process">
+<ClassType>persistent</ClassType>
+<IncludeCode>HS.IHE.XDSb,HS.IHE.ATNA,HS.HC</IncludeCode>
+<Super>Ens.BusinessProcess,HS.HC.Util.Trace.Helper</Super>
+<TimeChanged>66743,38202.5201039</TimeChanged>
+<TimeCreated>66738,22498.5238852</TimeCreated>
+<Inheritance>left</Inheritance>
+
+<Parameter name="HSDEPLOY">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="SETTINGS">
+<Default>ConvertToUTF:Basic,RepositoryOperations,RegistryOperations,ProvidePostProcessor,XDSbRetrieveConsentTarget,ProvidePreProcessor,ValidateSizeAndHash,ProvideAndRegisterToRegisterTransform,RegisterResponseTransform,TextToRetrieveDocumentResponseTransform,RemoveDocumentsTransform,RemoveDocumentsTarget</Default>
+</Parameter>
+
+<Property name="ConvertToUTF">
+<Description>
+Option used if there are issues with Unicode characters that prevent parsing. Default is off. </Description>
+<Type>%Boolean</Type>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<Property name="RepositoryOperations">
+<Description>
+Host which will handle the Storage of the document.  Typically the HS.IHE.XDSb.Repository.Operations host.</Description>
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.IHE.XDSb.Repository.Operations"</InitialExpression>
+</Property>
+
+<Property name="RegistryOperations">
+<Description>
+Host which will handle the Registration of the document.  Typically the HS.IHE.XDSb.Repository.Operations host.
+In a situation where the Repository and Registry were in the same production this value would be the HS.IHE.XDSb.Registry.Operations</Description>
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.IHE.XDSb.Repository.Operations"</InitialExpression>
+</Property>
+
+<Property name="RemoveDocumentsTarget">
+<Description>
+Host which will handle the RemoveDocument request.  Typically the HS.IHE.XDSb.Repository.Operations host.</Description>
+<Type>Ens.DataType.ConfigName</Type>
+<InitialExpression>"HS.IHE.XDSb.Repository.Operations"</InitialExpression>
+</Property>
+
+<Property name="IHEVersion">
+<Type>%Integer</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="Transformer">
+<Type>HS.Util.XSLTTransformer</Type>
+</Property>
+
+<Property name="ValidateSizeAndHash">
+<Description>
+Checks the size and hash values provided against calculated values 
+and alerts the user to discrepancies. Disabling this option silences 
+the alert. Whether this option is enabled or disabled, the calculated 
+values are used for registration.</Description>
+<Type>%Boolean</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="Errors">
+<Description>
+Property to hold errors generated while processing the message</Description>
+<Type>HS.Types.IHE.Errors</Type>
+</Property>
+
+<Property name="RepositoryOID">
+<Description>
+Internal value while processing for this repository, obtained at startup</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="64"/>
+</Property>
+
+<Property name="ProvidePreProcessor">
+<Description>
+Pre Processor for XDSb_ProvideAndRegisterDocumentSet</Description>
+<Type>Ens.DataType.ConfigName</Type>
+</Property>
+
+<Property name="ProvidePostProcessor">
+<Description><![CDATA[
+Additional processing for documents with a given format code after document registration/store.
+Will not execute if registration or store failed. Failure of the post processor will not
+rollback document store.
+<p>The value is a delimeted list: formatCode^^formatScheme^^targetHost||formatCode^^formatScheme^^targetHost...
+<p>For example: urn:nhin:names:acp:XACML^^1.3.6.1.4.1.19376.1.2.3^^HS.Consent.XACML.Importer]]></Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="XDSbRetrieveConsentTarget">
+<Description>
+ConfigName of the business host for consent evaluation for retrieve responses.
+By default, consent is not evaluated for retrieve.</Description>
+<Type>Ens.DataType.ConfigName</Type>
+</Property>
+
+<Property name="ProvideAndRegisterToRegisterTransform">
+<Description>
+Stylesheet used to generate the Registry request</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/ProvideAndRegisterToRegister.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="RegisterResponseTransform">
+<Description>
+Stylesheet used to generate the Provide And Register response</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/RegisterResponse.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="TextToRetrieveDocumentResponseTransform">
+<Description>
+Stylesheet used to build the Retrieve Response</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/TextToRetrieveDocumentResponse.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Property name="RemoveDocumentsTransform">
+<Description>
+Stylesheet used to build the DeleteDocumentSetRequest</Description>
+<Type>%String</Type>
+<InitialExpression>"IHE/XDSb/Version1/RMDRequestToRequest.xsl"</InitialExpression>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Method name="OnRequest">
+<FormalSpec>pRequest:%Persistent,*pResponse:%Persistent</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	
+	Try {
+		Set ..Errors = ##class(HS.Types.IHE.Errors).%New()
+		$$$GetTransformer(..Transformer)
+		Set ..RepositoryOID = ##class(HS.Data.OIDMap).GetOIDForCode($namespace,"")
+
+		Set pResponse = ##class(HS.Message.XMLMessage).%New()
+
+		If pRequest.%IsA("HS.Message.XMLMessage") {
+			Set tAction = pRequest.AdditionalInfo.GetAt("SOAPAction")
+			
+			If (tAction = $$$XDSbProvideAndRegisterAction(..IHEVersion)) {
+				Set pResponse.Name=$$$XDSbProvideAndRegisterResponse
+				If ..RepositoryOID="" $$$ThrowOnError($$$ERROR($$$GeneralError,"Repository OID is not defined. Define an oid for code:"_$namespace))
+				#; XDSb_ProvideAndRegisterDocumentSet Transaction *
+				If ..ProvidePreProcessor'="" {
+					Set tRequest=pRequest.%ConstructClone(1)
+					Set tSC = ..SendRequestSync(..ProvidePreProcessor,tRequest,.tPreProcessorResponse)
+					Quit:$$$ISERR(tSC)
+					Set pRequest=tPreProcessorResponse,(tPreProcessorResponse,tRequest)=""
+				}
+				Set tSC = ..ProvideAndRegisterDocumentSetb(pRequest, .pResponse) 
+				Do $$$ATNAEvent("XDSbRepository",pRequest,pResponse,tSC)
+				$$$ThrowOnError(tSC)
+				//If the provide and register was successful, check whether to delete attachments
+				Set tResponseStatus = ##class(HS.IHE.XDSb.Util).ProcessResponse(pResponse)
+				If ($$$ISOK(tResponseStatus)&&pRequest.AdditionalInfo.GetAt("DeleteAttachments")){
+					Do ##class(HS.IHE.XDSb.Util).DeleteAttachments(.pRequest)
+				}
+				If (##class(HS.IHE.Util).IsAsync(pRequest)) {
+					Set pResponse.Name=$$$XDSbRegisterResponse
+					Set tSC = ..PrepareAndSendAsync(pRequest,.pResponse) $$$ThrowOnError(tSC)
+				}
+				$$$ThrowOnError(tSC)
+			}
+			ElseIf (tAction = $$$XDSbRetrieveAction(..IHEVersion)) {
+				Set pResponse.Name=$$$XDSbRetrieveResponse
+				#; XDSb_RetrieveDocumentSet Transaction *
+				#; if repositoryOID is null we need to route the transaction (typically on the bus)
+				If ..RepositoryOID="" {
+					Set tSC = ##class(HS.IHE.Util).GetXPathValue(pRequest.ContentStream,"/xdsb:RetrieveDocumentSetRequest/xdsb:DocumentRequest/xdsb:RepositoryUniqueId","text()",.tValue)
+					Set tService = ##class(HS.Registry.Service.Abstract).EndPointForOID(tValue,"Repository","XDSb.Retrieve")
+					If '$IsObject(tService) $$$ThrowOnError($$$ERROR($$$GeneralError,"Repository ID not defined for namespace and a service cannot be located for OID: "_tValue))
+					Do pRequest.AdditionalInfo.SetAt(tService.Name,"ServiceName")
+					Set tSC = ..SendRequestSync(..RepositoryOperations,pRequest,.pResponse) $$$ThrowOnError(tSC)
+				} Else {
+					Set tSC = ..RetrieveDocumentSet(pRequest, .pResponse) 
+					//%HS_NotifyAndQueryOperations is only used for an internal HS message - don't audit
+					Do:pRequest.SAMLData.HSRoles'="%HS_NotifyAndQueryOperations" $$$ATNAEvent("XDSbRepository",pRequest,pResponse,tSC)
+					$$$ThrowOnError(tSC)
+				}
+				If (##class(HS.IHE.Util).IsAsync(pRequest)) {
+					Set tSC = ..PrepareAndSendAsync(pRequest,.pResponse)
+					$$$ThrowOnError(tSC)
+					//If the retrieve request was successful, check whether to delete attachments
+					Set tResponseStatus = ##class(HS.IHE.XDSb.Util).ProcessResponse(pResponse)
+					If ($$$ISOK(tResponseStatus)&&(pResponse.AdditionalInfo.GetAt("DeleteAttachments"))){
+						Do ##class(HS.IHE.XDSb.Util).DeleteAttachments(.pResponse)
+					}
+				}
+
+			}
+			ElseIf (tAction = $$$RMDAction(..IHEVersion)) {
+				Set tSC = ..RemoveDocuments(pRequest,.pResponse)
+			}
+			Else {
+				Set tSC = $$$ERROR($$$GeneralError, "Unknown SOAP Action:  " _ tAction) $$$ThrowOnError(tSC)
+			}
+		}
+		Else {
+			Set tSC = $$$ERROR($$$GeneralError, "Unknown Message Type:  " _ pRequest.%ClassName(1)) $$$ThrowOnError(tSC)
+		}
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		Do ..Errors.logError("XDSbRepository","Error",$system.Status.GetErrorText(tSC))
+	}
+	If ..Errors.Errors.Count() {
+		$$$HSTRACE("Errors","Errors",..Errors)
+		Set tErrorText="",tWarningText=""
+		For tIdx=1:1:..Errors.Errors.Count() {
+			Set tError = ..Errors.Errors.GetAt(tIdx)
+			If tError.Severity="Error" {
+				Set tErrorText = tErrorText _ "["_tError.Description_ "]"
+			} Else {
+				Set tWarningText = tWarningText _ "["_tError.Description_ "]"
+			}
+		}
+		If tErrorText]"" $$$LOGERROR(tErrorText)
+		If tWarningText]"" $$$LOGWARNING(tWarningText)
+	}
+	#; if the message is an erorr, and we have not reported the problem (contentstream is empty) report the problem
+	If $$$ISERR(tSC) && (pResponse.ContentStream.Size=0) {
+		Do ##class(HS.IHE.XDSb.Util).ErrorResponse(tSC,pResponse.Name,.pResponse,..Transformer)
+		Set tSC=$$$OK
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="OnResponse">
+<Description>
+OnResponse must be overridden here to avoid error upon response from async request.</Description>
+<FormalSpec><![CDATA[pRequest:Ens.Request,&pResponse:Ens.Response,pCallrequest:Ens.Request,pCallresponse:Ens.Response,pCompletionKey:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ProvideAndRegisterDocumentSetb">
+<FormalSpec>pRequest:HS.Message.XMLMessage,pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+
+	/// used for debugging simultaneous transactions
+	If ..TraceOperations=100 Lock +^HS.Repository.Document.Testing#"S"
+	Try {
+		Set tStoredDocument=0
+		Set tRegistryResponse = ""
+		Set tXPathNamespaces = ##class(HS.IHE.Util).XPathNamespaces()
+		Set tSC = ##class(%XML.XPATH.Document).CreateFromStream(pRequest.ContentStream, .tDocument, , , , , tXPathNamespaces) $$$ThrowOnError(tSC)
+		Set tSC = ..ParseRegistrationHeader(tDocument, .tDocumentArray)
+		If $$$ISERR(tSC) Do ..Errors.logError("XDSRepository","Error","Unable to parse registration header "_$system.Status.GetErrorText(tSC)) Quit
+		Quit:..Errors.Errors.Count()
+		#; move any inline documents to attachments and build tDocumentArray
+		Set tSC = ..BuildAttachments(pRequest,tDocument,.tDocumentArray)
+		Quit:..Errors.Errors.Count()
+
+		Set tSC = tDocument.EvaluateExpression("/xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:RegistryPackage/rim:ExternalIdentifier[@identificationScheme='urn:uuid:6b5aea1a-874d-4603-a4bc-96a0a7b38446']", "@value", .tResults) 
+		If $$$ISOK(tSC) {
+			Set tLockPatientID = $S('$IsObject(tResults):"",tResults.Count():tResults.GetAt(1).Value)
+			$$$HSTRACE("patient id "_tLockPatientID)
+			/// lock for single patient processing
+			If tLockPatientID]"" {
+				Lock +^HS.Repository.Document.Patient(tLockPatientID)
+			}
+		} Else {
+			Set tLockPatientID = ""
+		}
+		#; Now store and register all documents
+		Set tInputStream = ##class(%Stream.GlobalCharacter).%New()
+		Do tInputStream.Write("<root>")
+		For tStreamIndex = 1:1:pRequest.StreamCollection.Count() {
+			Set tDocumentStream = pRequest.StreamCollection.GetAt(tStreamIndex)
+			Set tDocumentStream.ContentId=$zcvt(tDocumentStream.ContentId,"I","URL")
+			
+			Set tDocumentIndex = $g(tDocumentArray("Reference", tDocumentStream.ContentId))
+			If tDocumentIndex = "" {
+				Do ..Errors.logError("XDSbRepository","Error","Content id:"_tDocumentStream.ContentId_" referenced but not found")
+				Continue
+			}
+			If '$Data(tDocumentArray(tDocumentIndex, "documentID")) {
+				Do ..Errors.logError("XDSbRepository","Warning","Un-referenced attachment found in mime collection:  " _ tDocumentIndex)
+				$$$LOGINFO("Un-referenced attachment found in mime collection:  " _ tDocumentIndex) Continue
+			}
+
+			#; Calculate hash
+			Set tHashValue = ##class(HS.IHE.XDSb.Util).StreamHash(tDocumentStream.Body)
+			#; adding setting check because this is something not checked previously
+			if ..ValidateSizeAndHash {
+				Set tValue=$G(tDocumentArray(tDocumentIndex,"hash"),tHashValue)
+				If tValue]"" && ($zcvt(tValue,"l")'=tHashValue) Do ..Errors.logError("XDSRepositoryMetadataError","Error","Incorrect hash value Document:"_tDocumentIndex_" hash: "_tHashValue_"'="_tValue) Quit
+				Set tValue= $G(tDocumentArray(tDocumentIndex,"size"),tDocumentStream.Body.Size)
+				If tValue]"" && (tValue'=tDocumentStream.Body.Size) Do ..Errors.logError("XDSRepositoryMetadataError","Error","Incorrect size value Document:"_tDocumentIndex_" size "_tDocumentStream.Body.Size) Quit
+			}
+			#; Store document
+			Set tDocumentRequest = ##class(HS.Message.XMLMessage).%New()
+			Set tDocumentRequest.Name = "XDSb_StoreRequest"
+			Set tDocumentRequest.AdditionalInfo = pRequest.AdditionalInfo.%ConstructClone()  ///SAML/User Auth
+			Set tDocumentRequest.SAMLData = pRequest.SAMLData.%ConstructClone()  ///SAML/User Auth
+
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentID"), "documentID")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentName"), "documentName")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentDescription"), "documentDescription")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentContentType"), "documentContentType")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentCreationTime"), "documentCreationTime")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentFormatCode"), "documentFormatCode")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentFormatScheme"), "documentFormatScheme")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "serviceStartTime"), "serviceStartTime")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "serviceStopTime"), "serviceStopTime")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceID"), "patientSourceID")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAssigningAuthority"), "patientSourceAssigningAuthority")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceFirstName"), "patientSourceFirstName")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceLastName"), "patientSourceLastName")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceDOB"), "patientSourceDOB")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceSex"), "patientSourceSex")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAddressStreetLine1"), "patientSourceAddressStreetLine1")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAddressStreetLine2"), "patientSourceAddressStreetLine2")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAddressCity"), "patientSourceAddressCity")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAddressState"), "patientSourceAddressState")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAddressZip"), "patientSourceAddressZip")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientSourceAddressCountry"), "patientSourceAddressCountry")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientGlobalID"), "patientGlobalID")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "patientGlobalAssigningAuthority"), "patientGlobalAssigningAuthority")
+			Do tDocumentRequest.AdditionalInfo.SetAt(..RepositoryOID, "repositoryOID")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentStream.Body.Size, "documentSize")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tHashValue, "documentHash")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentFormatCode"), "documentFormatCode")
+			Do tDocumentRequest.AdditionalInfo.SetAt(tDocumentArray(tDocumentIndex, "documentFormatScheme"), "documentFormatScheme")
+			Do tDocumentRequest.StreamCollection.Insert(tDocumentStream)
+			
+			Do tInputStream.Write("<DocInfo id=""" _ tDocumentArray(tDocumentIndex, "documentID") _ """ hash=""" _ tHashValue _ """ size=""" _ tDocumentStream.Body.Size _ """/>")
+
+			Set tSC = ..SendRequestSync(..RepositoryOperations, tDocumentRequest, .tRepositoryResponse) $$$ThrowOnError(tSC)
+			If '$IsObject(tRepositoryResponse){
+				Throw ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"No response from repository operations"))
+			}
+			Set tErrorcount = tRepositoryResponse.AdditionalInfo.GetAt("Errors")
+			For tErrorIdx=1:1:tErrorcount {
+				$$$HSTRACE("Error "_tErrorIdx)
+				Set tItem = tRepositoryResponse.AdditionalInfo.GetAt("Error#"_tErrorIdx)
+				Do ..Errors.logError($li(tItem),$li(tItem,2),$li(tItem,3),$li(tItem,4))
+			}
+			If 'tStoredDocument && 'tErrorcount {
+				Set tStoredDocument=1
+			}
+			Set tDocumentArray(tDocumentIndex,"repositoryDocumentID")= tRepositoryResponse.AdditionalInfo.GetAt("repositoryDocumentID")
+			// Set new flag to indicate this document already existed on the Repository
+			Set tDocumentArray(tDocumentIndex,"ExistingDocument")= tRepositoryResponse.AdditionalInfo.GetAt("ExistingDocument")
+			Quit:tErrorcount  /// problem storing document don't store the rest to just rollback
+		}
+
+		#; Register documents
+		Do pRequest.ContentStream.Rewind(), tInputStream.CopyFrom(pRequest.ContentStream)
+		Do tInputStream.Write("</root>"), tInputStream.Rewind()
+	
+		Set tXSLArguments("repositoryOID") = ..RepositoryOID
+
+		$$$HSTRACESTARTCALL
+
+        ///CNR this has a unitcode error
+        ///Convert tInputStream to UTF
+
+        //Recopy it with UTF to see if we can clear it
+		if ..ConvertToUTF=1 {
+     	   Set tmpStream = $ZCONVERT(tInputStream, "O", "UTF-8")
+		   Set tSC = ..Transformer.Transform(tmpStream, ..ProvideAndRegisterToRegisterTransform /*"IHE/XDSb/Version1/ProvideAndRegisterToRegister.xsl"*/, .tOutputStream, .tXSLArguments)
+		}
+		else {
+			Set tSC = ..Transformer.Transform(tInputStream, ..ProvideAndRegisterToRegisterTransform /*"IHE/XDSb/Version1/ProvideAndRegisterToRegister.xsl"*/, .tOutputStream, .tXSLArguments)				
+		}
+		//Set tSC = ..Transformer.Transform(tInputStream, ..ProvideAndRegisterToRegisterTransform /*"IHE/XDSb/Version1/ProvideAndRegisterToRegister.xsl"*/, .tOutputStream, .tXSLArguments)
+        
+		$$$HSTRACEENDCALL
+		If $$$ISERR(tSC) Do ..Errors.logError("XDSbRepository","Error","unable to transform to registry request"_$system.Status.GetErrorText(tSC))
+		$$$HSTRACE("Registry Request","tOutputStream,tInputStream",tOutputStream,tInputStream)
+		Set tRegistration = ##class(HS.Message.XMLMessage).%New()
+		Set tRegistration.Name = $$$XDSbRegisterRequest
+		Set tRegistration.ContentStream = tOutputStream
+		Do tRegistration.ContentStream.Rewind()
+		Set tRegistration.AdditionalInfo = pRequest.AdditionalInfo.%ConstructClone()  ///SAML/User Auth
+		Set tRegistration.SAMLData = pRequest.SAMLData.%ConstructClone()  ///SAML/User Auth
+		Do tRegistration.AdditionalInfo.SetAt($$$XDSbRegisterAction(..IHEVersion), "SOAPAction")
+		#; only send registration if no errors
+		If '..Errors.Errors.Count() || (..Errors.HighestError'="Error") { 
+			Set tSC = ..SendRequestSync(..RegistryOperations, tRegistration, .pResponse) 
+			If $$$ISERR(tSC) { Do ..Errors.logError("XDSRegistryNotAvailable","Error","") Quit }
+			// log ATNA export event
+			Do $$$ATNAEvent("XDSbRepository",tRegistration,pResponse,tSC)
+			#; Check for invalid response
+			If '$IsObject(pResponse) || ($IsObject(pResponse) && (pResponse.ContentStream.Size = 0 )) { Do ..Errors.logError("XDSRegistryNotAvailable","Error","") Quit }
+			Set tRegistryResponse=pResponse.ContentStream
+			#; Check for registry error
+			Set tSC = ##class(%XML.XPATH.Document).CreateFromStream(pResponse.ContentStream, .tDocument, , , , , "xdsb urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0") $$$ThrowOnError(tSC)
+			Set tSC = tDocument.EvaluateExpression("/xdsb:RegistryResponse", "@status", .tResults) $$$ThrowOnError(tSC)
+			If 'tResults.Count() {
+				Set tSC = $$$ERROR($$$GeneralError, "Unable to locate status in registry response")
+			} Else {
+				Set tRegistryStatus = $Piece(tResults.GetAt(1).Value, ":", $Length(tResults.GetAt(1).Value, ":"))
+
+				$$$HSTRACE("Registry Status","Status",tRegistryStatus)
+				If ($ZConvert(tRegistryStatus, "U") '= "SUCCESS") {
+					; document structure based on CSP/xslt/IHE/XDSb/Version1/RegistryAddResponse.xsl
+					set tSC = tDocument.EvaluateExpression("/xdsb:RegistryResponse/xdsb:RegistryErrorList/xdsb:RegistryError", "@codeContext", .tResults)
+					Do:(tResults.Size=0) ..Errors.logError("XDSbRepository","Error","Registry error response") ; log something even if we can't pull an error message out
+					set tI=""
+					for{
+						set tError = tResults.GetNext(.tI)
+						quit:((tI="")||(tError=""))
+						set tErrorMsg = tError.Value
+						Do ..Errors.logError("XDSbRepository","Error","Registry error response: "_tErrorMsg)
+					}
+				}
+			}	
+			#; Post process documents
+			#; Intentionally does not propegate error up through tSC
+			If $$$ISOK(tSC) && ($ZConvert(tRegistryStatus, "U") = "SUCCESS") {
+				Set tPostProcessStatus=..ExecuteProvidePostProcessor(pRequest,.tDocumentArray)
+				If $$$ISERR(tPostProcessStatus) $$$LOGSTATUS(tPostProcessStatus)
+			}
+
+		}
+	
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		Do ..Errors.logError("XDSbRepository","Error","Internal error "_$system.Status.GetErrorText(tSC)) 
+	}
+	
+	if ..Errors.Errors.Count() && (..Errors.HighestError="Error") {
+		try {
+			#; Rollback submitted entries to repository due to error
+			If tStoredDocument {
+				Set tSCRB = ..RollbackProvideAndRegisterDocumentSetb(.tDocumentArray, pRequest) $$$ThrowOnError(tSCRB)
+			}
+			Set pResponse = ##class(HS.Message.XMLMessage).%New()
+			Set pResponse.Name = $$$XDSbRegisterResponse
+
+			If $IsObject($g(tRegistryResponse)) {
+				#; if the registry gave us a response use that
+				Set tResponse = tRegistryResponse
+			} Else {
+				#; produce some sort of error message if we have a hard error, otherwise return what came from registry
+				Set tXSLArguments("status")	= "Failure"
+				Set tStream = ##class(%Stream.GlobalCharacter).%New()
+				Do ..Errors.XMLExportToString(.tErrorString)
+				Do tStream.Write("<Submission>"_tErrorString_"</Submission>")
+				$$$HSTRACE("Response stream","tStream,Status",tStream,tXSLArguments("status"))
+				Do tStream.Rewind()
+			
+				$$$HSTRACESTARTCALL
+				Set tSC = ..Transformer.Transform(tStream, ..RegisterResponseTransform /*"IHE/XDSb/Version1/RegisterResponse.xsl"*/, .tResponse, .tXSLArguments)
+				$$$HSTRACEENDCALL
+				If $$$ISERR(tSC) $$$LOGSTATUS(tSC)
+			}
+			If $IsObject(tResponse) {
+				Do tResponse.Rewind(), pResponse.ContentStream.CopyFrom(tResponse)
+			}
+			If $$$ISERR(tSC) $$$LOGSTATUS(tSC)
+			Set tSC=$$$OK
+		} Catch eException {
+			Set tSC = eException.AsStatus()
+		}	
+	}
+	/// unlock for single patient processing
+	If $G(tLockPatientID)]"" {
+		Lock -^HS.Repository.Document.Patient(tLockPatientID)
+	}
+	/// used for debugging simultaneous transactions
+	If ..TraceOperations=100 Lock -^HS.Repository.Document.Testing
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="BuildAttachments">
+<Description>
+Move any inline documents to attachments and build DocumentArray </Description>
+<FormalSpec>pRequest:HS.Message.XMLMessage,pDocument,*pDocumentArray</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		#; Pre-process inline, non-MTOM documents
+		Set tXPathRoot = "/xdsb:ProvideAndRegisterDocumentSetRequest/xdsb:Document"
+		If 'pRequest.StreamCollection.Count() {
+			#; Get inline documents
+			Set tSC = pDocument.EvaluateExpression(tXPathRoot, "text()", .tInlineDocuments) $$$ThrowOnError(tSC)
+			$$$HSTRACE("Inline Document Count","Count",tInlineDocuments.Count())
+			For tDocumentIndex = 1:1:tInlineDocuments.Count() {
+				Set tStream = ##class(%Stream.GlobalBinary).%New()
+				Set tInlineDocument = tInlineDocuments.GetAt(tDocumentIndex).Value
+				Set tSC = ##class(HS.Util.StreamUtils).Base64Decode(tInlineDocument,.tStream)
+				If $$$ISERR(tSC) {
+					Do ..Errors.logError("XDSRepository","Error","Unable to base 64 decode document "_tInlineDocument) Quit
+				}
+
+				Set tReference = ##class(%SYSTEM.Util).CreateGUID()
+
+				Set tCollectionObject = ##class(HS.IHE.Common.Messages.MIMEAttachment).%New()
+				Set tCollectionObject.Body = tStream
+				Set tCollectionObject.ContentId = tReference
+
+				
+				Set tObject = tXPathRoot _ "[" _ tDocumentIndex _ "]"
+				Set tSC = pDocument.EvaluateExpression(tObject, "@id", .tResults) $$$ThrowOnError(tSC)
+				Throw:(tResults.Count()=0) ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"Missing document identifier: "_tXPathRoot_"[@id]"))
+				Kill tDocId
+				Set tDocId = tResults.GetAt(1).Value
+				If tDocId = "" {
+					Do ..Errors.logError("XDSRepository","Error","Document @id at "_tDocumentIndex_" is empty")
+					continue
+				}
+				If '$D(pDocumentArray(tDocId)) {
+					Do ..Errors.logError("XDSRepository","Error","Document id "_tDocId_" does not have inline document")
+					continue
+				}
+				Set pDocumentArray = tDocumentIndex
+				Set pDocumentArray(tDocId, "Reference") = tReference
+				Set pDocumentArray("Reference", tReference) = tDocId
+				If $zstrip(pDocumentArray(tDocId, "patientGlobalID"),"*WC")'=pDocumentArray(tDocId, "patientGlobalID") Do ..Errors.logError("XDSRepository","Error","Patient Identifier contains invalid characters:"_tDocId)
+				
+				Do pRequest.StreamCollection.Insert(tCollectionObject)
+			}
+			#; check to make sure that there are no missing attachments (if we find any there is a problem because there are no attachments)
+			Set tSC = pDocument.EvaluateExpression("/xdsb:ProvideAndRegisterDocumentSetRequest/xdsb:Document/xop:Include", "@href", .tDocumentReferences) $$$ThrowOnError(tSC)
+			For tDocumentIndex = 1:1:tDocumentReferences.Count() {
+				Set tReference = tDocumentReferences.GetAt(tDocumentIndex).Value
+				Do ..Errors.logError("XDSbRepository","Error","Content id:"_tDocumentReferences.GetAt(tDocumentIndex).Value_" referenced but not found")
+			}
+
+			
+		}
+		#; Instead pre-process documents attached with MTOM
+		Else {
+			#; track all content id's in tStreamIndex to ensure they exist when getting the xop references
+			For tStreamIndex = 1:1:pRequest.StreamCollection.Count() {
+				Set tDocumentStream = pRequest.StreamCollection.GetAt(tStreamIndex)
+				Set tDocumentStream.ContentId=$zcvt(tDocumentStream.ContentId,"I","URL")
+				Set tStreamIndex(tDocumentStream.ContentId)=""
+			}
+			
+			Set tSC = pDocument.EvaluateExpression(tXPathRoot_"/xop:Include" /*"/xdsb:ProvideAndRegisterDocumentSetRequest/xdsb:Document/xop:Include"*/, "@href", .tDocumentReferences) $$$ThrowOnError(tSC)
+		
+			For tDocumentIndex = 1:1:tDocumentReferences.Count() {
+				Set tReference = tDocumentReferences.GetAt(tDocumentIndex).Value
+				If $ZConvert($Extract(tReference, 1, 4), "l") = "cid:" {
+					Set tReference = $ZConvert($Extract(tReference, 5, *), "I", "URL")
+					$$$HSTRACE("Adding doc to array "_tReference)
+				}
+				Else {
+					Do ..Errors.logError("XDSbRepository","Warning","Document reference does not start with cid:  " _ tReference)
+					$$$LOGWARNING("Document reference does not start with cid:  " _ tReference)
+				}
+				If '$d(tStreamIndex(tReference)) {
+					Do ..Errors.logError("XDSbRepository","Error","Content id:"_tReference_" referenced but not found")
+					Continue
+				}
+
+				Set tObject = tXPathRoot _ "[" _ tDocumentIndex _ "]"
+				Set tSC = pDocument.EvaluateExpression(tObject, "@id", .tResults) $$$ThrowOnError(tSC)
+				Throw:(tResults.Count()=0) ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"Missing document identifier: "_tXPathRoot_"[@id]"))
+				Kill tDocId
+				Set tDocId = tResults.GetAt(1).Value
+
+				Set pDocumentArray = tDocumentIndex
+				Set pDocumentArray(tDocId, "Reference") = tReference
+				Set pDocumentArray("Reference", tReference) = tDocId
+			}
+		}
+		Set tSC = pDocument.EvaluateExpression("/xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:ExtrinsicObject", "@id", .tDocumentList) $$$ThrowOnError(tSC)
+		If tDocumentList.Count()>pRequest.StreamCollection.Count() {
+			Do ..Errors.logError("XDSMissingDocument","Error","Expected "_tDocumentList.Count()_" but found "_pRequest.StreamCollection.Count()_" document(s)")
+		} ElseIf tDocumentList.Count()'=pRequest.StreamCollection.Count() {
+			Do ..Errors.logError("XDSMissingDocumentMetadata","Error","Expected "_tDocumentList.Count()_" but found "_pRequest.StreamCollection.Count()_" document(s)")
+		}
+	} catch eException {
+		Set tSC = eException.AsStatus()
+		Do ..Errors.logError("XDSbRepository","InternalError",$system.Status.GetErrorText(tSC))
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="RetrieveDocumentSet">
+<FormalSpec>pRequest:HS.Message.XMLMessage,pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+
+	Set tSC = $$$OK
+
+	Try {
+		Set tSC = ..SendRequestSync(..RepositoryOperations, pRequest, .pResponse) 
+		
+		//%HS_NotifyAndQueryOperations is only used for an internal message - no consent
+		If ..XDSbRetrieveConsentTarget ] "", pRequest.SAMLData.HSRoles'="%HS_NotifyAndQueryOperations" {
+			Set pResponse.AdditionalInfo = pRequest.AdditionalInfo
+			Set pResponse.SAMLData = pRequest.SAMLData.%ConstructClone()
+			Set tSC = ..SendRequestSync(..XDSbRetrieveConsentTarget, pResponse, .tConsentedResponse) $$$ThrowOnError(tSC)
+			SEt pResponse = tConsentedResponse
+		}
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+
+		Do ..Errors.logError("XDSbRepository","Error","Internal Error:"_eException.DisplayString()) 
+		Set tXSLArguments("status")="Failure"
+		Set tXSLArguments("repositoryOID")=..RepositoryOID
+		Do tResponseStream.Rewind(),tResponseStream.Write("<root>")
+		Do ..Errors.XMLExportToString(.tErrors)
+		Do tResponseStream.Write(tErrors)
+		Do tResponseStream.Write("</root>")
+		$$$HSTRACESTARTCALL
+		Set tSC = ..Transformer.Transform(tResponseStream, ..TextToRetrieveDocumentResponseTransform /*"IHE/XDSb/Version1/TextToRetrieveDocumentResponse.xsl"*/, .tRetrieveResponse, .tXSLArguments) 
+		$$$HSTRACEENDCALL
+		Do tRetrieveResponse.Rewind()
+		Do pResponse.ContentStream.CopyFrom(tRetrieveResponse)
+	}
+
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="ParseRegistrationHeader">
+<FormalSpec><![CDATA[pDocument:%XML.XPATH.Document,&pResults:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+
+	Try {
+		Set tSC = $$$OK
+		
+		Kill pResults
+		
+		Set tXPathRoot = "/xdsb:ProvideAndRegisterDocumentSetRequest/lcm:SubmitObjectsRequest/rim:RegistryObjectList/rim:ExtrinsicObject"
+		
+		#; Iterate over document collection
+		Set tSC = pDocument.EvaluateExpression(tXPathRoot, "name()", .tDocumentList) $$$ThrowOnError(tSC)
+		For tDocumentIndex = 1:1:tDocumentList.Count() {
+			Set tObject = tXPathRoot _ "[" _ tDocumentIndex _ "]"
+			Set tSC = pDocument.EvaluateExpression(tObject, "@id", .tResults) $$$ThrowOnError(tSC)
+			Throw:(tResults.Count()=0) ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"Missing document identifier: "_tXPathRoot_"[@id]"))
+			Kill tDocId
+			Set tDocId = tResults.GetAt(1).Value
+						
+			#; Get document ID
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:ExternalIdentifier[@identificationScheme='urn:uuid:2e82c1f6-a085-4c72-9da3-8640a32e42ab']", "@value", .tResults) $$$ThrowOnError(tSC)
+			Set (pResults(tDocId, "documentID"),tUniqueId) = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+			If tUniqueId="" Do ..Errors.logError("XDSRegistryMetadataError","Error","UniqueId.id required for ExtrinsicObject["_tDocumentIndex_"]",tObject)
+
+			#; Get document name
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Name/rim:LocalizedString", "@value", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentName") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+			#; Get document Description
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Description/rim:LocalizedString", "@value", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentDescription") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+			#; Get document mime type
+			Set tSC = pDocument.EvaluateExpression(tObject, "@mimeType", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentContentType") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+			#; Get document format code
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Classification[@classificationScheme='urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d']", "@nodeRepresentation", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentFormatCode") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+			#; Get document format scheme
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Classification[@classificationScheme='urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d']/rim:Slot/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentFormatScheme") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+			#; Get document creation time
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='creationTime']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentCreationTime") = $Case(tResults.Count(), 0:"", :##class(HS.Util.XSLTHelper).xmltimestamp(tResults.GetAt(1).Value))
+
+			#; Get service start time
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='serviceStartTime']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "serviceStartTime") = $Case(tResults.Count(), 0:"", :##class(HS.Util.XSLTHelper).xmltimestamp(tResults.GetAt(1).Value))
+
+			#; Get service stop time
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='serviceStopTime']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "serviceStopTime") = $Case(tResults.Count(), 0:"", :##class(HS.Util.XSLTHelper).xmltimestamp(tResults.GetAt(1).Value))
+
+			#; Get global patient identifier
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:ExternalIdentifier[@identificationScheme='urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427']", "@value", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "patientGlobalID") = $Case(tResults.Count(), 0:"", :$Piece(tResults.GetAt(1).Value, "^", 1))
+			Set pResults(tDocId, "patientGlobalAssigningAuthority") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "&", 2), "&", 1))
+			//Set pResults(tDocId, "patientGlobalAssigningAuthorityOID") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "&", 2), "&", 1))
+			//Set pResults(tDocId, "patientGlobalAssigningAuthority") = ##class(HS.Data.OIDMap).GetCodeForOID(pResults(tDocumentIndex, "patientGlobalAssigningAuthorityOID"))
+
+			#; Get local patient identifier
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='sourcePatientId']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "patientSourceID") = $Case(tResults.Count(), 0:"", :$Piece(tResults.GetAt(1).Value, "^", 1))
+			Set pResults(tDocId, "patientSourceAssigningAuthority") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "&", 2), "&", 1))
+
+			#; Get local patient name
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='sourcePatientInfo']/rim:ValueList/rim:Value[contains(text(), 'PID-5')]", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "patientSourceFirstName") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "^", 2), "^", 1))
+			Set pResults(tDocId, "patientSourceLastName") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "|", 2), "^", 1))
+
+			#; Get local patient DOB
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='sourcePatientInfo']/rim:ValueList/rim:Value[contains(text(), 'PID-7')]", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "patientSourceDOB") = $Case(tResults.Count(), 0:"", :##class(HS.Util.XSLTHelper).xmltimestamp($Piece(tResults.GetAt(1).Value, "|", 2)))
+
+			#; Get local patient sex
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='sourcePatientInfo']/rim:ValueList/rim:Value[contains(text(), 'PID-8')]", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "patientSourceSex") = $Case(tResults.Count(), 0:"", :$Piece(tResults.GetAt(1).Value, "|", 2))
+
+			#; Get local patient address
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='sourcePatientInfo']/rim:ValueList/rim:Value[contains(text(), 'PID-11')]", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "patientSourceAddressStreetLine1") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "|", 2), "^", 1))
+			Set pResults(tDocId, "patientSourceAddressStreetLine2") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "^", 2), "^", 1))
+			Set pResults(tDocId, "patientSourceAddressCity") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "^", 3), "^", 1))
+			Set pResults(tDocId, "patientSourceAddressState") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "^", 4), "^", 1))
+			Set pResults(tDocId, "patientSourceAddressZip") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "^", 5), "^", 1))
+			Set pResults(tDocId, "patientSourceAddressCountry") = $Case(tResults.Count(), 0:"", :$Piece($Piece(tResults.GetAt(1).Value, "^", 6), "^", 1))
+
+			#; Get document format code and scheme
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Classification[@classificationScheme='urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d']", "@nodeRepresentation", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentFormatCode") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Classification[@classificationScheme='urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d']/rim:Slot[@name='codingScheme']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "documentFormatScheme") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='size']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "size") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+			Set tSC = pDocument.EvaluateExpression(tObject _ "/rim:Slot[@name='hash']/rim:ValueList/rim:Value", "text()", .tResults) $$$ThrowOnError(tSC)
+			Set pResults(tDocId, "hash") = $Case(tResults.Count(), 0:"", :tResults.GetAt(1).Value)
+		}
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		$$$LOGSTATUS(tSC)
+	}	
+
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="RollbackProvideAndRegisterDocumentSetb">
+<FormalSpec><![CDATA[&pDocumentArray:%String="",pRequest:HS.Message.XMLMessage]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim eException As %Exception.AbstractException
+
+	Try {
+		Set tSC = $$$OK
+		
+		If ($O(pDocumentArray("Reference",""))="") Quit
+
+		#; Create rollback request
+		Set tRollbackRequest = ##class(HS.Message.XMLMessage).%New()
+		Set tRollbackRequest.Name = "XDSb_RollbackRequest"
+		Set tRollbackRequest.AdditionalInfo = pRequest.AdditionalInfo.%ConstructClone()  ///SAML/User Auth
+		Set tRollbackRequest.SAMLData = pRequest.SAMLData.%ConstructClone()  ///SAML/User Auth
+		
+		#; put the document list into a message to be deleted
+		Set tReference = ""
+		Set tCount = 0
+		For{
+			Set tReference = $O(pDocumentArray("Reference",tReference),1,tDocumentIndex )
+			Quit:tReference=""
+			Set tDocumentID=$g(pDocumentArray(tDocumentIndex, "repositoryDocumentID"))
+			If $G(pDocumentArray(tDocumentIndex,"ExistingDocument")) Continue // Skip rollback for existing documents
+			If tDocumentID ="" Continue  /// document must not have been filed - an error must have occurred
+			Do tRollbackRequest.AdditionalInfo.SetAt(tDocumentID, "repositoryDocumentID:" _ tDocumentID)
+			Set tCount = tCount + 1
+		}
+		If tCount {
+			/// if there was a single document or all documents failed to store, or an existing document, then no sense issuing the rollback, there is nothing in the message
+			Set tSC = ..SendRequestSync(..RepositoryOperations, tRollbackRequest, .tRollbackResponse)
+		} Else {
+			$$$HSTRACEMIN("Nothing to rollback")
+		}
+
+	}
+	Catch eException {
+		Set tSC = eException.AsStatus()
+		$$$LOGSTATUS(tSC)		
+	}	
+
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="ParseProcessor">
+<Description>
+Returns array(code^^scheme)=host from given string: code^^scheme^^host||code^^scheme^^host...</Description>
+<FormalSpec>pValues:%String</FormalSpec>
+<ReturnType>%ArrayOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+	Set tMap = ##class(%ArrayOfDataTypes).%New()
+	Try {
+		#; Get the production config for validing hosts
+		#; Skip host validation if there is an error looking up the production
+		Do ##class(Ens.Director).ParseConfigItemName("",.tProductionName)
+		If tProductionName {
+			Set tProduction=##class(Ens.Config.Production).%OpenId(tProductionName,0,.tSC)  
+			If $$$ISERR(tSC) $$$LOGSTATUS(tSC) Kill tProduction
+			If '$IsObject(tProduction) $$$LOGERROR("Unable to access production settings") Kill tProduction
+		}
+		
+		For i=1:1:$L(pValues,"||") {
+			#; Get the item
+			Set tItem=$P(pValues,"||",i)
+			Set tCode=$P(tItem,"^^",1)
+			Set tScheme=$P(tItem,"^^",2)
+			Set tHost=$P(tItem,"^^",3)
+			
+			#; Validate formatCode
+			If '##class(HS.IHE.CodedEntry).UniqueIndexExists("formatCode",tScheme,tCode) {
+				$$$LOGWARNING("Format code not found, skipping this processor: "_tItem)
+				Continue
+			}
+			
+			#; Validate target host
+			If $G(tProduction),tProduction.FindItemByConfigName(tHost)=$$$NULLOREF {
+				$$$LOGWARNING("Host not found, skipping this processor: "_tItem)
+				Continue
+			}
+
+			#; Add to array
+			Do tMap.SetAt(tHost,tCode_"^^"_tScheme)
+		}
+	} Catch ex {
+		$$$LOGSTATUS(ex.AsStatus())
+	}
+	Quit tMap
+]]></Implementation>
+</Method>
+
+<Method name="ExecuteProvidePostProcessor">
+<Description>
+Execute post-processing on a document set submission</Description>
+<FormalSpec><![CDATA[pRequest:HS.Message.XMLMessage,&pDocArray:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try {
+		If ..ProvidePostProcessor="" Quit
+					
+		For tStreamIndex = 1:1:pRequest.StreamCollection.Count() {
+			#; Skip unreferenced documents			
+			Set tAttachment = pRequest.StreamCollection.GetAt(tStreamIndex)
+			Continue:tAttachment.ContentId=""
+			Set tAttachment.ContentId=$zcvt(tAttachment.ContentId,"I","URL")
+			$$$HSTRACE("Have attachment")
+			Set tDocIndex=$G(pDocArray("Reference",tAttachment.ContentId))
+			Continue:tDocIndex=""
+			$$$HSTRACE("Have reference")
+
+			#; Skip if not configured for processing
+			Set tCode=$G(pDocArray(tDocIndex,"documentFormatCode"))
+			Set tScheme=$G(pDocArray(tDocIndex,"documentFormatScheme"))
+			Set tKey=tCode_"^^"_tScheme
+			Set tHost=$ZSTRIP($P($P(..ProvidePostProcessor,tKey,2),"||",1),"<>W","^")
+			$$$HSTRACE(tCode_tScheme_tHost)
+			Continue:tHost=""
+						
+			#; Create a generic message
+			Set tRequest=##class(HS.Message.XMLMessage).%New()
+			Set tRequest.Name="Document"
+			Set tRequest.DocType=tCode_"^^"_tScheme
+			Set tRequest.AdditionalInfo = pRequest.AdditionalInfo.%ConstructClone()  ///SAML/User Auth
+			Set tRequest.SAMLData = pRequest.SAMLData.%ConstructClone()  ///SAML/User Auth
+			
+			#; Copy attributes into additional items
+			Set tProp="" For { Set tProp=$O(pDocArray(tDocIndex,tProp),1,tValue) Quit:tProp=""
+				Continue:tProp="Reference"
+				Do tRequest.AdditionalInfo.SetAt(tValue,tProp)
+			}
+				
+			#; Copy document into content and ship it
+			Do tRequest.ContentStream.CopyFrom(tAttachment.Body)
+			Do tRequest.ContentStream.Rewind()
+			Set tSC=..SendRequestAsync(tHost,tRequest,0) $$$ThrowOnError(tSC)
+		}
+	} Catch ex { Set tSC=ex.AsStatus() }
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="RemoveDocuments">
+<Description>
+take external IHE message and turn it into internal DeleteDocumentSetRequest </Description>
+<FormalSpec>pRequest:HS.Message.XMLMessage,pResponse:HS.Message.XMLMessage</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+		/// if we are on a bus, we'll want to forward this message
+		If ..RepositoryOID="" {
+			Set tSC = ##class(HS.IHE.Util).GetXPathValue(pRequest.ContentStream,"/rmd:RemoveDocumentsRequest/xdsb:DocumentRequest/xdsb:RepositoryUniqueId","text()",.tRepositoryId)
+			Set tService = ##class(HS.Registry.Service.Abstract).EndPointForOID(tRepositoryId,"Repository","RMD")
+			If $IsObject(tService) {
+				Do pRequest.AdditionalInfo.SetAt(tService.Name,"ServiceName")
+				Set tSC = ..SendRequestSync(..RepositoryOperations,pRequest,.pResponse) $$$ThrowOnError(tSC)
+				Quit
+			} 
+			Do ..Errors.logError("XDSUnknownRepositoryId","Error","Repository OID does not match this repository ["_tIdx_"] "_tRepositoryId)
+			Quit
+		}
+		Set pResponse = ##class(HS.Message.XMLMessage).%New()
+		Set pResponse.Name = $$$RMDResponse
+		Set tSC = ..Transformer.TransformIntoObject(pRequest.ContentStream,..RemoveDocumentsTransform,.tRequest,,"HS.Message.IHE.XDSb.DeleteDocumentSetRequest","DeleteDocumentSetRequest")
+		If $$$ISERR(tSC) {
+			Do ..Errors.logError("XDSbRepository","Error","Failed to transform message "_$system.Status.GetErrorText(tSC))
+			Quit
+		}
+		Set tRequest.AdditionalInfo = pRequest.AdditionalInfo.%ConstructClone()  ///SAML/User Auth
+		If 'pRequest.AdditionalInfo.IsDefined("SOAPAction") {Do pResponse.AdditionalInfo.SetAt($$$RMDAction(1),"SOAPAction")}
+		If 'pRequest.AdditionalInfo.IsDefined("WSA:From") {Do pResponse.AdditionalInfo.SetAt("http://"_$$$HSNetworkHostName_"/Internal","WSA:From")}
+		If 'pRequest.AdditionalInfo.IsDefined("WSA:To") {Do pResponse.AdditionalInfo.SetAt("http://"_$$$HSNetworkHostName_"/Internal","WSA:To")}
+		Set tSC = ..DeleteDocuments(tRequest,.tResponse)
+		If $$$ISERR(tSC) {
+			Do ..Errors.logError("XDSbRepository","Error","Failed to transform message "_$system.Status.GetErrorText(tSC))
+			Quit
+		}
+		If $$$ISERR(tResponse.ErrStatus) {
+			Do ..Errors.logError("XDSbRepository","Error",$system.Status.GetErrorText(tResponse.ErrStatus))
+		}
+		If tResponse.ContentStream.Size {
+			Set pResponse.ContentStream=tResponse.ContentStream
+		}
+
+	}
+    Catch ex { 
+		Set tSC = ex.AsStatus() 
+		Do ..Errors.logError("Internal Error","Error",$system.Status.GetErrorText(tSC))
+	}
+	If $$$ISERR(tSC) {
+		If 'pResponse.ContentStream.Size {
+			Do ..BuildResponse(pResponse,"Failure",.tStream)
+			Set pResponse.ContentStream=tStream
+		}
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="DeleteDocuments">
+<FormalSpec>pRequest:HS.Message.IHE.XDSb.DeleteDocumentSetRequest,pResponse:HS.Message.IHE.XDSb.DeleteDocumentSetResponse</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Try {
+		Set tSC = pRequest.NewResponse(.pResponse)
+		Quit:$$$ISERR(tSC)
+		Set pRequest.Name = $$$RMDRequest
+		Set tSC = ..SendRequestSync(..RepositoryOperations,pRequest,.pResponse)
+		If $$$ISERR(tSC) {
+			Do ..Errors.logError("XDSbRepository","Error","Unexpected failure processing message "_$system.Status.GetErrorText(tSC))
+			Quit
+		}
+		If pResponse.ErrStatus'=$$$OK {
+			Do pResponse.Errors.logError("XDSbRepository","Error",$system.Status.GetErrorText(pResponse.ErrStatus))
+		}
+	}
+    Catch ex { 
+		Set tSC = ex.AsStatus() 
+		Do ..Errors.logError("Internal Error","Error",$system.Status.GetErrorText(tSC))
+	}
+	$$$HSTRACE("Status","tSC,pRequest,pResponse",tSC,$g(pRequest),$g(pResponse))
+	Do ..BuildResponse(pResponse,pResponse.Status,.tStream)
+	Set pResponse.ContentStream=tStream
+	Do $$$ATNAEvent("XDSbRepository",pRequest,pResponse,tSC)
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="BuildResponse">
+<FormalSpec><![CDATA[pResponse:HS.Message.XMLMessage,pStatusString,&pStream]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tXSLArguments("status")=pStatusString
+	For tIdx = 1:1:..Errors.Errors.Count() {
+		Set tError = ..Errors.Errors.GetAt(tIdx)
+		Do pResponse.Errors.Errors.Insert(tError)
+	}
+	/// ensure highest error level is set
+	For tIdx = 1:1:pResponse.Errors.Errors.Count() {
+		Do pResponse.Errors.setHighest(pResponse.Errors.Errors.GetAt(tIdx))
+	}
+	Do pResponse.XMLExportToStream(.tStream)
+	
+	Quit ..Transformer.Transform(tStream,..RegisterResponseTransform,.pStream,.tXSLArguments)
+]]></Implementation>
+</Method>
+
+<Method name="OnGetConnections">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*pArray:%String,item:Ens.Config.Item</FormalSpec>
+<Implementation><![CDATA[
+	Do ##super(.pArray,item)
+	#; Parse the post-processor value
+	Set tValue=""
+	Set tFound=item.GetModifiedSetting("ProvidePostProcessor",.tValue)
+	If 'tFound Set tValue=$$$comMemberKeyGet("HS.IHE.XDSb.Repository.Process",$$$cCLASSproperty,"ProvidePostProcessor",$$$cPROPinitialexpression)
+	If tValue]"" {
+		For i=1:1:$l(tValue,"||") {
+			Set tHost=$ZSTRIP($P($P(tValue,"||",i),"^^",3),"<>W")
+			If tHost]"" Set pArray(tHost)=""
+		}
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PrepareAndSendAsync">
+<FormalSpec><![CDATA[pRequest:HS.Message.XMLMessage,&pResponse:HS.Message.XMLMessage,*pWebServiceResponse]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC=$$$OK
+	Try{
+		If '$IsObject($G(pResponse)) $$$ThrowStatus($$$ERROR($$$GeneralError,"XDSb repository did not return a response"))
+		Set tReplyTo = pRequest.AdditionalInfo.GetAt("ReplyAddress")
+		$$$HSTRACE("reply to","tReplyTo",tReplyTo)
+		Do pResponse.AdditionalInfo.SetAt(tReplyTo,"ReplyAddress")
+		Do pResponse.AdditionalInfo.SetAt(pRequest.AdditionalInfo.GetAt("RelatesTo"),"RelatesTo")
+		Set tSC = ..SendRequestSync(..RepositoryOperations,pResponse)
+	}
+	Catch ex{
+		Set tSC = ex.AsStatus
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DefaultData>ProcessDefaultData</DefaultData>
+<Data name="ProcessDefaultData">
+<Subscript>"Process"</Subscript>
+<Value name="1">
+<Value>TraceOperations</Value>
+</Value>
+<Value name="2">
+<Value>RepositoryOperations</Value>
+</Value>
+<Value name="3">
+<Value>RegistryOperations</Value>
+</Value>
+<Value name="4">
+<Value>RemoveDocumentsTarget</Value>
+</Value>
+<Value name="5">
+<Value>IHEVersion</Value>
+</Value>
+<Value name="6">
+<Value>Transformer</Value>
+</Value>
+<Value name="7">
+<Value>ValidateSizeAndHash</Value>
+</Value>
+<Value name="8">
+<Value>Errors</Value>
+</Value>
+<Value name="9">
+<Value>RepositoryOID</Value>
+</Value>
+<Value name="10">
+<Value>ProvidePreProcessor</Value>
+</Value>
+<Value name="11">
+<Value>ProvidePostProcessor</Value>
+</Value>
+<Value name="12">
+<Value>XDSbRetrieveConsentTarget</Value>
+</Value>
+<Value name="13">
+<Value>ProvideAndRegisterToRegisterTransform</Value>
+</Value>
+<Value name="14">
+<Value>RegisterResponseTransform</Value>
+</Value>
+<Value name="15">
+<Value>TextToRetrieveDocumentResponseTransform</Value>
+</Value>
+<Value name="16">
+<Value>RemoveDocumentsTransform</Value>
+</Value>
+<Value name="17">
+<Value>ConvertToUTF</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="HS.Local.Util.CCDHelper">
+<IncludeCode>HS.Common</IncludeCode>
+<TimeChanged>66740,613.311569</TimeChanged>
+<TimeCreated>66738,22535.7892766</TimeCreated>
+
+<Method name="GetCodedEntryDefaultValue">
+<Description>
+This method takes a coded entry type (e.g., "TypeCode", "FormatCode", etc)
+as input and returns a default CodedValue object for MHD for the type.
+The default value is stored in the Configuration Registry.  The key name
+is "\IHE\Default\" plus the coded type.  The value is expected to be
+the default Code and the default Scheme, separated by caret (^).</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pCodeType:%String,&pCodedValue:HS.IHE.XDSb.Types.CodedValue]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	
+	Try {
+		Set pCodedValue = ""
+		Set tKey = "\IHE\Default\"_pCodeType
+		Set tValue = ##class(HS.Registry.Config).GetKeyValue(tKey)
+		If tValue'="" {
+			Set tCode = $Piece(tValue, "^", 1)
+			Set tScheme = $Piece(tValue, "^", 2)
+			Set tDescription = $Piece(tValue, "^", 3)
+            /*
+        	Set tStatement = ##class(%SQL.Statement).%New()
+			Set tStatement.%SelectMode=2
+			Set tQuery = "SELECT Description FROM HS_IHE.CodedEntry WHERE CodeType=? AND Code=? AND CodingScheme=?"
+			Set tStatus = tStatement.%Prepare(tQuery)
+			Set tResultSet = tStatement.%Execute(pCodeType, tCode, tScheme)
+			While tResultSet.%Next() {
+				Set tDescription = tResultSet.Description
+			}
+            */
+			Set pCodedValue = ##class(HS.IHE.XDSb.Types.CodedValue).%New(tCode, tScheme, tDescription)
+		}
+	} Catch eException {
+		Set tSC = eException.AsStatus()
+	}
+		
+	Quit tSC
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="HS.Local.Util.CCDInstaller">
+<Description>
+Installation tools for HealthShare</Description>
+<IncludeCode>HS.Common,%ZHSLIB,%syPrompt</IncludeCode>
+<Super>HS.HC.Util.Installer,HS.Util.Installer.Kit.PostInstall.Base</Super>
+<TimeChanged>66743,48120.3855636</TimeChanged>
+<TimeCreated>66738,22640.3052514</TimeCreated>
+
+<UDLText name="T">
+<Content><![CDATA[
+/* Methods for FOB - set up CCDA setup 
+   The "Setup" methods are to be run once initially
+   The "Add Participant" methods are to be run when a new participant is onboarded
+
+*/
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// To run:
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// HSLIB> w ##class(HS.Local.Util.CCDInstaller).InstallFramework()
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// On server where HSROUTER installed run:
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// HSROUTER> w ##class(HS.Local.Util.CCDInstaller).InstallRouter()
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Then run: 
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// HSREGISTRY> w ##class(HS.Local.Util.CCDInstaller).AddParticipantFacility()
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// For these scripts, there is the option to pass in all required parameters or run without arguments and get prompted. 
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Main method for initial setup: Calls the methods to install the required infrastructure in HSROUTER, HSREGISTRY, HSBUS
+
+]]></Content>
+</UDLText>
+
+<Method name="InstallFramework">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	//SetupHomeCommunity Keys first
+	Set tSC = ..SetupHomeCommunity()
+
+	//Bus repository on Registry
+	Set tSC = ..SetupBusRepositoryKey("HSREGISTRY")
+
+	//Add items to BUS
+	Set tSC =  ..AddProductionItems("HSBUS", "BusItems")
+
+
+	quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="InstallRouter">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+
+	//Configuration keys in Registry on HSROUTER needed for PNR Header
+	Set tSC = ..SetupConfigurationKeys()
+
+	//Bus repository Key on HSROUTER
+	Set tSC = ..SetupBusRepositoryKey("HSROUTER")
+
+	//Set up HSROUTER production
+	Set tSC =  ..AddProductionItems("HSROUTER", "RouterItems")
+
+	//Set up HS.IHE.CodedEntry for CCDA Testing
+	Set tSC = ##class(HS.IHE.CodedEntry).SetupCDA()
+
+	quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="SetupHomeCommunity">
+<Description>
+CNR: There is some trickery around using a pSubstitutionValues as a lookup
+because of loose typing it's not clear from code what the datatype of pSubstitutionValues is
+so in order to use the trickery I have to figure out how to set up the lookup based
+on haunted code - I don't make the rules....</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pHomeCommunity:%String="",pOID:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		#; various things that need to be setup in a bus installation
+		Set tSC = $$$OK
+
+		If pHomeCommunity = "" { 
+			Read !, "ENTER the Home Community Name: ", pHomeCommunity
+			Read !, "ENTER the registered OID value for the Home Community: ", pOID
+		}
+
+		if pOID="" || pHomeCommunity = "" {
+			Write "Home Community and OID require non-empty values"
+			$$$ThrowStatus($$$ERROR($$$GeneralError, "Home Community and OID require non-empty values"))
+		}
+
+		ZN "HSREGISTRY"	
+		Write "  Setting Home Community entries in HSREGISTRY",!
+		Do ##class(HS.Data.OIDMap).FileOID(pHomeCommunity,"AssigningAuthority",pOID,"Home Community","HomeCommunity" )
+		Do ##class(HS.IHE.Util).SetAffinityDomain(pHomeCommunity)
+		Do ##class(HS.IHE.Util).SetHomeCommunity(pHomeCommunity)
+		
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Method to set up keys in HSROUTER for IHE codes in configuration key table 
+
+]]></Content>
+</UDLText>
+
+<Method name="SetupConfigurationKeys">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Namespace:%String="HSROUTER"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#; Default config key values used to set up PnR header for participants who just send the CCDA via file transfer
+	Set CLASSCODE = "\IHE\Default\ClassCode"	
+	Set CLASSCODEVALUE = "SUMMARY^1.3.6.1.4.1.19376.1.2.6.1^Summary"
+ 	Set CONFIDENTIALITYCODE = "\IHE\Default\ConfidentialityCode"	
+	Set CONFIDENTIALITYCODEVALUE = "N^2.16.840.1.113883.5.25^Normal"
+ 	Set CONTENTTYPECODE = "\IHE\Default\ContentTypeCode"	
+	Set CONTENTTYPECODEVALUE = "34117-2^2.16.840.1.113883.6.1^History and Physical Note"
+ 	Set FORMATCODE = "\IHE\Default\FormatCode"	
+	Set FORMATCODEVALUE = "2.16.840.1.113883.10.20.1^2.16.840.1.113883.3.88^HL7 CCD Document"
+ 	Set HEALTHCAREFACILITYTYPECODE = "\IHE\Default\HealthcareFacilityTypeCode"	
+	Set HEALTHCAREFACILITYTYPECODEVALUE = "OF^2.16.840.1.113883.5.11^Outpatient facility"
+ 	Set PRACTICESETTINGCODE = "\IHE\Default\PracticeSettingCode"	
+	Set PRACTICESETTINGCODEVALUE = "394802001^2.16.840.1.113883.6.96^General Medicine"
+	Set TYPECODE = "\IHE\Default\TypeCode"	
+	Set TYPECODEVALUE = "11506-3^2.16.840.1.113883.6.1^Progress note"
+	
+
+	Set tSC = $$$OK
+	#; Change namespace to where the configuration keys should be set
+	ZN Namespace
+
+	#; Set Configuration Key values for minimal header required for PnR
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(CLASSCODE , CLASSCODEVALUE))
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(CONFIDENTIALITYCODE , CONFIDENTIALITYCODEVALUE))
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(CONTENTTYPECODE , CONTENTTYPECODEVALUE))
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(FORMATCODE , FORMATCODEVALUE))
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(HEALTHCAREFACILITYTYPECODE , HEALTHCAREFACILITYTYPECODEVALUE))
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(PRACTICESETTINGCODE , PRACTICESETTINGCODEVALUE))
+	$$$ThrowOnError(##class(HS.Registry.Config).AddUpdateKeyValue(TYPECODE , TYPECODEVALUE))
+	Write "  Setting Coniguration Keys in HSROUTER",!
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Method to set up services in HSROUTER for the XDSb.Repository setting in the Service Registry
+
+]]></Content>
+</UDLText>
+
+<Method name="SetupBusRepositoryKey">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String="HSROUTER"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#; Default config key values used to set up PnR header for participants who just send the CCDA via file transfer	
+	Set tHostAndPort = ..GetCustomHostAndPort()
+	
+
+	Set tSC = $$$OK
+	#; Change namespace to where the service key should be set
+	ZN pNamespace
+
+	#; Set Service Key value to forward CCDs 
+	if pNamespace = "HSROUTER" {
+		Write "  Setting Repository Entries in HSROUTER",!
+		Set tEntries = "BusRegistryEntriesRouter"
+		$$$ThrowOnError(..SetupServiceRegistry(pNamespace, tEntries))
+	}
+	else {
+		Write "  Setting Repository Entries in HSREGISTRY",!
+		Set tEntries = "BusRegistryEntries"
+		$$$ThrowOnError(..SetupServiceRegistry(pNamespace, tEntries))
+		Set tEntries = "RegistryEntries"
+		$$$ThrowOnError(..SetupServiceRegistry(pNamespace, tEntries))
+	}
+	
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="SetupServiceRegistry">
+<Description>
+SetupServiceRegistry</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace="",pEntryName=""</FormalSpec>
+<Implementation><![CDATA[
+	zn pNamespace
+	Set tHostAndPort = ..GetCustomHostAndPort()
+	try {
+		Set tSubVals("CustomHostAndPort")=tHostAndPort
+		Set tObj = ..%New()
+		Set tSC = tObj.AddRegistryEntries(pNamespace,pEntryName, .tSubVals) Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Write "  Setting BUS Registry Entries in <"_pNamespace_">",!
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Need method to set up services, OID, assigning authority, facility id for a new facility
+
+]]></Content>
+</UDLText>
+
+<Method name="AddParticipantFacility">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pFacility:%String="",pOID:%String="",pDescription:%String="",pType:%String="AssigningAuthority",pNamespace=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		#; various things that need to be setup in a facility installation
+		Set tSC = $$$OK
+
+		If pFacility = "" { 
+			Read !, "ENTER the Facility ID: ", pFacility
+			Read !, "ENTER the registered OID value for the Facility: ", pOID
+			Read !, "ENTER the description for the Service registry: ", pDescription
+		}
+
+		if pOID="" || pFacility = "" {
+			Write "Facility ID and OID require non-empty values"
+			$$$ThrowStatus($$$ERROR($$$GeneralError, "Facility ID and OID require non-empty values"))
+		}
+
+		ZN "HSREGISTRY"	
+		Write "  Setting Facility entries in HSREGISTRY",!
+		Do ##class(HS.Data.OIDMap).FileOID(pFacility,pType,pOID,pDescription,"Facility" )
+		
+		#; Default config key values used to set up PnR header for participants who just send the CCDA via file transfer
+		Set SERVICENAME = pFacility_".XDSb.Repository"	
+		Set HOST = ##class(%SYS.System).GetNodeName(1)
+		Set WEBSERVERPORT = ^%SYS("WebServer","Port")
+		Set HOSTURL = "http://"_HOST_":"_WEBSERVERPORT 
+		Set SERVICEURL = "/csp/healthshare/EG"_pFacility_"/services/HS.IHE.XDSb.Repository.Services.cls"
+	
+		
+		Set tEndpoint = HOSTURL_SERVICEURL
+		
+		Set pNamespace = "HSREGISTRY"
+		#; Create Repository OID for EG{FacilityId}
+		Write "  Create Repository OID for EG{FacilityId} in <"_pNamespace_">",!
+		$$$ThrowOnError(..AddParticipantRepository(pNamespace, pFacility))
+
+		#; Set Service Key value to forward CCDs from HSBUS to EG{FacilityId}
+		Write "   BUS Registry Entries in <"_pNamespace_">",!
+		$$$ThrowOnError(..AddParticipantServiceRegistry(pNamespace, pFacility))
+		
+		
+		//Add items to edge
+		Do ..AddProductionItems("EG"_pFacility, "EdgeGatewayItems")
+
+
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetCustomHostAndPort">
+<Description>
+Helper method to return the Custom Host and Port. Example DEVSERVER:52773</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+ 	Set tHost = ##class(%SYS.System).GetNodeName(1)
+	Set tWebserverPort = ^%SYS("WebServer","Port")
+	Set tCustomHostAndPort = tHost_":"_tWebserverPort
+	Quit tCustomHostAndPort
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Add new Participant Repository on EDGE 
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// The scheme to assign the OIDs for Repository EDGE is to take the HomeCommunity OID and add a subOID
+
+]]></Content>
+</UDLText>
+
+<Method name="AddParticipantRepository">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,pFacility:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+	Set tSC = $$$OK
+	ZN pNamespace
+	//Get the Home Community value from the Configuration Registry
+	Set tKey = "\IHE\HomeCommunity"
+	Set tHomeCommunity = ##class(HS.Registry.Config).GetKeyValue(tKey)
+	w "tHomeCommunity: "_tHomeCommunity
+	//Get the Home Community OID
+	Set tHomeCommunityOID = ##class(HS.Data.OIDMap).GetOIDForCode(tHomeCommunity)
+	w "tHomeCommunityOID: "_tHomeCommunityOID
+
+	//Then get a count of current repositories and iterate by 1 to create a new repository OID
+	//This number is just an internal identification scheme for XDS protocol
+
+	/// Given a Type Repository, find the count of existing Repos and append count+1 to the HomeCommunityOID 
+	/// to assign the Repository OID
+	Set tDefault="Repository"
+	&sql(select Count(OID) into :tOIDCount from HS_Data.OIDMap where Types = 'Repository' )
+	If 'SQLCODE  {
+		Set tOIDCount = tOIDCount+1
+		Set tRepositoryOID = tHomeCommunityOID_"."_tOIDCount
+		w "tRepositoryOID: " _ tRepositoryOID
+	}
+	else {
+		W SQLCODE
+		$$$ThrowStatus($$$ERROR($$$GeneralError, $$$CurrentMethod_" Unable to Get Repository Count to assign OID"))
+	}
+	
+	
+	/// Make sure that OID doesn't already exist - GetCodeForOID returns the OID if no code found
+	If ##class(HS.Data.OIDMap).GetCodeForOID(tRepositoryOID)=tRepositoryOID {
+		Set tSC = ##class(HS.Data.OIDMap).FileOID("EG"_pFacility, "Repository", tRepositoryOID, "EDGE REPOSITORY For Participant: "_pFacility)
+		If $$$ISERR(tSC) Quit tSC
+	}
+	else {
+		$$$ThrowStatus($$$ERROR($$$GeneralError, $$$CurrentMethod_" OID for repository <"_tRepositoryOID_"> already exists. Cannot generate new Edge Repository in HSREGISTRY"))
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="AddParticipantServiceRegistry">
+<Description>
+This will only work where all namespaces are on the same system.  Use individual calls </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,pFacility:%String</FormalSpec>
+<Implementation><![CDATA[
+	try {
+		Set tObj = ..%New()
+
+		Set tHostAndPort=..GetCustomHostAndPort()
+
+		Set tSubVals("CustomHostAndPort")=tHostAndPort
+		Set tSubVals("FacilityId")=pFacility
+		/// AddRegistryEntries is defined in parent class HS.Util.Installer.Kit.Base and contains ByRef parameter pSub
+		Set tSC = tObj.AddRegistryEntries(pNamespace,"FacilityRegistryEntries",.tSubVals) Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="AddFacilityConfig">
+<Description>
+Helper method - add facility configuration key</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pFacilityId:%String="",pGateway:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC = $$$OK
+		
+		/// see if the Facility config already exists
+		Set tFacility = ##class(HS.Facility.Config).%OpenId(pFacilityId)
+		If '$IsObject(tFacility) Set tFacility=##class(HS.Facility.Config).%New()
+		Set tFacility.FacilityCode=pFacilityId
+		Set tFacility.Name=pFacilityId
+		Set tFacility.AssigningAuthority=1
+		Set tSC = ..DemoFindGatewayByName(pGateway,.tGWID)
+		Do tFacility.GatewaySetObjectId(tGWID)
+		Set tSC=tFacility.%Save() Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Helper method - update Service registry to add device and gateway
+
+]]></Content>
+</UDLText>
+
+<Method name="UpdateServiceRegistryConfig">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	// CNR: need to fix - Get Existing Service Entry or Create if one doesnt exist
+	Set tService = ##class(HS.Registry.Service.HTTP).EndPointForNameType(tServiceName, tServiceType)
+	If tService="" {
+		Set tService = ##class(HS.Registry.Service.HTTP).%New()
+		Set tService.Name = tServiceName
+		Set tService.Type = tServiceType
+	}
+	Set tService.SSLConfig = tSSLConfigName
+	Set tSC = tService.ParseURL(tIssuerURL)
+	Quit:$$$ISERR(tSC)
+	Set tService.DeviceFunction = tDeviceFunction
+	Set tSC = tService.%Save()
+	Kill tService
+]]></Implementation>
+</Method>
+
+<Method name="AddRegistryEntries">
+<Description>
+Method override to search for FacilityId and other parameterized keys to replace
+Parameter replacements needed in EndPoint, Name, OIDMapCodeItem</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pNS:%String="",pItems="RegistryEntries",&pSubstitutionValues]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		Set tWhere = $Namespace Set:pNS]"" $Namespace=pNS 
+		Set:pNS="" pNS=$Namespace
+		Set tSC	= ..getStream(pItems, .tItemsXData) Quit:$$$ISERR(tSC)
+		
+		set tReader = ##class(%XML.Reader).%New()
+		Set tSC = tReader.OpenStream(tItemsXData,.tObjects) Quit:$$$ISERR(tSC)
+		
+		// Initialize XPATH Document from tItemsXData
+		Set tSC = ##class(%XML.XPATH.Document).CreateFromStream(tItemsXData, .tDocument)
+		Quit:$$$ISERR(tSC)
+		
+		#; web services
+		Do tReader.Correlate("WebService","HS.Registry.Service.SOAP")
+		Set tSC=##class(%RoutineMgr).GetWebServerPort(.tPort) Quit:'tSC
+		Set tHostAndPort=$ZCVT($$$HSNetworkHostName,"L")_":"_tPort
+		//
+		// Initialize counter for SOAP items
+		Set i=0
+		//
+		While tReader.Next(.tItem, .tSC) {
+			
+			/*
+				Properties with Defaults
+				
+				Abstract:
+				Status
+				Push
+				SystemGenerated
+				
+				HTTP:
+				Abstract's properties
+				ProxyHTTPS
+				ProxyHTTPTunnel
+				ProxyHTTPSSLConnect
+				SSLCheckServerIdentity
+				
+				SOAP:
+				HTTP's properties
+				MTOM
+				SendSAMLAssertion
+			*/
+			
+			Set i=i+1 // Keep track of which item being processed to grab the corresponding item from the XDATA
+			For tProp="Push","SystemGenerated","ProxyHTTPS","ProxyHTTPTunnel","ProxyHTTPSSLConnect","SSLCheckServerIdentity","MTOM","SendSAMLAssertion" {
+				Set tSC=tDocument.EvaluateExpression("/Items/WebService[i]/"_tProp, "text()", .tResults)
+				Quit:$$$ISERR(tSC)
+				If $G(tResults.Data(1))="" { // No input property, so clear default from tItem
+					Set $Property(tItem, tProp) = ""
+				}
+			}
+
+			//The Name of the Webservice is parameterized so we need to update the Name
+			Set tName = tItem.Name
+			if tName [ "{" 
+			{	
+				If tName[ "{FacilityId}" && ($D(pSubstitutionValues("FacilityId"))) {
+					Set tItem.Name = pSubstitutionValues("FacilityId") _ $p(tName,"{FacilityId}",2)
+					w "tItem.Name is: "_tItem.Name
+				}
+				Else {
+					$$$ThrowStatus($$$ERROR($$$GeneralError, $$$CurrentMethod_" Facility Id Required"))
+				}
+			}
+
+			//The OIDMapCodeItem is also parameterized so we need to update the OIDMapCodeItem
+			/// Assume one instance is fine
+			Set tOIDMapItem = tItem.OIDMapCode.GetAt("Repository")
+			if tOIDMapItem [ "{" 
+			{	
+				If tOIDMapItem[ "{FacilityId}" && ($D(pSubstitutionValues("FacilityId"))) {
+					do tItem.OIDMapCode.SetAt($p(tOIDMapItem,"{FacilityId}",1)_pSubstitutionValues("FacilityId"),"Repository")
+					w "tItem.OIDMapCode Repository is: "_tItem.OIDMapCode.GetAt("Repository")
+					
+				}
+				Else {
+					$$$ThrowStatus($$$ERROR($$$GeneralError, $$$CurrentMethod_" Facility Id Required"))
+				}
+			}
+
+
+			Set tEP = ##class(HS.Registry.Service.SOAP).EndPointForNameType(tItem.Name,"SOAP")
+			If '$IsObject(tEP) Set tEP=tItem
+			Set tEndPoint = tItem.EndPoint
+			If tEndPoint ["{" {
+				If tEndPoint[ "{HostAndPort}" {
+					Set tEndPoint = $p(tEndPoint,"{HostAndPort}",1) _ tHostAndPort _ $p(tEndPoint,"{HostAndPort}",2)
+				} ElseIf tEndPoint[ "{CustomHostAndPort}" && ($D(pSubstitutionValues("CustomHostAndPort"))) {
+					Set tEndPoint = $p(tEndPoint,"{CustomHostAndPort}",1) _ pSubstitutionValues("CustomHostAndPort") _ $p(tEndPoint,"{CustomHostAndPort}",2)
+				} ElseIf tEndPoint[ "{CustomURL}" && ($D(pSubstitutionValues("CustomURL"))) {
+					Set tEndPoint = pSubstitutionValues("CustomURL")
+				} Else {
+					Set tSystemName = $p($p(tEndPoint,"{",2),"}")
+					Set tHost = ..GetSystemItem(tSystemName,"Host")
+					Set tPort = ..GetSystemItem(tSystemName,"WebPort")
+					Set tEndPoint = $p(tEndPoint,"{"_tSystemName_"}",1) _ tHost_":"_tPort _ $p(tEndPoint,"{"_tSystemName_"}",2)
+				}
+				If tEndPoint["{Namespace}" {
+					Set tEndPoint = $p(tEndPoint,"{Namespace}",1) _ $namespace _ $p(tEndPoint,"{Namespace}",2)
+				}
+
+				///The endpoint also needs to search and replace FacilityId
+			
+				if tEndPoint [ "{" 
+				{	
+					If tEndPoint[ "{FacilityId}" && ($D(pSubstitutionValues("FacilityId"))) {
+						Set tEndPoint = $p(tEndPoint,"{FacilityId}",1) _ pSubstitutionValues("FacilityId") _ $p(tEndPoint,"{FacilityId}",2)
+					}
+					Else {
+						$$$ThrowStatus($$$ERROR($$$GeneralError, $$$CurrentMethod_" Facility Id Required"))
+					}
+				}
+			}				
+			Set tSC = tItem.ParseURL(tEndPoint)
+			Set tSC = tEP.UpdateFrom(tItem,tEP)
+			Quit:$$$ISERR(tSC)
+			Set tEP.Type="SOAP"
+			Set tSC=tEP.%Save()
+			Quit:$$$ISERR(tSC)
+		}
+		
+		#; tcp services
+		Do tReader.Rewind()
+		Do tReader.Correlate("TCPService","HS.Registry.Service.TCP")
+		// Initialize counter for TCP Items
+		Set i=0
+		While tReader.Next(.tItem, .tSC) {
+			
+			/*
+				Properties with Defaults
+				
+				Abstract:
+				Status
+				Push
+				SystemGenerated
+				
+			*/
+			
+			Set i=i+1 // Keep track of which item being processed to grab the corresponding item from the XDATA
+
+			For tProp="Push","SystemGenerated" {
+				Set tSC=tDocument.EvaluateExpression("/Items/WebService[i]/"_tProp, "text()", .tResults)
+				Quit:$$$ISERR(tSC)
+				If $G(tResults.Data(1))="" { // No input property, so clear default from tItem
+					Set $Property(tItem, tProp) = ""
+				}
+			}
+
+
+			Set tEP = ##class(HS.Registry.Service.TCP).EndPointForNameType(tItem.Name,"TCP")
+			If '$IsObject(tEP) Set tEP=tItem
+			Set tSC = tEP.UpdateFrom(tItem,tEP)
+			Quit:$$$ISERR(tSC)
+			Set tEP.Type="TCP"
+			Set tSC=tEP.%Save()
+			Quit:$$$ISERR(tSC)
+		}
+		
+		#; http services
+		Do tReader.Rewind()
+		Do tReader.Correlate("HTTPService","HS.Registry.Service.HTTP")
+		Set tSC=##class(%RoutineMgr).GetWebServerPort(.tPort) Quit:'tSC
+		Set tHostAndPort=$ZCVT($$$HSNetworkHostName,"L")_":"_tPort
+		// Initialize counter for HTTP Items
+		Set i=0
+		While tReader.Next(.tItem, .tSC) {
+			
+			/*
+				Properties with Defaults
+				
+				Abstract:
+				Status
+				Push
+				SystemGenerated
+				
+				HTTP:
+				Abstract's properties
+				ProxyHTTPS
+				ProxyHTTPTunnel
+				ProxyHTTPSSLConnect
+				SSLCheckServerIdentity
+				
+			*/
+			
+			Set i=i+1 // Keep track of which item being processed to grab the corresponding item from the XDATA
+			For tProp="Push","SystemGenerated","ProxyHTTPS","ProxyHTTPTunnel","ProxyHTTPSSLConnect","SSLCheckServerIdentity" {
+				Set tSC=tDocument.EvaluateExpression("/Items/WebService[i]/"_tProp, "text()", .tResults)
+				Quit:$$$ISERR(tSC)
+				If $G(tResults.Data(1))="" { // No input property, so clear default from tItem
+					Set $Property(tItem, tProp) = ""
+				}
+			}
+
+
+			Set tEP = ##class(HS.Registry.Service.HTTP).EndPointForNameType(tItem.Name,"HTTP")
+			If '$IsObject(tEP) Set tEP=tItem
+			Set tEndPoint = tItem.EndPoint
+			If tEndPoint ["{" {
+				If tEndPoint[ "{HostAndPort}" {
+					Set tEndPoint = $p(tEndPoint,"{HostAndPort}",1) _ tHostAndPort _ $p(tEndPoint,"{HostAndPort}",2)
+				} ElseIf tEndPoint[ "{CustomHostAndPort}" && ($D(pSubstitutionValues("CustomHostAndPort"))) {
+					Set tEndPoint = $p(tEndPoint,"{CustomHostAndPort}",1) _ pSubstitutionValues("CustomHostAndPort") _ $p(tEndPoint,"{CustomHostAndPort}",2)
+				} ElseIf tEndPoint[ "{CustomURL}" && ($D(pSubstitutionValues("CustomURL"))) {
+					Set tEndPoint = pSubstitutionValues("CustomURL")
+				} Else {
+					Set tSystemName = $p($p(tEndPoint,"{",2),"}")
+					Set tHost = ..GetSystemItem(tSystemName,"Host")
+					Set tPort = ..GetSystemItem(tSystemName,"WebPort")
+					Set tEndPoint = $p(tEndPoint,"{"_tSystemName_"}",1) _ tHost_":"_tPort _ $p(tEndPoint,"{"_tSystemName_"}",2)
+				}
+				If tEndPoint["{Namespace}" {
+					Set tEndPoint = $p(tEndPoint,"{Namespace}",1) _ $namespace _ $p(tEndPoint,"{Namespace}",2)
+				}
+				If tEndPoint["{CustomURL}" {
+					Set tEndPoint = $p(tEndPoint,"{CustomURL}",1) _ pSubstitutionValues("CustomURL") _ $p(tEndPoint,"{CustomURL}",2)
+				}
+			}				
+			Set tSC = tItem.ParseURL(tEndPoint)
+			Quit:$$$ISERR(tSC)
+			Set tSC = tEP.UpdateFrom(tItem,tEP)
+			Quit:$$$ISERR(tSC)
+			Set tEP.Type="HTTP"
+			Set tSC=tEP.%Save()
+			Quit:$$$ISERR(tSC)
+		}
+		
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Set $Namespace=tWhere
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+
+ClassMethod HasSetting(pItem, pSettingName) As %Boolean
+{
+	set tIndex="",tFound=0 
+	for  {
+		set tIndex = pItem.Settings.Next(tIndex)  quit:tIndex=""
+		set tOneSetting = pItem.Settings.GetAt(tIndex)
+		If tOneSetting.Name = pSettingName Set tFound=1 Quit
+	}
+	;
+	set tTargetClassname("Host") = pItem.ClassName
+	set tTargetClassname("Adapter") = pItem.AdapterClassName()
+	set tTarget="" 
+	for  {
+		set tTarget=$o(tTargetClassname(tTarget),1,tClassname) quit:tTarget=""
+		set rs = ##class(%ResultSet).%New()
+		set rs.ClassName = tClassname
+		set rs.QueryName = "EnumerateSettings"
+		if ('rs.QueryIsValid()) continue
+		set tSC = rs.Execute()
+		while (rs.Next()) {
+			set tName = $G(rs.Data("Name"))
+			If tName = pSettingName Set tFound=1 Quit
+		}
+	}
+	quit tFound
+}
+*/
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+ClassMethod Add(pNamespaces As HS.Util.Installer.Kit.Namespaces = {$$$NULLOREF}, pRegistryNS As %String = "HSREGISTRY", pBusNS As %String = "HSBUS", pEdgeNS = "HSEDGE1", pAccessNS = "HSACCESS") As %Status
+{
+	Set tWhere = $Namespace
+	try {
+		//Set $Namespace = pRegistryNS Set tSC = ..AddHub(pNamespaces) Quit:$$$ISERR(tSC)
+		
+		Set $Namespace = pEdgeNS Set tSC = ..AddEdgeGateway(pNamespaces) Quit:$$$ISERR(tSC)
+		//Set $Namespace = pAccessNS Set tSC = ..AddAccessGateway(pNamespaces) Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Set $Namespace = tWhere
+	Quit tSC
+}
+*/
+]]></Content>
+</UDLText>
+
+<Method name="AddProductionItems">
+<Description>
+Add Production Items from XDATA block</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String="",pBlockItems:%String=""</FormalSpec>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		Write "  Installing components in <"_pNamespace_"> namespace",!
+		Set tSC= ..ProductionMods(pNamespace,pBlockItems,1) Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="ProductionMods">
+<Description>
+Helper method frequently used in Install Kit classes to update productions</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNS:%String=$namespace,pItems:%String="",pUpdate:%Boolean=0,pProductionClass="",pAddItemsString=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	try {
+		Set tSC=$$$OK
+		Set tWhere = $Namespace Set:pNS]"" $Namespace=pNS
+		Set tSC=..GetProduction(.tProdRef,pProductionClass) Quit:$$$ISERR(tSC)
+		If pAddItemsString="" {
+			Set tSC	= ..getStream(pItems, .tProduction) Quit:$$$ISERR(tSC)
+		} Else {
+			Set tProduction = ##class(%Stream.GlobalCharacter).%New()
+			Do tProduction.Write("<Items>"_pAddItemsString_"</Items>"),tProduction.Rewind()
+		}
+		set tReader = ##class(%XML.Reader).%New()
+		Set tSC = tReader.OpenStream(tProduction,.tObject) Quit:$$$ISERR(tSC)
+		Do tReader.Correlate("Item","Ens.Config.Item")
+		While tReader.Next(.tItem, .tSC) {
+			//There is 
+
+			Set tSC=..AddUpdateConfigItem(tItem,tProdRef,pUpdate) 
+			Quit:$$$ISERR(tSC)
+		}
+		Set tSC=##class(HS.Util.Installer.Upgrade.Abstract).SaveProduction(tProdRef)
+		
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Set $Namespace=tWhere
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="GetProduction">
+<Description>
+Helper method used in installs
+find the first production which starts out with this namespace name</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*pProdRef:Ens.Config.Production,pProductionClass=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Try {
+		Set tSC=$$$OK
+		Set:pProductionClass="" pProductionClass = ##class(HS.Util.Installer.ConfigItem).ProductionGetStored($namespace)
+		If pProductionClass="" {
+			Set tRS=##class(%ResultSet).%New("%Library.ClassDefinition:SubclassOf")     
+			Set tSC=tRS.Execute("HS.Util.AbstractProduction")
+			Quit:$$$ISERR(tSC)
+			While tRS.%Next() {
+				Set tItem=tRS.Get("Name")
+				If $p(tItem,".")=$Namespace Set pProductionClass=tItem Quit
+				If $p(tItem,".")=($Namespace_"PKG") Set pProductionClass=tItem Quit
+			}
+			If pProductionClass="" Do ##class(Ens.Director).ParseConfigItemName("",.pProductionClass)
+		}
+		If pProductionClass="" Set tSC=$$$ERROR($$$GeneralError,"Production Item not found") Quit
+		Set pProdRef=##class(Ens.Config.Production).%OpenId(pProductionClass)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="getStream">
+<Description>
+helper method used in installs</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pLocation:%String,*pStream</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	If pLocation '[ "://" Set pLocation = "xdata://"_..%ClassName(1)_":"_pLocation
+	Quit ##class(HS.Util.XMLUtils).GetXDataAsStreamWithSubstitutions(pLocation,.pStream)
+]]></Implementation>
+</Method>
+
+<Method name="AddUpdateConfigItem">
+<Description>
+helper method used to update production items</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pItem:Ens.Config.Item,pToProd:Ens.Config.Production,pUpdate</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim tItem As Ens.Config.Item
+	#dim tFromItem As Ens.Config.Item
+	try {
+		Set tFound=0,tSC=$$$OK
+		For tI=1:1:pToProd.Items.Count() {
+			Set tItem=pToProd.Items.GetAt(tI)
+			If tItem.ClassName=pItem.ClassName && (tItem.Name = pItem.Name) && (tItem.Comment = pItem.Comment) {Set tFound=1 Quit}
+		}
+		If tFound && 'pUpdate Quit   //already there, done if not updating it
+		If 'tFound {
+			Set tSC=pToProd.Items.Insert(pItem)
+			Quit
+		} Else {
+			For tProperty = "Category","ClassName","PoolSize","Enabled","Foreground","DisableErrorTraps","InactivityTimeout","Comment","LogTraceEvents","Schedule" {
+				Set $zobjProperty(tItem,tProperty)=$zobjProperty(pItem,tProperty)
+			}
+		}
+
+		Set tIdx=""
+		For {
+			Set tSetting = pItem.Settings.GetNext(.tIdx) Quit:tIdx=""
+			Set tIdx2="",tSettingFound=0
+			For  {
+				Set tSetting2 = tItem.Settings.GetNext(.tIdx2) Quit:tIdx2=""
+				If tSetting2.Name = tSetting.Name {
+					Set tSetting2.Value = tSetting.Value,tSetting2.Target = tSetting.Target,tSettingFound=1
+				}
+			}
+			If 'tSettingFound Do tItem.Settings.Insert(tSetting)
+		}
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="%ClassName">
+<Description><![CDATA[
+More helper methods
+Returns the object's class name. The <var>fullname</var> determines how the
+class name is represented. If it is 1 then it returns the full class name
+including any package qualifier. If it is 0 (the default) then it returns the
+name of the class without the package, this is mainly for backward compatibility
+with the pre-package behaviour of %ClassName.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>fullname:%Boolean</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ServerOnly>0</ServerOnly>
+<Implementation><![CDATA[	Quit $select($get(fullname,0):$$$objClass,1:$$$ClassCompatibleName($$$objClass))
+]]></Implementation>
+</Method>
+
+<Method name="Notes">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set dir=##class(%File).NormalizeDirectory($system.Util.InstallDirectory()_"\Data")
+	do ..DisplayNotes("InstallIntro",dir)
+	read !?60,"<Enter>",y
+]]></Implementation>
+</Method>
+
+<Method name="SetupFacility">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCode,pName,pExternalOrGateway</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	If ##class(HS.Facility.Config).%ExistsId(pCode) Quit $$$OK
+
+	Write !,"Setup facility "_pCode
+	Set tFacility=##class(HS.Facility.Config).%New()
+	Set tFacility.FacilityCode=pCode
+	Set tFacility.Name=pName
+	If pExternalOrGateway = 1 {
+		Set tFacility.ExternalHIE = 1
+	} Else {
+		Set tSC = ##class(HS.Gateway.Config).FindByName(pExternalOrGateway, .tGWID) Quit:$$$ISERR(tSC) tSC
+		If tGWID="" Quit $$$ERROR($$$GeneralError,"Gateway not found: "_pExternalOrGateway) 
+		Do tFacility.GatewaySetObjectId(tGWID)
+	}
+	Quit tFacility.%Save()
+]]></Implementation>
+</Method>
+
+<Method name="DisplayNotes">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pXdata:%String="DemoNotes",p1:%String=""</FormalSpec>
+<Implementation><![CDATA[
+ if p1="" set p1=##class(%File).NormalizeDirectory($system.Util.InstallDirectory()_"\Data")
+ set tSC=##class(Ens.Util.URLStream).GetURLStream("xdata://HS.Util.Installer:"_pXdata, .notes) Quit:$$$ISERR(tSC)
+ set note=notes.Read(32000),note=$p(note,"<text>",2,99999),note=$p(note,"</text>")
+ while note["{p1}" {set note=$p(note,"{p1}")_p1_$p(note,"{p1}",2,99999)}
+ while $l(note) {
+	set n1=$p(note,$c(13,10),1,24),note=$p(note,$c(13,10),25,99999)
+	write !,n1
+	if $l(note) read !?60,"<Enter>",y
+ }
+]]></Implementation>
+</Method>
+
+<Method name="CreateDir">
+<Description>
+Create a directory
+Deprecated - do not use</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pPath:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set tSC=$$$OK
+ set tOK=##class(%File).CreateDirectoryChain(pPath)  
+ if 'tOK set tSC=$$$ERROR($$$DirectoryCannotCreate,pPath)
+ quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="CopyDir">
+<Description>
+Copy a directory
+Deprecated - do not use</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pSrc:%String,pTarget:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set %objlasterror = $$$OK,tSC=$$$OK
+ set tOK=##class(%File).CopyDir(pSrc, pTarget,1)
+ if 'tOK {
+	if $$$ISERR(%objlasterror) {set tSC=%objlasterror}
+	else {set tSC=$$$ERROR($$$FileCanNotCopy,pSrc,pTarget)}
+ }
+ quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="CopyFile">
+<Description>
+Copy a file</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pSrc:%String,pTarget:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set tSC=$$$OK
+ set tOK=$zu(140,11,pSrc,pTarget) // 0 = success
+ if tOK'=0 set tSC=$$$ERROR($$$FileCanNotCopy,pSrc,pTarget)
+ quit tSC
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+ClassMethod AddHub(pNamespaces As HS.Util.Installer.Kit.Namespaces = {$$$NULLOREF}, pNS = {$Namespace}, pAddBusEntries = 0)
+{
+	try {
+		Set tObj = ..%New()
+		Set tSC = tObj.AddRegistryEntries(pNS,"RegistryEntries") Quit:$$$ISERR(tSC)
+		If 'pAddBusEntries && $isObject(pNamespaces) {
+			For tIdx = 1:1:pNamespaces.Namespace.Count() {
+				Set tNamespace = pNamespaces.Namespace.GetAt(tIdx)
+				If tNamespace.Type = "Bus" Set pAddBusEntries=1 Quit
+			}
+		}
+		Set:pAddBusEntries tSC = tObj.AddRegistryEntries(pNS,"BusRegistryEntries") Quit:$$$ISERR(tSC)
+		Set tSC = ##class(HS.Util.Installer.Kit.IHE.PIXPDQ).AddHub(pAddBusEntries) Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+}
+*/
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+ClassMethod AddBus(pNamespaces As HS.Util.Installer.Kit.Namespaces = {$$$NULLOREF}, pNS = "")
+{
+	try {
+		Set tSC = ..ProductionMods(pNS,"BusItems",1) Quit:$$$ISERR(tSC)
+		Set tSC = ##class(HS.Util.Installer.Kit.IHE.PIXPDQ).AddBus(pNamespaces) Quit:$$$ISERR(tSC)
+	} Catch ex {
+		Set tSC=ex.AsStatus()
+	}
+	Quit tSC
+}
+*/
+]]></Content>
+</UDLText>
+
+<XData name="FacilityRegistryEntries">
+<Description>
+replaced $namespace</Description>
+<Data><![CDATA[
+<Items>
+<WebService>
+<Name>{FacilityId}.XDSb.Repository</Name>
+<Push>1</Push>
+<SSLConfig></SSLConfig>
+<EndPoint>http://{HostAndPort}/csp/healthshare/EG{FacilityId}/services/HS.IHE.XDSb.Repository.Services.cls</EndPoint>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+<OIDMapCode>
+<OIDMapCodeItem OIDMapCodeKey="Repository">EG{FacilityId}</OIDMapCodeItem>
+</OIDMapCode>
+<MTOM>1</MTOM>
+<DeviceFunction>XDSb.Retrieve</DeviceFunction>
+</WebService>
+</Items>
+]]></Data>
+</XData>
+
+<UDLText name="T">
+<Content><![CDATA[
+// RegistryEntries for Service Registry
+
+]]></Content>
+</UDLText>
+
+<XData name="RegistryEntries">
+<Data><![CDATA[
+<Items>
+<WebService>
+<Name>XDSb.Registry</Name>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsregistry/services/HS.IHE.XDSb.Registry.Services.cls</EndPoint>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+<WebService>
+<Name>XDSb.Repository</Name>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsrepository/services/HS.IHE.XDSb.Repository.Services.cls</EndPoint>
+<MTOM>1</MTOM>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+
+<WebService>
+<Name>XDR.Recipient</Name>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsrepository/services/HS.IHE.XDR.Recipient.Services.cls</EndPoint>
+<MTOM>1</MTOM>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+</Items>
+]]></Data>
+</XData>
+
+<XData name="BusRegistryEntries">
+<Data><![CDATA[
+<Items>
+<WebService>
+<Name>BUS.XDSb.Repository</Name>
+<SSLConfig></SSLConfig>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsbus/services/HS.IHE.XDSb.Repository.Services.cls</EndPoint>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+<WebService>
+<Name>BUS.XDSb.Registry</Name>
+<SSLConfig></SSLConfig>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsbus/services/HS.IHE.XDSb.Registry.Services.cls</EndPoint>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+</Items>
+]]></Data>
+</XData>
+
+<XData name="BusRegistryEntriesRouter">
+<Data><![CDATA[
+<Items>
+<WebService>
+<Name>BUS.XDSb.Repository</Name>
+<SSLConfig></SSLConfig>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsbus/services/HS.IHE.XDR.Recipient.Services.cls</EndPoint>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+<WebService>
+<Name>BUS.XDSb.Registry</Name>
+<SSLConfig></SSLConfig>
+<EndPoint>http://{HostAndPort}/csp/healthshare/hsbus/services/HS.IHE.XDSb.Registry.Services.cls</EndPoint>
+<UsernameTokenProfileConfig>HS_Services</UsernameTokenProfileConfig>
+</WebService>
+</Items>
+]]></Data>
+</XData>
+
+<XData name="RouterItems">
+<Data><![CDATA[
+<Items>
+  <Item Name="HS.IHE.XDR.Recipient.Services" Category="" ClassName="HS.IHE.XDR.Recipient.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HS.IHE.XDR.Recipient.DirectProcess" Category="" ClassName="HS.IHE.XDR.Recipient.DirectProcess" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="DeliveryTarget">HS.IHE.XDSb.Repository.Operations</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Registry.Services" Category="" ClassName="HS.IHE.XDSb.Registry.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Process" Category="" ClassName="HS.IHE.XDSb.Repository.Process" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HS.IHE.XDSb.Registry.Operations" Category="" ClassName="HS.IHE.XDSb.Registry.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="XDSbRegistryServiceName">BUS.XDSb.Registry</Setting>
+  </Item>
+  <Item Name="HS.Test.Service" Category="" ClassName="HS.Test.Service" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="XDSbSourceOperations">HS.IHE.XDSb.Repository.Operations</Setting>
+    <Setting Target="Host" Name="SourceOperations">HS.IHE.PIXv3.Source.Operations</Setting>
+    <Setting Target="Host" Name="PIXConsumerOperations">HS.IHE.PIXv3.Manager.Operations</Setting>
+  </Item>
+  <Item Name="HS.IHE.PIXv3.Source.Operations" Category="" ClassName="HS.IHE.PIXv3.Source.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="Device">PIXv3SourceDevice</Setting>
+    <Setting Target="Host" Name="ServiceName">BUS.PIXv3.Manager</Setting>
+  </Item>
+  <Item Name="HS.IHE.PIXv3.Manager.Operations" Category="" ClassName="HS.IHE.PIXv3.Manager.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="ServiceName">PIXv3.Manager</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Operations" Category="" ClassName="HS.IHE.XDSb.Repository.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="XDSbRepositoryServiceName">BUS.XDSb.Repository</Setting>
+    <Setting Target="Host" Name="TraceOperations">*FULL*</Setting>
+    <Setting Target="Host" Name="XDSbRegistryServiceName">BUS.XDSb.Registry</Setting>
+  </Item>
+  <Item Name="HS.Util.Trace.Operations" Category="" ClassName="HS.Util.Trace.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="EnsLib.XML.FileService" Category="" ClassName="EnsLib.XML.FileService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="TargetConfigNames">HS.IHE.XDSb.AddHeader.Process</Setting>
+    <Setting Target="Adapter" Name="ArchivePath">C:\CCD\Archive\</Setting>
+    <Setting Target="Adapter" Name="FilePath">C:\CCD\In\</Setting>
+    <Setting Target="Adapter" Name="WorkPath">C:\CCD\Workpath\</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.DocumentSource.Operations" Category="" ClassName="HS.IHE.XDSb.DocumentSource.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="XDSbRepositoryServiceName">BUS.XDSb.Repository</Setting>
+    <Setting Target="Host" Name="ServiceName"></Setting>
+    <Setting Target="Host" Name="XDSbRegistryServiceName">BUS.XDSb.Registry</Setting>
+    
+  </Item>
+  <Item Name="HS.IHE.XDSb.AddHeader.Process" Category="" ClassName="HS.Local.IHE.XDSb.AddHeader.Process" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="TargetConfigNames">HS.IHE.XDSb.DocumentSource.Operations</Setting>
+  </Item>
+</Items>
+]]></Data>
+</XData>
+
+<XData name="BusItems">
+<Data><![CDATA[
+<Items>
+<Item Name="HS.Bus.Identification.Services" Category="" ClassName="HS.Bus.Identification.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="RegistrationTarget">HUB</Setting>
+    <Setting Target="Host" Name="GatewayType">B</Setting>
+  </Item>
+  <Item Name="HS.Bus.Identification.Operations" Category="" ClassName="HS.Bus.Identification.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="ServiceName">HSREGISTRY</Setting>
+  </Item>
+  <Item Name="HS.Bus.Data.Services" Category="" ClassName="HS.Bus.Data.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.Bus.Data.Operations" Category="" ClassName="HS.Bus.Data.Operations" PoolSize="2" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.Bus.Security.Services" Category="" ClassName="HS.Bus.Security.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.Bus.Security.Operations" Category="" ClassName="HS.Bus.Security.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="ServiceName">HSREGISTRY</Setting>
+  </Item>
+  <Item Name="HUB" Category="" ClassName="HS.Hub.HSWS.RemoteOperations" PoolSize="0" Enabled="true" Foreground="false" DisableErrorTraps="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="ServiceName">HSREGISTRY</Setting>
+  </Item>
+  <Item Name="HS.Util.MaintenanceService" Category="" ClassName="HS.Util.MaintenanceService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Adapter" Name="CallInterval">60</Setting>
+  </Item>
+  <Item Name="HS.Util.Trace.Operations" Category="" ClassName="HS.Util.Trace.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HS.IHE.PIXv3.Manager.Services" Category="" ClassName="HS.IHE.PIXv3.Manager.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="PIXv3AddTarget">HS.IHE.PIXv3.Manager.Operations</Setting>
+    <Setting Target="Host" Name="PIXv3MergeTarget">HS.IHE.PIXv3.Manager.Operations</Setting>
+    <Setting Target="Host" Name="PIXv3QueryTarget">HS.IHE.PIXv3.Manager.Operations</Setting>
+    <Setting Target="Host" Name="PIXv3ReviseTarget">HS.IHE.PIXv3.Manager.Operations</Setting>
+  </Item>
+  <Item Name="HS.IHE.PIXv3.Manager.Operations" Category="" ClassName="HS.IHE.PIXv3.Manager.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="ServiceName">PIXv3.Manager</Setting>
+  </Item>
+  <Item Name="HS.IHE.PIXv3.Consumer.Services" Category="" ClassName="HS.IHE.PIXv3.Consumer.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="PIXv3ReviseTarget">PIXv3.NotificationOperations</Setting>
+  </Item>
+  <Item Name="PIXv3.NotificationOperations" Category="" ClassName="HS.Util.SOAPClient.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="ServiceName">PIXv3.Consumer</Setting>
+  </Item>
+  <Item Name="HS.IHE.PDQv3.Supplier.Services" Category="" ClassName="HS.IHE.PDQv3.Supplier.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="PDQv3CancelTarget">HS.IHE.PDQv3.Consumer.Operations</Setting>
+    <Setting Target="Host" Name="PDQv3ContinueTarget">HS.IHE.PDQv3.Consumer.Operations</Setting>
+    <Setting Target="Host" Name="PDQv3QueryTarget">HS.IHE.PDQv3.Consumer.Operations</Setting>
+  </Item>
+  <Item Name="HS.IHE.PDQv3.Consumer.Operations" Category="" ClassName="HS.IHE.PDQv3.Consumer.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="ServiceName">PDQv3.Supplier</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Registry.Services" Category="" ClassName="HS.IHE.XDSb.Registry.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbQueryTarget">HS.IHE.XDSb.Registry.Operations</Setting>
+    <Setting Target="Host" Name="XDSbRegisterTarget">HS.IHE.XDSb.Registry.Operations</Setting>
+    <Setting Target="Host" Name="PIXv3ManagerTarget">HS.IHE.PIXv3.Manager.Operations</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Registry.Operations" Category="" ClassName="HS.IHE.XDSb.Registry.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbRegistryServiceName">XDSb.Registry</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Services" Category="" ClassName="HS.IHE.XDSb.Repository.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbProvideAndRegisterTarget">HS.IHE.XDSb.DocumentSource.Operations</Setting>
+    <Setting Target="Host" Name="XDSbRetrieveTarget">HS.IHE.XDSb.Repository.Router</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Router" Category="" ClassName="HS.IHE.XDSb.Repository.Router" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Operations" Category="" ClassName="HS.IHE.XDSb.Repository.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbRepositoryServiceName"></Setting>
+    <Setting Target="Host" Name="ReplyCodeActions">E=R</Setting>
+  </Item>
+  <Item Name="HS.IHE.XCA.RespondingGateway.Services" Category="" ClassName="HS.IHE.XCA.RespondingGateway.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XCAQueryTarget">HS.IHE.XCA.RespondingGateway.Process</Setting>
+    <Setting Target="Host" Name="XCARetrieveTarget">HS.IHE.XCA.RespondingGateway.Process</Setting>
+  </Item>
+  <Item Name="HS.IHE.XCA.RespondingGateway.Process" Category="" ClassName="HS.IHE.XCA.RespondingGateway.Process" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbRegistryOperations">HS.IHE.XDSb.Registry.Operations</Setting>
+    <Setting Target="Host" Name="XCARespondingGatewayOperations">HS.IHE.XCA.RespondingGateway.Operations</Setting>
+    <Setting Target="Host" Name="XDSbRepositoryProcess">HS.IHE.XDSb.Repository.Process</Setting>
+  </Item>
+  <Item Name="HS.IHE.XCA.RespondingGateway.Operations" Category="" ClassName="HS.IHE.XCA.RespondingGateway.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Process" Category="" ClassName="HS.IHE.XDSb.Repository.Process" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.IHE.XCPD.RespondingGateway.Services" Category="" ClassName="HS.IHE.XCPD.RespondingGateway.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XCPDDiscoveryTarget">HS.IHE.XCPD.RespondingGateway.Process</Setting>
+  </Item>
+  <Item Name="HS.IHE.XCPD.RespondingGateway.Process" Category="" ClassName="HS.IHE.XCPD.RespondingGateway.Process" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.IHE.XCPD.RespondingGateway.Operations" Category="" ClassName="HS.IHE.XCPD.RespondingGateway.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.DocumentSource.Operations" Category="" ClassName="HS.Local.IHE.XDSb.DocumentSource.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="XDSbRepositoryServiceName"></Setting>
+  </Item>
+  <Item Name="HS.IHE.XDR.Source.Operations" Category="" ClassName="HS.IHE.XDR.Source.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HS.IHE.XDSb.DocumentSource.Operations" Category="" ClassName="HS.Local.IHE.XDSb.DocumentSource.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="XDSbRepositoryServiceName"></Setting>
+  </Item>
+<Item Name="HS.IHE.XDR.Recipient.Services" Category="" ClassName="HS.IHE.XDR.Recipient.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="ProvideAndRegisterTarget">HS.IHE.XDSb.DocumentSourceRouter</Setting>
+  </Item>    
+  <Item Name="HS.IHE.XDR.Recipient.CommonProcess" Category="" ClassName="HS.IHE.XDR.Recipient.CommonProcess" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="MessageTarget">HS.IHE.XDSb.DocumentSourceRouter</Setting>
+    <Setting Target="Host" Name="CustomProcessor"></Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.DocumentSourceRouter" Category="" ClassName="HS.Local.IHE.XDSb.DocumentSourceRouter" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+</Items>
+]]></Data>
+</XData>
+
+<XData name="EdgeGatewayItems">
+<Description>
+XData for Edge Gateway import</Description>
+<Data><![CDATA[
+<Items>
+  <Item Name="HS.IHE.XDSb.Repository.Services" Category="" ClassName="HS.IHE.XDSb.Repository.Services" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbProvideAndRegisterTarget">HS.IHE.XDSb.Repository.Process</Setting>
+    <Setting Target="Host" Name="XDSbRetrieveTarget">HS.IHE.XDSb.Repository.Process</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Process" Category="" ClassName="HS.Local.IHE.XDSb.Repository.Process" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="RepositoryOperations">HS.IHE.XDSb.Repository.Operations</Setting>
+    <Setting Target="Host" Name="RegistryOperations">HS.IHE.XDSb.Repository.Operations</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.Repository.Operations" Category="" ClassName="HS.IHE.XDSb.Repository.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="InactivityTimeout">0</Setting>
+    <Setting Target="Host" Name="XDSbRegistryServiceName">XDSb.Registry</Setting>
+    <Setting Target="Host" Name="ReplyCodeActions">E=R</Setting>
+    <Setting Target="Host" Name="XDSbRepositoryServiceName"></Setting>
+    <Setting Target="Host" Name="ContentConsumerTarget">HS.IHE.XDSb.ContentConsumer.Operations</Setting>
+    <Setting Target="Host" Name="TraceOperations">*FULL*</Setting>
+  </Item>
+  <Item Name="HS.Util.Trace.Operations" Category="" ClassName="HS.Util.Trace.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HS.IHE.XDSb.Consumer.Operations" Category="" ClassName="HS.IHE.XDSb.Consumer.Operations" PoolSize="2" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="XDSbRegistryServiceName">XDSb.Registry</Setting>
+  </Item>
+  <Item Name="HS.IHE.XDSb.ContentConsumer.Operations" Category="" ClassName="HS.Local.IHE.XDSb.ContentConsumer.Operations" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+</Items>
+]]></Data>
+</XData>
+
+<XData name="InstallIntro">
+<Description>
+XData for HSROUTER import
+XData for HSBUS import</Description>
+<Data><![CDATA[
+<text>
+A new HealthShare CCDA Pipeline for Facility {FacilityId} is installed and running.
+To process CCAS, copy the files 
+into {p1}EG{FacilityId}\CCDIn (on HSROUTER)
+
+</text>
+]]></Data>
+</XData>
+</Class>
+</Export>
