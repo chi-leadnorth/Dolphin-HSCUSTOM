@@ -1,3 +1,4 @@
+
 Class HS.Custom.SampleData.HL7.test Extends %RegisteredObject
 {
 
