@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-10-13 08:33:57">
+<Class name="TEAM1SANDBOXPKG.FoundationProduction">
+<ProcedureBlock>0</ProcedureBlock>
+<Super>Ens.Production</Super>
+<TimeChanged>66735,47772.9072242</TimeChanged>
+<TimeCreated>66735,44639.0497099</TimeCreated>
+
+<XData name="ProductionDefinition">
+<Data><![CDATA[
+<Production Name="TEAM1SANDBOXPKG.FoundationProduction" LogGeneralTraceEvents="false">
+  <Description></Description>
+  <ActorPoolSize>2</ActorPoolSize>
+  <Item Name="MsgRouter" Category="" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="This handles message routing logic." LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="Validation"></Setting>
+    <Setting Target="Host" Name="BusinessRuleName">TEAM1SANDBOXPKG.FoundationProduction.RoutingRule</Setting>
+    <Setting Target="Host" Name="BadMessageHandler">BadMessageHandler</Setting>
+  </Item>
+  <Item Name="HL7FileService" Category="" ClassName="EnsLib.HL7.Service.FileService" PoolSize="1" Enabled="true" Foreground="false" Comment="This is a default HL7 File Service." LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="TargetConfigNames">MsgRouter</Setting>
+    <Setting Target="Host" Name="MessageSchemaCategory">2.8</Setting>
+    <Setting Target="Adapter" Name="ArchivePath">C:\DOLPHIN PROJECT\in\archive\</Setting>
+    <Setting Target="Adapter" Name="FilePath">C:\DOLPHIN PROJECT\in\</Setting>
+    <Setting Target="Adapter" Name="WorkPath"></Setting>
+  </Item>
+  <Item Name="HL7FileOperation" Category="" ClassName="EnsLib.HL7.Operation.FileOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="This is a default HL7 File Operation." LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="Filename">DOLPHIN</Setting>
+    <Setting Target="Adapter" Name="FilePath">C:\DOLPHIN PROJECT\out\</Setting>
+  </Item>
+</Production>
+]]></Data>
+</XData>
+</Class>
+</Export>

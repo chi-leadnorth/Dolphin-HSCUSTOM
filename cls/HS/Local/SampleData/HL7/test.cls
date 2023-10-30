@@ -10,6 +10,8 @@ Copy test data into this XDATA block
 </text>
 }
 
+/// test
+
 /// XData for HL7 Transform
 XData HL7TransformTestData
 {
