@@ -33,6 +33,8 @@ ClassMethod GetAll() As %Status
     Quit tSC
 }
 
+// NH: Get a Connection Detail
+
 ClassMethod GetOne(id As %String) As %Status
 {
     #dim tSC As %Status = $$$OK
