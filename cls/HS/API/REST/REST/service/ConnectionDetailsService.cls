@@ -65,6 +65,8 @@ ClassMethod GetOne(id As %String) As %Status
     Quit tSC
 }
 
+// NH: Create a Connection Detail
+
 ClassMethod Create() As %Status
 {
     #dim tSC As %Status = $$$OK
@@ -100,6 +102,8 @@ ClassMethod Create() As %Status
     Quit tSC
 }
 
+// NH: Update a Connection Detail
+
 ClassMethod Update(id As %String) As %Status
 {
     #dim tSC As %Status = $$$OK
@@ -129,6 +133,8 @@ ClassMethod Update(id As %String) As %Status
     Write result.%ToJSON()
     Quit tSC
 }
+
+// NH: Delete a Connection Detail
 
 ClassMethod Delete(id As %String) As %Status
 {
