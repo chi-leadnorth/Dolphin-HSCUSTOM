@@ -1,6 +1,8 @@
 Class HS.API.REST.REST.service.ConnectionDetailsService Extends %CSP.REST
 {
 
+// NH: Get all Connection Details
+
 ClassMethod GetAll() As %Status
 {
     Set qry = "SELECT * FROM DOLPHIN_DB_Connection.Details"
