@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="dolphin.ZPM">
+    <Module>
+      <Name>dolphin</Name>
+      <Description>Integration services for IRIS</Description>
+      <Version>0.1.2</Version>
+      <Packaging>module</Packaging>
+      <SourcesRoot>cls</SourcesRoot>
+      <Resource Name="HS.Local.Api.REST.service.PKG"/>
+      <Resource Name="HS.Local.Api.REST.PKG"/>
+      <Resource Name="HS.Local.Builders.PKG"/>
+      <Resource Name="HS.Local.UnitTest.PKG"/>
+      <Resource Name="HS.Local.UnitTestClass.PKG"/>
+      <SystemRequirements Version=">=2020.1" Interoperability="enabled" />
+    </Module>
+  </Document>
+</Export>
