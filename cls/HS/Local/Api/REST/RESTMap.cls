@@ -20,7 +20,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/_spec" Method="GET" Call="SwaggerSpec" />
 
 <!-- Log in -->
-<Route Url="/login" Method="GET" Call="Login" />
+<!-- <Route Url="/login" Method="GET" Call="Login" /> -->
 
 
 <!-- List all facilities -->
