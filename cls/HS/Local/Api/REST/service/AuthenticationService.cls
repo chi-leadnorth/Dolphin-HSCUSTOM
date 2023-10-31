@@ -1,4 +1,4 @@
-Class HS.API.REST.REST.service.AuthenticationService Extends %CSP.REST
+Class HS.Local.Api.REST.service.AuthenticationService Extends %CSP.REST
 {
 
 /// CNR: Method Login
