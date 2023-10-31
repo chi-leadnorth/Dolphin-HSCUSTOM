@@ -1,5 +1,5 @@
 
-Class GenerateUnitTest Extends %RegisteredObject
+Class HS.Local.Builders.GenerateUnitTest Extends %RegisteredObject
 {
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"
