@@ -1,4 +1,4 @@
-Class UnitTestClass Extends %UnitTest.TestCase
+Class HS.Local.UnitTestClass Extends %UnitTest.TestCase
 {
 
 /// Description
