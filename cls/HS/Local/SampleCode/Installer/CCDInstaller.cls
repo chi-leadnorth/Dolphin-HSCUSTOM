@@ -2,7 +2,7 @@
 Include (HS.Common, %ZHSLIB, %syPrompt)
 
 /// Installation tools for HealthShare
-Class HS.Custom.SampleCode.Installer.CCDInstaller Extends (HS.HC.Util.Installer, HS.Util.Installer.Kit.PostInstall.Base)
+Class HS.Local.SampleCode.Installer.CCDInstaller Extends (HS.HC.Util.Installer, HS.Util.Installer.Kit.PostInstall.Base)
 {
 
 // Need method to set up services, OID, assigning authority, facility id for a new facility
