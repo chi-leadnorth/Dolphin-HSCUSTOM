@@ -1,4 +1,4 @@
-Class HS.API.REST.REST.service.ConnectionDetailsService Extends %CSP.REST
+Class HS.Local.Api.REST.service.ConnectionDetailsService Extends %CSP.REST
 {
 
 // NH: Get all Connection Details
