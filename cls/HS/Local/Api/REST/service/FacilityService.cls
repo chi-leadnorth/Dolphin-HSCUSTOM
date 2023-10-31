@@ -1,4 +1,4 @@
-Class HS.API.REST.REST.service.FacilityService Extends %CSP.REST
+Class HS.Local.Api.REST.service.FacilityService Extends %CSP.REST
 {
 
 ClassMethod GetAll() As %Status
