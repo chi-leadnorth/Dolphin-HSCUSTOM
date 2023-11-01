@@ -1,4 +1,4 @@
-Class HS.Local.Builders.GenerateTransform extends %RegisteredObject
+Class HS.Local.Builders.GenerateTransform Extends %RegisteredObject
 {
 
 // Do ##class(TEAM2SANDBOXPKG.DolphinBuilder.DolphinBuilder).GenerateDTLExportXML()
@@ -452,4 +452,6 @@ XData DolphinSUBS
     </Export>
 </text>
 }
+
 }
+

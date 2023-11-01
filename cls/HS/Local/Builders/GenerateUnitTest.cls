@@ -1,4 +1,3 @@
-
 Class HS.Local.Builders.GenerateUnitTest Extends %RegisteredObject
 {
 
@@ -300,3 +299,4 @@ Creating the first method to test</Description>
 }
 
 }
+

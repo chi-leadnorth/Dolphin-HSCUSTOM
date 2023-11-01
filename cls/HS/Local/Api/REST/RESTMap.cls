@@ -71,12 +71,15 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 </Routes>
 }
 
-/// Log in
-//ClassMethod Login() As %Status
-//{
-//  Return ##class(HS.Local.Api.REST.service.AuthenticationService).Login()
-//}
+// ClassMethod Login() As %Status
 
+// {
+
+//  Return ##class(HS.Local.Api.REST.service.AuthenticationService).Login()
+
+// }
+
+/// Log in
 /// List facilities
 ClassMethod GetAllFacilities() As %Status
 {
@@ -282,3 +285,4 @@ ClassMethod SwaggerSpec() As %Status
 }
 
 }
+
