@@ -1,4 +1,4 @@
-Class DOLPHIN.MasterSuite Extends %RegisteredObject
+Class HS.Local.DOLPHIN.MasterSuite Extends %RegisteredObject
 {
 
 // do ##class(DOLPHIN.MasterSuite).TestSuiteBuilderGenerator()
@@ -23,8 +23,6 @@ Parameter UnitTestPIDSubtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.in
 
 Parameter UnitTestPV1Subtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
 
-// set content=pStream.Read(32000),content=$p(content,"<text>",2,99999),content=$p(content,"</text>")
-
 ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
     Set tSC = $$$OK
@@ -43,9 +41,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
     if pFacilityName = "" {
         Write "Facility Name cannot be empty"
         $$$ThrowStatus($$$ERROR($$$GeneralError, "Facility Name cannot be empty"))
-    }   
-
-
+    }
     If pNamespace = "" {
         Read !, "ENTER the Namespace Name: ", pNamespace
     }
@@ -72,7 +68,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
     }
 
     // Create the output file
-    //Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestNames_".cls")
+    Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestNames_".cls")
     //Quit:(OutFile = $$$NULLOREF)
 
     // Initialize the file content stream
@@ -89,10 +85,18 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
         Write "Processing UnitTestName: ", pSelectedUnitTestName, !
         // Access the XData block directly based on pSelectedSubTransformName
         //Set xdataBlock = ##class(%Dictionary.XDataDefinition).%OpenId(pSelectedUnitTestName)
-        do ..getStream(pSelectedUnitTestName,.xdataBlock)
+        //do ..getStream(pSelectedUnitTestName,.xdataBlock)
         // Create the output file
         Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestName_".cls")
         Quit:(OutFile = $$$NULLOREF)
+
+        #; Set OutFile = ..ReturnOutputFile(pFilePath_"/"__pSelectedUnitTestName_".cls")
+        #; If (OutFile = $$$NULLOREF) quit
+
+
+        //initialize the file content stream with contents of the RuleContents XDATA block
+
+        do ..getStream(pSelectedUnitTestName,.xdataBlock)
 
         // Debug: Output the value of xdataBlock
         Write "xdataBlock: ", xdataBlock, !
@@ -103,8 +107,8 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
             Quit:$$$ERROR($$$GeneralError, "Invalid UnitTestName")
         }
 
-    // Parse the content from the XData block
-    Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
+        // Parse the content from the XData block
+        Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
         Write "pStream: ", pStream, !
 
         // Parse out the content from in between the <transform> tags
@@ -121,7 +125,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
                 }
             }
 
-            If insideUnitTest {
+                If insideUnitTest {
                 If $find(line, "]]></Implementation>") {
                     Set insideUnitTest = 0
                 } Else {
@@ -141,14 +145,12 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
         Set updatedContent = header_parameters_methodHeader_unitTestContent_xdataFooter       
 
         // Replace placeholders with actual values
-        //Set updatedContent = $replace(updatedContent, "{FacilityName}", pFacilityName)
+        Set updatedContent = $replace(updatedContent, "{FacilityName}", pFacilityName)
         //Set updatedContent = $replace(updatedContent, "{TransformName}", pTransformName)
         //Set updatedContent = $replace(updatedContent, "{Namespace}", pNamespace)
     
         // Write the updated content to the output file
-        Set tSC = OutFile.Write(updatedContent)
-
-        // Close the output file
+        Set tSC = OutFile.Write(updatedContent)        
         Do OutFile.Close()
         Quit:$$$ISERR(tSC)
     }
@@ -179,8 +181,8 @@ Method WriteFile(pFilePath As %String, pContent As %String) As %Status
             Do $system.Status.DisplayError(closeStatus)
             Quit:$$$ISOK(tSC)  // Return file write error if the close operation also fails
         }
-    }
-    Catch ex {
+        }
+        Catch ex {
             Do file.%Close()
             Set tSC = ex.AsStatus()
     }
@@ -199,8 +201,7 @@ ClassMethod searchAndReplace(pInput As %String, pSearch As %String, pReplace As 
         If pInput[ pSearch {
             Set pOutput = $p(pInput, pSearch, 1) _ pReplace _ $p(pInput, pSearch, 2)
         }
-        Else {
-            Set pOutput = pInput
+        Else {Set pOutput = pInput
         }
 }
 
@@ -216,6 +217,37 @@ ClassMethod ReturnOutputFile(filename As %String) As %File
         }
         Do fileObj.%Close()
         Quit fileObj
+}
+
+/// I saw this and I love to see if it can be applied (223-251)
+Method ReadClasses(folderPath As %String) As %File
+{
+    
+    
+        #dim fileSpec As %String = folderPath _ "*.cls"
+        #dim fileIterator As %String = ##class(%File).FileSet(fileSpec)
+        #dim fileContent As %String
+
+        While 'fileIterator.AtEnd {
+            #dim filePath As %String = fileIterator.Next()
+            
+            If ##class(%File).Exists(filePath) {
+                #dim fileStream As %Stream.GlobalBinary
+                Set fileStream = ##class(%Stream.GlobalBinary).%New()
+                Do fileStream.LinkToFile(filePath)
+                
+                Set fileContent = ""
+                While 'fileStream.AtEnd {
+                    Set fileContent = fileContent _ fileStream.Read(32767)
+                }
+                
+                Do fileStream.%Close()
+                Write "File Path: ", filePath, !
+                Write "File Content:", !, fileContent, !
+            }
+            
+        }
+        Do fileIterator.Close()
 }
 
 XData UnitTestMSHSubtransform
@@ -238,8 +270,8 @@ Creating the first method to test</Description>
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New() 
      //set InputMessage = ##class(EnsLib.HL7.Segment).%New() 
-    #;  set InputMessage.MessageType="ORU_R01" 
-    #;  set InputMessage.DocType="2.8:ADT_A01"         
+    #;set InputMessage.MessageType="ORU_R01" 
+    #;set InputMessage.DocType="2.8:ADT_A01"         
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
       "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
@@ -268,7 +300,7 @@ Creating the first method to test</Description>
     set OutputMessage.DocType="2.8:ORU_R01"
     //set OutputMessage.MessageType = "ORU"
     write OutputMessage.OutputToString()
-    ; Access fields and segments in the HL7 message     
+    ;Access fields and segments in the HL7 message     
     set SendingApplication = OutputMessage.GetValueAt("MSH:3")
     set SendingFacility = OutputMessage.GetValueAt("MSH:4")    
     set ReceivingApplication = OutputMessage.GetValueAt("MSH:5", "|") 
@@ -429,7 +461,6 @@ Creating the first method to test</Description>
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
 ]]></Implementation>
 </Method>
-
 <XData name="PV1Segment">
 </XData>
 </Class>
