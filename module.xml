@@ -1,5 +1,3 @@
-<!-- Run this command from terminal to load this module.xml : zpm "load -dev c:/temp/Dolphin-HSCUSTOM" replace with your local folder location -->
-
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
   <Document name="dolphin.ZPM">
