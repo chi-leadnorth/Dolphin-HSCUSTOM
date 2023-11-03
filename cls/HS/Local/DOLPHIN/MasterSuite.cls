@@ -1,7 +1,7 @@
 Class HS.Local.DOLPHIN.MasterSuite Extends %RegisteredObject
 {
 
-// do ##class(DOLPHIN.MasterSuite).TestSuiteBuilderGenerator()
+// do ##class(HS.Local.DOLPHIN.MasterSuite).TestSuiteBuilderGenerator()
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"
 
@@ -108,7 +108,11 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
         }
 
         // Parse the content from the XData block
-        Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
+        //Chi Notes 11/3
+        //$$$LOGINFO("xdata://" _ %HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment")
+        //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ %ClassName(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
+        do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ %HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
+        //Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
         Write "pStream: ", pStream, !
 
         // Parse out the content from in between the <transform> tags
