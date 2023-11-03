@@ -9,7 +9,7 @@ Class HS.Local.DOLPHIN.MasterSuite Extends %RegisteredObject
 
 // Set pTestMethodName = "GenerateDTLExportXML"
 
-// Set pUnitTestName = "UnitTestMSHSubtransform, UnitTestPIDSubtransform,UnitTestPV1Subtransform"
+// Set pUnitTestName = "UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform"
 
 // Set pUnitTestSubtransformNames = "UnitTestMSHSubtransform"
 
@@ -23,7 +23,7 @@ Parameter UnitTestPIDSubtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.in
 
 Parameter UnitTestPV1Subtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
 
-ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
+ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
     Set tSC = $$$OK
 
@@ -34,6 +34,13 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
     if pFilePath = "" {
         Write "File Path cannot be empty"
         $$$ThrowStatus($$$ERROR($$$GeneralError, "File Path cannot be empty"))
+    }
+    If pFileName = "" {
+        Read !, "Enter the File Name: ", pFileName
+    }
+    if pFileName = "" {
+        Write "File Name cannot be empty"
+        $$$ThrowStatus($$$ERROR($$$GeneralError, "File Name cannot be empty"))
     }
     If pFacilityName = "" {
         Read !, "ENTER the Facility Name: ", pFacilityName
@@ -68,7 +75,8 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
     }
 
     // Create the output file
-    Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestNames_".cls")
+    //Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestNames_".cls")
+    Set OutFile = ..ReturnOutputFile(pFilePath_"\"_pFileName_".cls")
     //Quit:(OutFile = $$$NULLOREF)
 
     // Initialize the file content stream
@@ -109,10 +117,11 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName A
 
         // Parse the content from the XData block
         //Chi Notes 11/3
-        //$$$LOGINFO("xdata://" _ %HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment")
+        //$$$LOGINFO("xdata://" _ %ClassName(1)_".UnitTestMSHSubtransform:MSHSegment")
         //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ %ClassName(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
         do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ %HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
         //Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
+        Set tSC = ..getStream("UnitTestMSHSubtransform:MSHSegment", .pStream)
         Write "pStream: ", pStream, !
 
         // Parse out the content from in between the <transform> tags
