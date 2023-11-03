@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestSubtransformations Extends %UnitTest.TestCase
+Class HS.Local.UnitTest.UnitTestSubtransformations Extends %UnitTest.TestCase
 {
 
 /// Description
