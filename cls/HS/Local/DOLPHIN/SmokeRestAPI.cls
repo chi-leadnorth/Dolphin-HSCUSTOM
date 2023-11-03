@@ -33,6 +33,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/facilities/:id" Method="PUT" Call="UpdateFacility" />
 <!-- Delete a facility -->
 <Route Url="/facilities/:id" Method="DELETE" Call="DeleteFacility" />
+<Route Url="/facilities/:id" Method="DELETE" Call="DeleteFacility" />
 
 <!-- List all connection profiles -->
 <Route Url="/connection/profile" Method="GET" Call="GetAllConnectionProfiles" />
