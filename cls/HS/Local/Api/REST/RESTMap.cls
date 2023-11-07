@@ -22,6 +22,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <!-- Log in -->
 <!-- <Route Url="/login" Method="GET" Call="Login" /> -->
 
+<Route Url="/hl7/buildInterface" Method="POST" Call="BuildInterface" />
 
 <!-- List all facilities -->
 <Route Url="/facilities" Method="GET" Call="GetAllFacilities" />
@@ -78,6 +79,11 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 //  Return ##class(HS.Local.Api.REST.service.AuthenticationService).Login()
 
 // }
+
+ClassMethod BuildInterface() As %Status
+{
+  Return ##class(HS.Local.Api.REST.service.FacilityService).Create()
+}
 
 /// Log in
 /// List facilities
