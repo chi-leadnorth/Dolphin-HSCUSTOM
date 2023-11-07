@@ -1,16 +1,20 @@
-Class HS.Local.DOLPHIN.UnitTestOBRSubtransform Extends %UnitTest.TestCase
+Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestPV1Subtransform Extends %UnitTest.TestCase
 {
 
-Method TestOBRSegment()
+/// Creating the first method to test
+Method TestPV1()
 {
-    //create a transformation class instance, input message sample to parse
-
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+    Set tSC = $$$OK
+    //create a transformation class instance
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-     set InputMessage = ##class(EnsLib.HL7.Message).%New()          
+     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPV1).%New()
+
+   // sample HL7 Input message
+     set InputMessage = ##class(EnsLib.HL7.Message).%New()
+         
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
-      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||DTA348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
+      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_
       "ORC|RE|81738228^EPC|OC11US18192^EPC||P||^^^201108062114^201108062147^STAT||201108080738|P249130^ROGERS^DIANE||P676146^ZWEIFELHOFER^CHRISTEN|3010014^^^3010^^^^^OCM EDOC-EMERGENCY|(280)454-7052||"_$C(13,10)_
       "OBR|1|81738228^EPC|OC11US18192^EPC|IUS000063^US TESTICULAR^^^US TESTICULA||201108062115|||||O|||||P676146^ZWEIFELHOFER^CHRISTEN|(977)692-9023|309562814464||||201108080737||US|P||^^^201108062114^201108062147^STAT||||^Torsion||P094529^LEE^BENJAMIN^C^|P630889^DRABEK^EMMA|121732^MENDEZ TRANSCRIPTIONIST^MICHELE^^|201108062115|||||||||"_$C(13,10)_
@@ -30,48 +34,48 @@ Method TestOBRSegment()
     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc) 
     
     set status = Transformation.Transform(InputMessage,.OutputMessage)
-    
-    set OutputMessage.DocType="2.8:ORU_R30"
+    set OutputMessage.DocType="2.5.1:ADT_A01"     
+    //set OutputMessage.DocType="2.5.1:ORU_R01"    
     write OutputMessage.OutputToString()
-    ; Access fields and segments in the HL7 message     
-    set PlacerOrderNumber = OutputMessage.GetValueAt("OBR:2.1", "|")
-    set FillerOrderNumber = OutputMessage.GetValueAt("OBR:3.1", "|")
-    set UniversalServiceIdentifier = OutputMessage.GetValueAt("OBR:4", "|")
-    set RequestedDateTime = OutputMessage.GetValueAt("OBR:6", "|")
-    set OrderingProvider = OutputMessage.GetValueAt("OBR:16", "|")       
+    ; Access fields and segments in the HL7 message  
+    
+    Set PlaceofVisit = OutputMessage.GetValueAt("PV1:2") 
+    Set AttendingDoctor = OutputMessage.GetValueAt("PV1:7") 
+    Set VisitNumber = OutputMessage.GetValueAt("PV1:19")         
         
    ///Here we are logging in the values from the message 
-    Write "PlacerOrderNumber: ", OutputMessage.GetValueAt("OBR:2.1"), !
-    write "FillerOrderNumber: ", OutputMessage.GetValueAt("OBR:3.1"), !
-    Write "UniversalserviceIdentifier: ", OutputMessage.GetValueAt("OBR:4"), !
-    Write "RequestedDateTime: ", OutputMessage.GetValueAt("OBR:6"), !     
-    write "OrderingProvider: ", OutputMessage.GetValueAt("OBR:16"), ! 
-    write "ResultStatus: ", OutputMessage.GetValueAt("OBR:25"), ! 
     
-      
-     
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestOBRSubtransform", "/nodelete")
+    Write "PlaceofVisit: ", OutputMessage.GetValueAt("PV1:2"), ! 
+    Write "AttendingDoctor: ", OutputMessage.GetValueAt("PV1:7"), ! 
+    Write "VisitNumber: ", OutputMessage.GetValueAt("PV1:19"), ! 
+   
+     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
 }
 
-XData OBRSegmentXData
+XData UnitTestPV1Subtransform
 {
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-17 14:36:51">
-<Class name="DOLPHIN.UnitTestPIDSubtransform">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-26 10:42:26">
+<Class name="DOLPHIN.UnitTestPV1Subtransform">
 <Super>%UnitTest.TestCase</Super>
-<TimeChanged>66764,52543.245917</TimeChanged>
-<TimeCreated>66764,44249.5526742</TimeCreated>
+<TimeChanged>66773,38465.4821254</TimeChanged>
+<TimeCreated>66764,44336.3416844</TimeCreated>
 
-<Method name="TestPIDSegment">
+<Method name="TestPV1">
+<Description>
+Creating the first method to test</Description>
 <Implementation><![CDATA[
-    //create a transformation class instance, input message sample to parse
+    Set tSC = $$$OK
+    //create a transformation class instance
+     //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
+     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPV1).%New()
 
-     //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
-     set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-     set InputMessage = ##class(EnsLib.HL7.Message).%New()          
+   // sample HL7 Input message
+     set InputMessage = ##class(EnsLib.HL7.Message).%New()
+         
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
-      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||DTA348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
+      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_
       "ORC|RE|81738228^EPC|OC11US18192^EPC||P||^^^201108062114^201108062147^STAT||201108080738|P249130^ROGERS^DIANE||P676146^ZWEIFELHOFER^CHRISTEN|3010014^^^3010^^^^^OCM EDOC-EMERGENCY|(280)454-7052||"_$C(13,10)_
       "OBR|1|81738228^EPC|OC11US18192^EPC|IUS000063^US TESTICULAR^^^US TESTICULA||201108062115|||||O|||||P676146^ZWEIFELHOFER^CHRISTEN|(977)692-9023|309562814464||||201108080737||US|P||^^^201108062114^201108062147^STAT||||^Torsion||P094529^LEE^BENJAMIN^C^|P630889^DRABEK^EMMA|121732^MENDEZ TRANSCRIPTIONIST^MICHELE^^|201108062115|||||||||"_$C(13,10)_
@@ -91,32 +95,27 @@ XData OBRSegmentXData
     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc) 
     
     set status = Transformation.Transform(InputMessage,.OutputMessage)
-    
-    set OutputMessage.DocType="2.8:ORU_R30"
+    set OutputMessage.DocType="2.5.1:ADT_A01"     
+    //set OutputMessage.DocType="2.5.1:ORU_R01"    
     write OutputMessage.OutputToString()
-    ; Access fields and segments in the HL7 message     
-    set PatientLastName = OutputMessage.GetValueAt("PID:5.1")  
-    set PatientFirstName = OutputMessage.GetValueAt("PID:5.2") 
-    set PatientMiddleName = OutputMessage.GetValueAt("PID:5.3")
-    Set PatientDateofBirth = OutputMessage.GetValueAt("PID:7") 
-    Set PatientGender = OutputMessage.GetValueAt("PID:8")
-    Set PatientAddress = OutputMessage.GetValueAt("PID:11")
-    Set PatientAccountNumber = OutputMessage.GetValueAt("PID:18")        
+    ; Access fields and segments in the HL7 message  
+    
+    Set PlaceofVisit = OutputMessage.GetValueAt("PV1:2") 
+    Set AttendingDoctor = OutputMessage.GetValueAt("PV1:7") 
+    Set VisitNumber = OutputMessage.GetValueAt("PV1:19")         
         
    ///Here we are logging in the values from the message 
-    Write "PatientLastName: ", OutputMessage.GetValueAt("PID:5.1:"), !     
-    Write "PatientFirstName: ", OutputMessage.GetValueAt("PID:5.2:"), !
-    Write "PatientMiddleName: ", OutputMessage.GetValueAt("PID:5.3:"), !  
-    Write "PatientDateofBirth: ", OutputMessage.GetValueAt("PID:7:"), !  
-    Write "PatientGender: ", OutputMessage.GetValueAt("PID:8:"), ! 
-    Write "PatientAddress: ", OutputMessage.GetValueAt("PID:11:"), !  
-    Write "PatientAccountNumber: ", OutputMessage.GetValueAt("PID:18:"), !  
     
-      
-     
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPIDSubtransform", "/nodelete")
+    Write "PlaceofVisit: ", OutputMessage.GetValueAt("PV1:2"), ! 
+    Write "AttendingDoctor: ", OutputMessage.GetValueAt("PV1:7"), ! 
+    Write "VisitNumber: ", OutputMessage.GetValueAt("PV1:19"), ! 
+   
+     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
 ]]></Implementation>
 </Method>
+
+<XData name="PV1Segment">
+</XData>
 </Class>
 </Export>
 }

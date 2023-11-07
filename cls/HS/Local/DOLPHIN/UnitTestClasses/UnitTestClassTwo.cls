@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClassTwo Extends %UnitTest.TestCase
+Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestClassTwo Extends %UnitTest.TestCase
 {
 
 /// Description

@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTest Extends %UnitTest.TestCase
+Class HS.Local.DOLPHIN.UnitTestClasses.UnitTest Extends %UnitTest.TestCase
 {
 
 /// Creating the first method to test
