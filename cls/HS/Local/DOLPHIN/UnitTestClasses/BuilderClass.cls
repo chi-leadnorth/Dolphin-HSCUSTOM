@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.BuilderClass
+Class HS.Local.DOLPHIN.UnitTestClasses.BuilderClass
 {
 
 Property SendingApplication As %String;

@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MasterBuilderPID Extends %RegisteredObject
+Class HS.Local.DOLPHIN.UnitTestClasses.MasterBuilderPID Extends %RegisteredObject
 {
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"

@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.BuilderTest Extends %RegisteredObject
+Class HS.Local.DOLPHIN.UnitTestClasses.BuilderTest Extends %RegisteredObject
 {
 
 // ClassMethod %New() As DOLPHIN.BuilderTest

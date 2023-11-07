@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MasterBuilderOBR Extends %RegisteredObject
+Class HS.Local.DOLPHIN.UnitTestClasses.MasterBuilderPV1 Extends %RegisteredObject
 {
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"
@@ -7,19 +7,19 @@ Class HS.Local.DOLPHIN.MasterBuilderOBR Extends %RegisteredObject
 
 // Set pTestMethodName = "GenerateDTLExportXML"
 
-// Set pUnitTestName = "UnitTestOBRSubtransform"
+// Set pUnitTestName = "UnitTestPV1Subtransform"
 
 // Set pNamespace = "TEAM2SANDBOX"
 
-// do ##class(DOLPHIN.MasterBuilderOBR).TestSuiteBuilderGenerator()
+// do ##class(DOLPHIN.MasterBuilderPV1).GenerateDTLExportXML()
 
-// Do ##class(DOLPHIN.MasterBuilderOBR).TestSuiteBuilderGenerator(pFilePath, pFacilityName, pTestMethodName, pUnitTestName, pNamespace)
+// Do ##class(DOLPHIN.MasterBuilderPV1).GenerateDTLExportXML(pFilePath, pFacilityName, pTestMethodName, pUnitTestName, pNamespace)
 
-Parameter UnitTestOBRSubtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
+Parameter UnitTestPV1Subtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
 
 // set content=pStream.Read(32000),content=$p(content,"<text>",2,99999),content=$p(content,"</text>")
 
-ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFacilityName As %String = "", pTestMethodName As %String = "", pUnitTestName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
+ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %String = "", pTestMethodName As %String = "", pUnitTestName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
     Set tSC = $$$OK
 
@@ -218,26 +218,31 @@ ClassMethod ReturnOutputFile(filename As %String) As %File
         Quit fileObj
 }
 
-XData UnitTestOBRSubtransform
+XData UnitTestPV1Subtransform
 {
 <text>
-<?xmlversion="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-17 15:32:01">
-<Class name="DOLPHIN.UnitTestOBRSubtransform">
+?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-26 10:42:26">
+<Class name="DOLPHIN.UnitTestPV1Subtransform">
 <Super>%UnitTest.TestCase</Super>
-<TimeChanged>66764,55635.7133645</TimeChanged>
-<TimeCreated>66764,54752.0226884</TimeCreated>
+<TimeChanged>66773,38465.4821254</TimeChanged>
+<TimeCreated>66764,44336.3416844</TimeCreated>
 
-<Method name="TestOBRSegment">
+<Method name="TestPV1">
+<Description>
+Creating the first method to test</Description>
 <Implementation><![CDATA[
-    //create a transformation class instance, input message sample to parse
-
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+    Set tSC = $$$OK
+    //create a transformation class instance
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-     set InputMessage = ##class(EnsLib.HL7.Message).%New()          
+     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPV1).%New()
+
+   // sample HL7 Input message
+     set InputMessage = ##class(EnsLib.HL7.Message).%New()
+         
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
-      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||DTA348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
+      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_
       "ORC|RE|81738228^EPC|OC11US18192^EPC||P||^^^201108062114^201108062147^STAT||201108080738|P249130^ROGERS^DIANE||P676146^ZWEIFELHOFER^CHRISTEN|3010014^^^3010^^^^^OCM EDOC-EMERGENCY|(280)454-7052||"_$C(13,10)_
       "OBR|1|81738228^EPC|OC11US18192^EPC|IUS000063^US TESTICULAR^^^US TESTICULA||201108062115|||||O|||||P676146^ZWEIFELHOFER^CHRISTEN|(977)692-9023|309562814464||||201108080737||US|P||^^^201108062114^201108062147^STAT||||^Torsion||P094529^LEE^BENJAMIN^C^|P630889^DRABEK^EMMA|121732^MENDEZ TRANSCRIPTIONIST^MICHELE^^|201108062115|||||||||"_$C(13,10)_
@@ -257,28 +262,26 @@ XData UnitTestOBRSubtransform
     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc) 
     
     set status = Transformation.Transform(InputMessage,.OutputMessage)
-    
-    set OutputMessage.DocType="2.8:ORU_R30"
+    set OutputMessage.DocType="2.5.1:ADT_A01"     
+    //set OutputMessage.DocType="2.5.1:ORU_R01"    
     write OutputMessage.OutputToString()
-    ; Access fields and segments in the HL7 message     
-    set PlacerOrderNumber = OutputMessage.GetValueAt("OBR:2.1", "|")
-    set FillerOrderNumber = OutputMessage.GetValueAt("OBR:3.1", "|")
-    set UniversalServiceIdentifier = OutputMessage.GetValueAt("OBR:4", "|")
-    set RequestedDateTime = OutputMessage.GetValueAt("OBR:6", "|")
-    set OrderingProvider = OutputMessage.GetValueAt("OBR:16", "|")       
+    ; Access fields and segments in the HL7 message  
+    
+    Set PlaceofVisit = OutputMessage.GetValueAt("PV1:2") 
+    Set AttendingDoctor = OutputMessage.GetValueAt("PV1:7") 
+    Set VisitNumber = OutputMessage.GetValueAt("PV1:19")         
         
    ///Here we are logging in the values from the message 
-    Write "PlacerOrderNumber: ", OutputMessage.GetValueAt("OBR:2.1"), !
-    write "FillerOrderNumber: ", OutputMessage.GetValueAt("OBR:3.1"), !
-    Write "UniversalserviceIdentifier: ", OutputMessage.GetValueAt("OBR:4"), !
-    Write "RequestedDateTime: ", OutputMessage.GetValueAt("OBR:6"), !     
-    write "OrderingProvider: ", OutputMessage.GetValueAt("OBR:16"), ! 
-    write "ResultStatus: ", OutputMessage.GetValueAt("OBR:25"), !     
-     
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestOBRSubtransform", "/nodelete")
+    
+    Write "PlaceofVisit: ", OutputMessage.GetValueAt("PV1:2"), ! 
+    Write "AttendingDoctor: ", OutputMessage.GetValueAt("PV1:7"), ! 
+    Write "VisitNumber: ", OutputMessage.GetValueAt("PV1:19"), ! 
+   
+     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
 ]]></Implementation>
 </Method>
-<XData name="OBRSegment">
+
+<XData name="PV1Segment">
 </XData>
 </Class>
 </Export>
