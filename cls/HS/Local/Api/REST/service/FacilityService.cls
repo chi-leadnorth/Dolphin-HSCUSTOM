@@ -3,6 +3,9 @@ Class HS.Local.Api.REST.service.FacilityService Extends %CSP.REST
 
 ClassMethod GetAll() As %Status
 {
+    // 200 - Good
+    // 400 - Client Error
+    // 500 - Server Error
     Set qry = "SELECT * FROM DOLPHIN_DB_Data.Facility"
     #dim tSC As %Status = $$$OK
 

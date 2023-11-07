@@ -1,4 +1,4 @@
-Class HS.Local.Api.REST.RESTMap Extends %CSP.REST
+Class HS.Local.Unit.DOLPHIN.UnitTestClasses.SmokeRestAPI Extends %CSP.REST
 {
 
 Parameter CHARSET = "utf-8";
@@ -22,7 +22,6 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <!-- Log in -->
 <!-- <Route Url="/login" Method="GET" Call="Login" /> -->
 
-<Route Url="/hl7/buildInterface" Method="POST" Call="BuildInterface" />
 
 <!-- List all facilities -->
 <Route Url="/facilities" Method="GET" Call="GetAllFacilities" />
@@ -33,6 +32,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <!-- Update a facility -->
 <Route Url="/facilities/:id" Method="PUT" Call="UpdateFacility" />
 <!-- Delete a facility -->
+<Route Url="/facilities/:id" Method="DELETE" Call="DeleteFacility" />
 <Route Url="/facilities/:id" Method="DELETE" Call="DeleteFacility" />
 
 <!-- List all connection profiles -->
@@ -79,11 +79,6 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 //  Return ##class(HS.Local.Api.REST.service.AuthenticationService).Login()
 
 // }
-
-ClassMethod BuildInterface() As %Status
-{
-  Return ##class(HS.Local.Api.REST.service.FacilityService).Create()
-}
 
 /// Log in
 /// List facilities
