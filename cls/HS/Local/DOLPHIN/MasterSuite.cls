@@ -73,12 +73,13 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         Write "Minimum of 1 Selection Required"
         $$$ThrowStatus($$$ERROR($$$GeneralError, "Must use at least 1 UnitTestName"))
     }
+     
 
     // Create the output file
     //Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestNames_".cls")
-    Set OutFile = ..ReturnOutputFile(pFilePath_"\"_pFileName_".cls")
+    //Set OutFile = ..ReturnOutputFile(pFilePath_"\"_pFileName_".cls")
     //Quit:(OutFile = $$$NULLOREF)
-
+       
     // Initialize the file content stream
     Set updatedContent = ""
 
@@ -95,8 +96,11 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         //Set xdataBlock = ##class(%Dictionary.XDataDefinition).%OpenId(pSelectedUnitTestName)
         //do ..getStream(pSelectedUnitTestName,.xdataBlock)
         // Create the output file
+        w "About to open file"
         Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestName_".cls")
         Quit:(OutFile = $$$NULLOREF)
+
+         w "file opened"
 
         #; Set OutFile = ..ReturnOutputFile(pFilePath_"/"__pSelectedUnitTestName_".cls")
         #; If (OutFile = $$$NULLOREF) quit
@@ -104,24 +108,24 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
 
         //initialize the file content stream with contents of the RuleContents XDATA block
 
-        do ..getStream(pSelectedUnitTestName,.xdataBlock)
+        //do ..getStream(pSelectedUnitTestName,.xdataBlock)
 
         // Debug: Output the value of xdataBlock
-        Write "xdataBlock: ", xdataBlock, !
+        //Write "xdataBlock: ", xdataBlock, !
 
         // Check if the selected subtransform name is valid
-        If '$data(xdataBlock) {
-            Write "Selected UnitTestName is not valid."
-            Quit:$$$ERROR($$$GeneralError, "Invalid UnitTestName")
-        }
+        #; If '$data(xdataBlock) {
+        #;     Write "Selected UnitTestName is not valid."
+        #;     Quit:$$$ERROR($$$GeneralError, "Invalid UnitTestName")
+        #; }
 
         // Parse the content from the XData block
         //Chi Notes 11/3
-        //$$$LOGINFO("xdata://" _ %ClassName(1)_".UnitTestMSHSubtransform:MSHSegment")
-        //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ %ClassName(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
-        do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ %HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
+        //write "xdata://" _ ..%ClassName(1)_".UnitTestMSHSubtransform:MSHSegment"
+        do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
+        //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ "%HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
         //Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
-        Set tSC = ..getStream("UnitTestMSHSubtransform:MSHSegment", .pStream)
+        //Set tSC = ..getStream("UnitTestMSHSubtransform:MSHSegment", .pStream)
         Write "pStream: ", pStream, !
 
         // Parse out the content from in between the <transform> tags
@@ -166,8 +170,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         Set tSC = OutFile.Write(updatedContent)        
         Do OutFile.Close()
         Quit:$$$ISERR(tSC)
-    }
-
+}
     Quit tSC
 }
 

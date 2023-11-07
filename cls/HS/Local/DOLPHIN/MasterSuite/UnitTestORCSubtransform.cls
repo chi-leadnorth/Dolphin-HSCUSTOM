@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestORCSubtransform Extends %UnitTest.TestCase
+Class HS.Local.DOLPHIN.MasterSuite.UnitTestORCSubtransform Extends %UnitTest.TestCase
 {
 
 /// Creating the first method to test
@@ -67,7 +67,7 @@ Method TestORCSegment()
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestORCSubtransform", "/nodelete")
 }
 
-XData ORCSegmentXData
+XData UnitTestContent
 {
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-19 11:16:51">
