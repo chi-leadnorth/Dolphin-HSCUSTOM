@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MorrisRuleBuilder Extends %RegisteredObject
+Class HS.Local.DOLPHIN.UnitTestClasses.MorrisRuleBuilder Extends %RegisteredObject
 {
 
 // do ##class(DOLPHIN.MorrisRuleBuilder).ReadCLSFiles()

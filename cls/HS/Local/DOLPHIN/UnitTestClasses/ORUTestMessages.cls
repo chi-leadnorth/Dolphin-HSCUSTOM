@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.ORUTestMessages Extends %RegisteredObject
+Class HS.Local.DOLPHIN.UnitTestClasses.ORUTestMessages Extends %RegisteredObject
 {
 
 /// Resource for Sample Data: HS.Util.SampleData.HL7Scenarios

@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MasterSuite Extends %RegisteredObject
+Class HS.Local.DOLPHIN.UnitTestClasses.MasterSuite Extends %RegisteredObject
 {
 
 // do ##class(HS.Local.DOLPHIN.MasterSuite).TestSuiteBuilderGenerator()

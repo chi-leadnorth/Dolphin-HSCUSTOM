@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.OutputTestPV1 Extends Ens.Rule.Definition
+Class HS.Local.DOLPHIN.UnitTestClasses.OutputTestPID Extends Ens.Rule.Definition
 {
 
 Parameter RuleAssistClass = "EnsLib.HL7.MsgRouter.RuleAssist";
@@ -9,7 +9,7 @@ XData RuleDefinition [ XMLNamespace = "http://www.intersystems.com/rule" ]
         <ruleSet name="" effectiveBegin="" effectiveEnd="">
             <rule name="Transform">
                 <when condition="1">
-                    <send transform="TEAM2SANDBOXPKG.DolphinPV1" target="HS.Gateway.HL7.InboundProcess"></send>
+                    <send transform="TEAM2SANDBOXPKG.DolphinPID" target="HS.Gateway.HL7.InboundProcess"></send>
                 </when>
             </rule>
         </ruleSet>

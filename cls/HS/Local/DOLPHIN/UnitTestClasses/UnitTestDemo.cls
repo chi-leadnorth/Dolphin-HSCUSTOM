@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestDemo Extends %UnitTest.TestCase
+Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestDemo Extends %UnitTest.TestCase
 {
 
 /// /Class DOLPHIN.UnitTestDemo Extends (%Library.Persistent, %RegisteredObject, %UnitTest.TestCase)
