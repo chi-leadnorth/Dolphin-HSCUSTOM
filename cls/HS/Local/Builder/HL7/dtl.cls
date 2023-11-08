@@ -1,4 +1,4 @@
-Class HS.Local.D.dtl Extends Ens.DataTransformDTL [ DependsOn = EnsLib.HL7.Message ]
+Class HS.Local.Builder.HL7.dtl Extends Ens.DataTransformDTL [ DependsOn = EnsLib.HL7.Message ]
 {
 
 Parameter IGNOREMISSINGSOURCE = 1;

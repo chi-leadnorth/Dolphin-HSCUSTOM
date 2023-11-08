@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestNTESubtransform Extends %RegisteredObject
+Class HS.Local.UnitTest.Subtransform.UnitTestNTESubtransform Extends %RegisteredObject
 {
 
 }

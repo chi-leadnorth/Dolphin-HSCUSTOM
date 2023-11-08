@@ -1,5 +1,5 @@
 /// 
-Class HS.Local.D.DOLP.RoutingRule Extends Ens.Rule.Definition
+Class HS.Local.Builder.HL7.RoutingRule Extends Ens.Rule.Definition
 {
 
 Parameter RuleAssistClass = "EnsLib.HL7.MsgRouter.RuleAssist";

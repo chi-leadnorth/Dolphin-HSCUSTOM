@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.SmokeRestAPI Extends %CSP.REST
+Class HS.Local.UnitTest.Subtransform.SmokeRestAPI Extends %CSP.REST
 {
 
 Parameter CHARSET = "utf-8";

@@ -1,5 +1,5 @@
 
-Class HS.Local.SampleData.HL7.test Extends %RegisteredObject
+Class HS.Local.UnitTest.SampleData.test Extends %RegisteredObject
 {
 
 /// XData for HL7 Inbound

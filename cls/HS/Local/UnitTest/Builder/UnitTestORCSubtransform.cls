@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MasterSuite.UnitTestORCSubtransform Extends %UnitTest.TestCase
+Class HS.Local.UnitTest.Builder.UnitTestORCSubtransform Extends %UnitTest.TestCase
 {
 
 /// Creating the first method to test

@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.MasterBuilderPV1 Extends %RegisteredObject
+Class HS.Local.UnitTest.Subtransform.MasterBuilderPV1 Extends %RegisteredObject
 {
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"

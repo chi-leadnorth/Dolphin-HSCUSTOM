@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.LeadNorthCallBackMethod
+Class HS.Local.UnitTest.Subtransform.LeadNorthCallBackMethod
 {
 
 // Morris Obiri-Creating a CallBack Method to Update some of the entries in the Registry, EdgeGateway and the XUA Configurations for purposes of various implementations

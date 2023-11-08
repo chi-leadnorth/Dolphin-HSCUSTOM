@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MasterSuite.UnitTestPIDSubtransform Extends %UnitTest.TestCase
+Class HS.Local.UnitTest.Builder.UnitTestPIDSubtransform Extends %UnitTest.TestCase
 {
 
 Method TestPID()

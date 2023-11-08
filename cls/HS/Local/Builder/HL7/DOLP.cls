@@ -1,4 +1,4 @@
-Class HS.Local.D.DOLP Extends Ens.Production
+Class HS.Local.Builder.HL7.DOLP Extends Ens.Production
 {
 
 XData ProductionDefinition

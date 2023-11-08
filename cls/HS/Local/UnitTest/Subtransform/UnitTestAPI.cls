@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestAPI Extends %CSP.REST
+Class HS.Local.UnitTest.Subtransform.UnitTestAPI Extends %CSP.REST
 {
 
 // 200 -Good

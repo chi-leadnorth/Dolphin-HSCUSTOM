@@ -1,4 +1,4 @@
-Class HS.Local.Builders.GenerateTransform Extends %RegisteredObject
+Class HS.Local.Builder.HL7.GenerateTransform Extends %RegisteredObject
 {
 
 // Do ##class(TEAM2SANDBOXPKG.DolphinBuilder.DolphinBuilder).GenerateDTLExportXML()

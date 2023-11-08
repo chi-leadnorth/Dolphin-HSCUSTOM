@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestClassThree Extends %UnitTest.TestCase
+Class HS.Local.UnitTest.Subtransform.UnitTestClassThree Extends %UnitTest.TestCase
 {
 
 /// Description

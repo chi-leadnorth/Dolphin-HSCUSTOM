@@ -1,5 +1,5 @@
 /// 
-Class HS.Local.D.DOLP.AlertRule Extends Ens.Rule.Definition
+Class HS.Local.Builder.HL7.AlertRule Extends Ens.Rule.Definition
 {
 
 Parameter RuleAssistClass = "EnsLib.MsgRouter.RuleAssist";

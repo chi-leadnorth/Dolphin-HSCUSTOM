@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.MasterSuite.UnitTestOBRSubtransform Extends %UnitTest.TestCase
+Class HS.Local.UnitTest.Builder.UnitTestOBRSubtransform Extends %UnitTest.TestCase
 {
 
 Method TestOBRSegment()

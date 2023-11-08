@@ -1,4 +1,4 @@
-Class HS.Local.DOLPHIN.UnitTestClasses.UnitTestPV1Subtransform Extends %UnitTest.TestCase
+Class HS.Local.UnitTest.Subtransform.UnitTestPV1Subtransform Extends %UnitTest.TestCase
 {
 
 /// Creating the first method to test
