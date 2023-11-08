@@ -25,7 +25,7 @@ ClassMethod Create() As %Status
         set connectionType = data.ConnectionType
         set namespace = data.Namespace
 
-        do 
+        #; do 
         
         Set item.message = "HL7 interface created successfully"
     } catch {
