@@ -9,9 +9,10 @@
       <SourcesRoot>cls</SourcesRoot>
       <Resource Name="HS.Local.Api.REST.service.PKG"/>
       <Resource Name="HS.Local.Api.REST.PKG"/>
-      <Resource Name="HS.Local.Builders.PKG"/>
+      <Resource Name="HS.Local.Builder.PKG"/>
+      <Resource Name="HS.Local.HL7.PKG"/>
       <Resource Name="HS.Local.UnitTest.PKG"/>
-      <Resource Name="HS.Local.UnitTestClass.PKG"/>
+      <Resource Name="HS.Local.Util.PKG"/>
       <SystemRequirements Version=">=2020.1" Interoperability="enabled" />
     </Module>
   </Document>
