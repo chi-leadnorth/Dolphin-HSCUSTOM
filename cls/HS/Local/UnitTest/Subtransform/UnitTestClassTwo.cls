@@ -7,7 +7,9 @@ Method TestORUTransformations()
 {
 
     //create a transformation class instance
-     set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
+    #;  set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
+    set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
+
    // sample HL7 Input message
      set InputMessage = ##class(EnsLib.HL7.Message).%New()       
       set HL7Message=     

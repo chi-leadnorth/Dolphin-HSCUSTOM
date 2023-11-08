@@ -8,7 +8,9 @@ ClassMethod TestSubTransformations()
 {
     Set tSC = $$$OK
     //create a transformation class instance
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+    #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+     set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
+
    // sample HL7 Input message
      set InputMessage = ##class(EnsLib.HL7.Message).%New()
     //set InputMessage.DocType = "2.3:ORU_R01" 

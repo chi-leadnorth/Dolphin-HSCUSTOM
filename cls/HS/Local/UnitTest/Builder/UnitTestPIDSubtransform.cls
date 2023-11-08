@@ -5,7 +5,9 @@ Method TestPID()
 {
     //create a transformation class instance, input message sample to parse
 
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPID).%New()
+    #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPID).%New()
+     set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
+
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
      set HL7Message=     

@@ -6,7 +6,8 @@ Method TestMSH()
 {
     //create a transformation class instance, input message sample
 
-   set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
+  #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
+   set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New() 
      //set InputMessage = ##class(EnsLib.HL7.Segment).%New() 
