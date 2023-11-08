@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.MasterBuilderPID Extends %RegisteredObject
-=======
-Class HS.Local.Unit.DOLPHIN.UnitTestClasses.MasterBuilderPID Extends %RegisteredObject
->>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"

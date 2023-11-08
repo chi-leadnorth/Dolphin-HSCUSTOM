@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.MorrisRuleBuilder Extends %RegisteredObject
-=======
-Class HS.Local.Unit.DOLPHIN.UnitTestClasses.MorrisRuleBuilder Extends %RegisteredObject
->>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 // do ##class(DOLPHIN.MorrisRuleBuilder).ReadCLSFiles()

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.OutputTestPV1 Extends Ens.Rule.Definition
-=======
-Class HS.Local.Unit.DOLPHIN.UnitTestClasses.OutputTestPV1 Extends Ens.Rule.Definition
->>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 Parameter RuleAssistClass = "EnsLib.HL7.MsgRouter.RuleAssist";

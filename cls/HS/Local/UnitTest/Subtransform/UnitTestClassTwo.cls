@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.UnitTestClassTwo Extends %UnitTest.TestCase
-=======
-Class HS.Local.Unit.DOLPHIN.UnitTestClasses.UnitTestClassTwo Extends %UnitTest.TestCase
->>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 /// Description

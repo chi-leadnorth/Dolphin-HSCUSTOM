@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.UnitTestDemo Extends %UnitTest.TestCase
-=======
-Class HS.Local.Unit.DOLPHIN.UnitTestClasses.UnitTestDemo Extends %UnitTest.TestCase
->>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 /// /Class DOLPHIN.UnitTestDemo Extends (%Library.Persistent, %RegisteredObject, %UnitTest.TestCase)

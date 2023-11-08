@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.ORUTestMessages Extends %RegisteredObject
-=======
-Class HS.Local.Unit.DOLPHIN.UnitTestClasses.ORUTestMessages Extends %RegisteredObject
->>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 /// Resource for Sample Data: HS.Util.SampleData.HL7Scenarios
