@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Class HS.Local.UnitTest.Builder.UnitTestORCSubtransform Extends %UnitTest.TestCase
+=======
+Class HS.Local.Unit.DOLPHIN.MasterSuite.UnitTestORCSubtransform Extends %UnitTest.TestCase
+>>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 /// Creating the first method to test
@@ -69,7 +73,8 @@ Method TestORCSegment()
 
 XData UnitTestContent
 {
-<?xml version="1.0" encoding="UTF-8"?>
+<text>
+<?xmlversion="1.0" encoding="UTF-8"?>
 <Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.1.2 (Build 574_0_22407U)" ts="2023-10-19 11:16:51">
 <Class name="DOLPHIN.UnitTestORCSubtransform">
 <Super>%UnitTest.TestCase</Super>
@@ -147,6 +152,7 @@ Creating the first method to test</Description>
 </XData>
 </Class>
 </Export>
+ </text>
 }
 
 }

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.UnitTestAPI Extends %CSP.REST
+=======
+Class HS.Local.Unit.DOLPHIN.UnitTestClasses.UnitTestAPI Extends %CSP.REST
+>>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 // 200 -Good

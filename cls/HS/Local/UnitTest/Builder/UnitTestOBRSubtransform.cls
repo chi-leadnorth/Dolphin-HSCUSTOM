@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Class HS.Local.UnitTest.Builder.UnitTestOBRSubtransform Extends %UnitTest.TestCase
+=======
+Class HS.Local.Unit.DOLPHIN.MasterSuite.UnitTestOBRSubtransform Extends %UnitTest.TestCase
+>>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 Method TestOBRSegment()
@@ -53,7 +57,7 @@ Method TestOBRSegment()
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestOBRSubtransform", "/nodelete")
 }
 
-XData UnitTestOBRSubtransform
+XData UnitTestContent
 {
 <text>
 <?xmlversion="1.0" encoding="UTF-8"?>

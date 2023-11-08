@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Class HS.Local.UnitTest.Builder.UnitTestPV1Subtransform Extends %UnitTest.TestCase
+=======
+Class HS.Local.Unit.DOLPHIN.MasterSuite.UnitTestPV1Subtransform Extends %UnitTest.TestCase
+>>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 /// Creating the first method to test
@@ -113,7 +117,6 @@ Creating the first method to test</Description>
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
 ]]></Implementation>
 </Method>
-
 <XData name="PV1Segment">
 </XData>
 </Class>

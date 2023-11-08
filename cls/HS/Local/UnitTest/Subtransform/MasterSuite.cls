@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.MasterSuite Extends %RegisteredObject
+=======
+Class HS.Local.Unit.DOLPHIN.UnitTestClasses.MasterSuite Extends %RegisteredObject
+>>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
-// do ##class(HS.Local.DOLPHIN.MasterSuite).TestSuiteBuilderGenerator()
+// do ##class(HS.Local.DOLPHIN.UnitTestClasses.MasterSuite).TestSuiteBuilderGenerator()
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"
 
@@ -9,7 +13,7 @@ Class HS.Local.UnitTest.Subtransform.MasterSuite Extends %RegisteredObject
 
 // Set pTestMethodName = "GenerateDTLExportXML"
 
-// Set pUnitTestName = "UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform"
+// Set pUnitTestName = "UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform"
 
 // Set pUnitTestSubtransformNames = "UnitTestMSHSubtransform"
 
@@ -85,8 +89,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
 
     Set length = $LISTLENGTH(pSelectedUnitTestNames)
     // Iterate over the selected subtransform names
-    For i = 1:1:length {
-        
+    For i = 1:1:length {  
 
         // Initialize the file content stream
         Set updatedContent = ""
@@ -96,11 +99,11 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         //Set xdataBlock = ##class(%Dictionary.XDataDefinition).%OpenId(pSelectedUnitTestName)
         //do ..getStream(pSelectedUnitTestName,.xdataBlock)
         // Create the output file
-        w "About to open file"
+        write "About to open file"
         Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestName_".cls")
         Quit:(OutFile = $$$NULLOREF)
 
-         w "file opened"
+         write "the file has been opened"
 
         #; Set OutFile = ..ReturnOutputFile(pFilePath_"/"__pSelectedUnitTestName_".cls")
         #; If (OutFile = $$$NULLOREF) quit
@@ -124,7 +127,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         //write "xdata://" _ ..%ClassName(1)_".UnitTestMSHSubtransform:MSHSegment"
         do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
         //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ "%HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_".UnitTestMSHSubtransform:MSHSegment", .pStream)
-        //Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
+        Set tSC = ..getStream(pSelectedUnitTestName, .pStream)
         //Set tSC = ..getStream("UnitTestMSHSubtransform:MSHSegment", .pStream)
         Write "pStream: ", pStream, !
 
@@ -170,7 +173,7 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         Set tSC = OutFile.Write(updatedContent)        
         Do OutFile.Close()
         Quit:$$$ISERR(tSC)
-}
+    }
     Quit tSC
 }
 
@@ -266,7 +269,7 @@ Method ReadClasses(folderPath As %String) As %File
         Do fileIterator.Close()
 }
 
-XData UnitTestMSHSubtransform
+XData UnitTestContent
 {
 <text>
 <?xmlversion="1.0" encoding="UTF-8"?>
@@ -337,13 +340,13 @@ Creating the first method to test</Description>
     write $$$AssertEquals("DTA-PHARMACY", ReceivingFacility)     
      
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestMSHSubtransform", "/nodelete")
-]]></Implementation>
-</Method>
-<XData name="MSHSegment">
-</XData>
-</Class>
-</Export>
-</text>
+    ]]></Implementation>
+    </Method>
+    <XData name="MSHSegment">
+    </XData>
+    </Class>
+    </Export>
+    </text>
 }
 
 XData UnitTestPIDSubtransform

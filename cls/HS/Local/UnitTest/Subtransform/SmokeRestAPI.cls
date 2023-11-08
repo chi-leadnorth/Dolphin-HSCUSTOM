@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Class HS.Local.UnitTest.Subtransform.SmokeRestAPI Extends %CSP.REST
+=======
+Class HS.Local.Unit.DOLPHIN.UnitTestAPI.SmokeRestAPI Extends %CSP.REST
+>>>>>>> 7c97b8415f5531b2180e3ea138a1b16f3fb26899
 {
 
 Parameter CHARSET = "utf-8";
