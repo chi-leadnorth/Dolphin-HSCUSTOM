@@ -5,9 +5,9 @@ Class HS.Local.UnitTest.Subtransform.UnitTest Extends %UnitTest.TestCase
 ClassMethod TestORUTransformations()
 {
     //create a transformation class instance
-    set Transformation = ##class(EnsLib).%New()
+    #; set Transformation = ##class(EnsLib).%New()
    // sample HL7 Input message
-   set InputMessage = ##class(EnsLib.HL7.Message).%New()   
+  #;  set InputMessage = ##class(EnsLib.HL7.Message).%New()   
   
    // Define a Sample of HL7 Message
     #; set HL7Message = "MSH|^~\&|HIS|LAB|LIS|LAB|201206130711||ORM^O01|0001|P|2.3"
