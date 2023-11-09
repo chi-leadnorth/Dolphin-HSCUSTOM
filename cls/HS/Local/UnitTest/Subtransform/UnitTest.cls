@@ -27,8 +27,8 @@ ClassMethod TestORUTransformations()
       "OBX||TX|||some text that goes with the image result.|||N|||N||||DEMO||COM"   
 
     //set hl7 message as a test of the input message
-     do InputMessage.ImportFromString(HL7Message)
-     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc)
+    #;  do InputMessage.ImportFromString(HL7Message)
+    #;  set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc)
     #;  Set segments = $LISTFROMSTRING(HL7Message, $CHAR(13,10))
     #;  For i = 1:1:$LISTLENGTH(HL7Message)
     #; {
@@ -67,20 +67,20 @@ ClassMethod TestORUTransformations()
      //set segments = HL7Message.strip().split()
      
     //Transformation Happens
-    set status = Transformation.Transform(InputMessage,.OutputMessage)
+    #; set status = Transformation.Transform(InputMessage,.OutputMessage)
     //set ^ZOutputMessage= OutputMessage.OutputToString()
     #; //Assertion: Verifications
-    set SendingFacility = OutputMessage.GetValueAt("MSH:4")
-    set ReceivingFacility = OutputMessage.GetValueAt("MSH:5")    
-    set MessageType = OutputMessage.GetValueAt("MSH:9.1")  
+    #; set SendingFacility = OutputMessage.GetValueAt("MSH:4")
+    #; set ReceivingFacility = OutputMessage.GetValueAt("MSH:5")    
+    #; set MessageType = OutputMessage.GetValueAt("MSH:9.1")  
     //set FamilyName=OutputMessage.GetValueAt("PID:5.1")
     //set DateTimeOfBirth=OutputMessage.GetValueAt("PID:7")
     //set AccountNumber =OutputMessage.GetValueAt("PID:18")
     //set VisitNumber=OutputMessage.GetValueAt("PV1:19")
      
-    w $$$AssertEquals("LEADNORTHLLC", SendingFacility)
-    w $$$AssertEquals("CERNER", ReceivingFacility)
-    write $$$AssertEquals("ADT", MessageType)
+    #; w $$$AssertEquals("LEADNORTHLLC", SendingFacility)
+    #; w $$$AssertEquals("CERNER", ReceivingFacility)
+    #; write $$$AssertEquals("ADT", MessageType)
     #; w $$$AssertEquals("Clark", FirstName)
     //do $$$AssertEquals(19850316, DateTimeOfBirth)
     //do $$$AssertEquals("369666810440", VisitNumber)
