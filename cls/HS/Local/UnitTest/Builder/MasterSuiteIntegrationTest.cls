@@ -13,19 +13,16 @@ Class HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest Extends %RegisteredOb
 
 // Set pNameSpace = "HSCUSTOM"
 
-// do ##class(DOLPHIN.MasterBuilderMSH).GenerateDTLExportXML()
+// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).UnitTestGenerator()
 
 // do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).UnitTestGenerator(pFacilityId, pFacilityName, pTransformName, pSubtransformName, pFilePath, pNameSpace)
-
-/// Description SetUp-Variables
-Parameter UnitTestMSHSubtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
 
 ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %String = "", pTransformName As %String = "", pSubtransformName As %String = "", pFilePath As %String = "", pNameSpace As %List = "") As %Status
 {
         // CallMasterSuite
 
-    // GenerateUnitTests method passing in FacilityId, TransformName, SubtransformName (Done)
-    // as List of comma separated values, Namespace, FilePath
+    // Pass
+    //FacilityId, TransformName, SubtransformName, FilePath,Namespace
     // to Build HL7 Interface in an edge gateway namespace (EG<FacilityId>)
 
     // GenerateUnitTests returns Status $$$OK or $$$ERROR
@@ -33,7 +30,7 @@ ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %Str
     // GenerateUnitTests creates a subtransform class and method for each Subtransform in the list.
 
     // All the Subtransform classes are located in FilePath/test. 
-        // pFacilityId,pFacilityName,pTransformName,pSubtransformName pFilePath  pNameSpace
+
     Set tSC = $$$OK
 
     // If any of the parameters are empty, prompt for input
