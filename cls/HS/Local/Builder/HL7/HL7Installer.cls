@@ -11,7 +11,7 @@ ClassMethod AddHL7Pipeline(pFacility As %String = "", pSchemaCategory As %String
 			Read !, "ENTER the Facility ID: ", pFacility
 		
 		}
-
+        //YEAH
 		if pFacility = "" {
 			Write "Facility ID and OID require non-empty values"
 			$$$ThrowStatus($$$ERROR($$$GeneralError, "Facility ID and OID require non-empty values"))
