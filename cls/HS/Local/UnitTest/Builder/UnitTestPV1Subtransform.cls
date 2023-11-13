@@ -7,7 +7,7 @@ Method TestPV1()
     Set tSC = $$$OK
     //create a transformation class instance
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPV1).%New()
+     //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPV1).%New()
      set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
 
 

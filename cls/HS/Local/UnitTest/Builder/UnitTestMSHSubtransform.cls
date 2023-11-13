@@ -6,7 +6,7 @@ Method TestMSH()
 {
     //create a transformation class instance, input message sample
 
-  #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
+  //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
    set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New() 
@@ -36,6 +36,10 @@ Method TestMSH()
     
     //set tDocType=##class(EnsLib.HL7.Schema).ResolveSchemaTypeToDocType("2.3",.sc) $$$ThrowOnError(sc)      
     
+    #; set tMSH=HL7Message.getSegmentByIndex(1)
+    #; set tName=tMSH.GetValueAt(9,":_~\&")
+    #; set tDocType=##class(EnsLib.HL7.Schema).ResolveSchemaTypeToDocType(..MessageSchemaCategory,tName, tSC, ..DocTypeResolution) $$$ThrowOnError(tSC)
+        
     set status = Transformation.Transform(InputMessage,.OutputMessage)
     
     set OutputMessage.DocType="2.8:ORU_R01"

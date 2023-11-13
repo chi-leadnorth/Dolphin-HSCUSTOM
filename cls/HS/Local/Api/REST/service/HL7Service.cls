@@ -39,4 +39,6 @@ ClassMethod Create() As %Status
     Write result.%ToJSON()
     Quit tSC
 }
+
 }
+

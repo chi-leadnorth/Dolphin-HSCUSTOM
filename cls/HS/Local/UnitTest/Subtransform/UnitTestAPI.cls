@@ -62,7 +62,7 @@ ClassMethod CallGenerateDTLExportXML() As %Status
             Set selectedSubTransformNames = request.%Get("SelectedSubTransformNames")
     // hard code all values
             // Call the GenerateDTLExportXML method in the DolphinBuilder class
-            Set tSC = ##class(HS.Local.DOLPHIN.MasterSuite).TestSuiteBuilderGenerator(filePath, facilityName, transformName, namespace, selectedSubTransformNames)
+            //Set tSC = ##class(HS.Local.DOLPHIN.MasterSuite).TestSuiteBuilderGenerator(filePath, facilityName, transformName, namespace, selectedSubTransformNames)
 
             // Handle the response as needed
             If $$$ISERR(tSC) {
@@ -84,21 +84,21 @@ ClassMethod TestMSHSubtransform() As %Status
 {
     Set tSC = $$$OK
     Quit tSC
-    Return ##class(HS.Local.DOLPHIN.UnitTestMSHSubtransform).TestMSH()
+    //Return ##class(HS.Local.DOLPHIN.UnitTestMSHSubtransform).TestMSH()
 }
 
 ClassMethod TestPIDSubtransform() As %Status
 {
     Set tSC = $$$OK
     Quit tSC
-    Return ##class(HS.Local.DOLPHIN.UnitTestPIDSubtransform).TestPID()
+    //Return ##class(HS.Local.DOLPHIN.UnitTestPIDSubtransform).TestPID()
 }
 
 ClassMethod TestPV1Subtransform() As %Status
 {
     set tSC = $$$OK
     Quit tSC
-    Return ##class(HS.Local.DOLPHIN.UnitTestPV1Subtransform).TestPV1()
+    //Return ##class(HS.Local.DOLPHIN.UnitTestPV1Subtransform).TestPV1()
 }
 
 }

@@ -1,4 +1,3 @@
-
 Class HS.Local.UnitTest.SampleData.test Extends %RegisteredObject
 {
 
@@ -11,7 +10,6 @@ Copy test data into this XDATA block
 }
 
 /// test
-
 /// XData for HL7 Transform
 XData HL7TransformTestData
 {

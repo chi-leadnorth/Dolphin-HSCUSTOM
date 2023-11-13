@@ -1,4 +1,3 @@
-
 Include (HS.Common, %ZHSLIB, %syPrompt)
 
 /// Installation tools for HealthShare
