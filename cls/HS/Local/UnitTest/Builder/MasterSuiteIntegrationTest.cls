@@ -13,19 +13,16 @@ Class HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest Extends %RegisteredOb
 
 // Set pNameSpace = "HSCUSTOM"
 
-// do ##class(DOLPHIN.MasterBuilderMSH).GenerateDTLExportXML()
+// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).IntegrationTestGenerator()
 
-// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).UnitTestGenerator(pFacilityId, pFacilityName, pTransformName, pSubtransformName, pFilePath, pNameSpace)
+// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).IntegrationTestGenerator(pFacilityId, pFacilityName, pTransformName, pSubtransformName, pFilePath, pNameSpace)
 
-/// Description SetUp-Variables
-Parameter UnitTestMSHSubtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
-
-ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %String = "", pTransformName As %String = "", pSubtransformName As %String = "", pFilePath As %String = "", pNameSpace As %List = "") As %Status
+ClassMethod IntegrationTestGenerator(pFacilityId As %String = "", pFacilityName As %String = "", pTransformName As %String = "", pSubtransformName As %String = "", pFilePath As %String = "", pNameSpace As %List = "") As %Status
 {
         // CallMasterSuite
 
-    // GenerateUnitTests method passing in FacilityId, TransformName, SubtransformName (Done)
-    // as List of comma separated values, Namespace, FilePath
+    // Pass
+    //FacilityId, TransformName, SubtransformName, FilePath,Namespace
     // to Build HL7 Interface in an edge gateway namespace (EG<FacilityId>)
 
     // GenerateUnitTests returns Status $$$OK or $$$ERROR
@@ -33,7 +30,7 @@ ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %Str
     // GenerateUnitTests creates a subtransform class and method for each Subtransform in the list.
 
     // All the Subtransform classes are located in FilePath/test. 
-        // pFacilityId,pFacilityName,pTransformName,pSubtransformName pFilePath  pNameSpace
+
     Set tSC = $$$OK
 
     // If any of the parameters are empty, prompt for input
@@ -100,10 +97,21 @@ ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %Str
     }
 
     // Create the output file
+    //,i missing inside
+        Set pSubtransformName = $LIST(pSubtransformName) 
+        Write "Processing UnitTestName: ", pSubtransformName, !        
+        // Create the output file
+        write "About to open file"
     Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSubtransformName_".cls")
     Quit:(OutFile = $$$NULLOREF)
 
+    write "The file has been opened" 
+
     // Initialize the file content stream
+
+    //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
+    //write "xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent"      
+    //Write "pStream: ", pStream, ! 
     Set updatedContent = ""
 
     Set length = $LISTLENGTH(pSubtransformName)
@@ -152,7 +160,7 @@ ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %Str
     }
         
         // Generate the header and class definition
-        //Set header = "Class "_pFacilityName_"."_pNamespace_"."_pUnitTestName_" Extends %UnitTest.TestCase "_$c(13,10)_"{"_$c(13,10)
+        Set header = "Class "_pFacilityName_"."_pNameSpace_"."_pSubtransformName_" Extends %UnitTest.TestCase "_$c(13,10)_"{"_$c(13,10)
         Set parameters = "Parameter IGNOREMISSINGSOURCE = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter REPORTERRORS = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter TREATEMPTYREPEATINGFIELDASNULL = 0;"_$c(13,10)_$c(13,10)
