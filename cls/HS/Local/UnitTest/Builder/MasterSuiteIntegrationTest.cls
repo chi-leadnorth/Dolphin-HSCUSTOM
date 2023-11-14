@@ -13,11 +13,11 @@ Class HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest Extends %RegisteredOb
 
 // Set pNameSpace = "HSCUSTOM"
 
-// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).UnitTestGenerator()
+// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).IntegrationTestGenerator()
 
-// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).UnitTestGenerator(pFacilityId, pFacilityName, pTransformName, pSubtransformName, pFilePath, pNameSpace)
+// do ##class(HS.Local.UnitTest.Builder.MasterSuiteIntegrationTest).IntegrationTestGenerator(pFacilityId, pFacilityName, pTransformName, pSubtransformName, pFilePath, pNameSpace)
 
-ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %String = "", pTransformName As %String = "", pSubtransformName As %String = "", pFilePath As %String = "", pNameSpace As %List = "") As %Status
+ClassMethod IntegrationTestGenerator(pFacilityId As %String = "", pFacilityName As %String = "", pTransformName As %String = "", pSubtransformName As %String = "", pFilePath As %String = "", pNameSpace As %List = "") As %Status
 {
         // CallMasterSuite
 
@@ -97,10 +97,21 @@ ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %Str
     }
 
     // Create the output file
+    //,i missing inside
+        Set pSubtransformName = $LIST(pSubtransformName) 
+        Write "Processing UnitTestName: ", pSubtransformName, !        
+        // Create the output file
+        write "About to open file"
     Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSubtransformName_".cls")
     Quit:(OutFile = $$$NULLOREF)
 
+    write "The file has been opened" 
+
     // Initialize the file content stream
+
+    //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
+    //write "xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent"      
+    //Write "pStream: ", pStream, ! 
     Set updatedContent = ""
 
     Set length = $LISTLENGTH(pSubtransformName)
@@ -149,7 +160,7 @@ ClassMethod UnitTestGenerator(pFacilityId As %String = "", pFacilityName As %Str
     }
         
         // Generate the header and class definition
-        //Set header = "Class "_pFacilityName_"."_pNamespace_"."_pUnitTestName_" Extends %UnitTest.TestCase "_$c(13,10)_"{"_$c(13,10)
+        Set header = "Class "_pFacilityName_"."_pNameSpace_"."_pSubtransformName_" Extends %UnitTest.TestCase "_$c(13,10)_"{"_$c(13,10)
         Set parameters = "Parameter IGNOREMISSINGSOURCE = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter REPORTERRORS = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter TREATEMPTYREPEATINGFIELDASNULL = 0;"_$c(13,10)_$c(13,10)

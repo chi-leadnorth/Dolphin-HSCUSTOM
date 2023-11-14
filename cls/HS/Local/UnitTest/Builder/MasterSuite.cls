@@ -1,25 +1,35 @@
 Class HS.Local.UnitTest.Builder.MasterSuite Extends %RegisteredObject
 {
 
+// MKO: To develop a Builder that generates Unit Test Suite Classes and reads the contents of the Subtransform classes from each class folder
+
 // do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilderGenerator()
 
 // Set pFilePath = "C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput"
 
-// Set pFacilityName = "MMCT"
+// set pFileName = "TEST"
+
+// Set pFacilityName = "JPS"
 
 // Set pNamespace = "HSCUSTOM"
 
-// Set pTestMethodName = "GenerateDTLExportXML"
+// Set pTestMethodName = "TestSuiteBuilderGenerator"
 
-// Set pSelectedUnitTestNames = "UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform"
+// Set pSelectedUnitTestNames = "UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestORCSubtransform,UnitTestOBRSubtransform"
 
-// UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform,UnitTestORCSubtransform
-
-ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
+ClassMethod TestSuiteBuilderGenerator(pFacilityID As %String = "", pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
     Set tSC = $$$OK
 
     // If any of the parameters are empty, prompt for input
+    If pFacilityID = "" {
+        Read !, "ENTER the FacilityID: ", pFacilityID
+    }
+    if pFacilityID = "" {
+        Write "FacilityID cannot be empty"
+        $$$ThrowStatus($$$ERROR($$$GeneralError, "FacilityIDcannot be empty"))
+    }
+
     If pFilePath = "" {
         Read !, "ENTER the File Path: ", pFilePath
     }
@@ -82,20 +92,15 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
         Set OutFile = ..ReturnOutputFile(pFilePath_"/"_pSelectedUnitTestName_".cls")
         Quit:(OutFile = $$$NULLOREF)
 
-         write "the file has been opened"        
+         write "The file has been opened"        
 
         // Parse the content from the XData block
-        //Chi Notes 11/3
-        //write "xdata://" _ ..%ClassName(1)_".UnitTestMSHSubtransform:MSHSegment"       
-        //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ .."%HS.Local.DOLPHIN.UnitTestMSHSubtransform(1)_"."_UnitTestMSHSubtransform_":UnitTestContent", .pStream)
-        //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
+        //Chi & Morris 11/03/23
+        
         do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
-        write "xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent"        
-        //do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%HS.Local.UnitTest.Builder(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
+        write "xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent"      
           
-        Write "pStream: ", pStream, !
-
-    
+        Write "pStream: ", pStream, !    
 
         // Parse out the content from in between the <transform> tags
         Set unitTestContent = ""
@@ -121,18 +126,18 @@ ClassMethod TestSuiteBuilderGenerator(pFilePath As %String = "", pFileName As %S
             }
         }    
         
-        // Generate the header and class definition
-        Set header = "Class "_pFacilityName_"."_pNamespace_"."_pSelectedUnitTestName_" Extends %UnitTest.TestCase "_$c(13,10)_"{"_$c(13,10)
+        // Generate the Header and Class Definition
+        Set header = "Class "_pFacilityName_""_pFacilityID_"."_pNamespace_"."_pSelectedUnitTestName_" Extends %UnitTest.TestCase "_$c(13,10)_"{"_$c(13,10)
         Set parameters = "Parameter IGNOREMISSINGSOURCE = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter REPORTERRORS = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter TREATEMPTYREPEATINGFIELDASNULL = 0;"_$c(13,10)_$c(13,10)
-        Set methodHeader = "Method "_pSelectedUnitTestName_"()"_$c(13,10)_"{"_$c(13,10)
+        Set methodHeader = "Method "_pSelectedUnitTestName_"()"_$c(13,10)_"{"_$c(13,10)        
         Set xdataFooter = $c(13,10)_$c(13,10)_"}"_$c(13,10)_$c(13,10)_"}"
         // Combine the header, parameters, xdataHeader, and transformContent
         Set updatedContent = header_parameters_methodHeader_unitTestContent_xdataFooter       
 
         // Replace placeholders with actual values
-        Set updatedContent = $replace(updatedContent, "{FacilityName}", pFacilityName)       
+        Set updatedContent = $replace(updatedContent, "{FacilityName}", pFacilityName)    
     
         // Write the updated content to the output file
         Set tSC = OutFile.Write(updatedContent)        
@@ -203,10 +208,9 @@ ClassMethod ReturnOutputFile(filename As %String) As %File
         Quit fileObj
 }
 
-/// I saw this and I love to see if it can be applied (223-251)
+/// MKO: This method will be reading contents of the classes
 Method ReadClasses(folderPath As %String) As %File
 {
-    
     
         #dim fileSpec As %String = folderPath _ "*.cls"
         #dim fileIterator As %String = ##class(%File).FileSet(fileSpec)
