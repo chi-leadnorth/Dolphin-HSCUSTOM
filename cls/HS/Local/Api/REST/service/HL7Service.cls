@@ -4,6 +4,7 @@ Class HS.Local.Api.REST.service.HL7Service Extends %CSP.REST
 ClassMethod Create() As %Status
 {
     #dim tSC As %Status = $$$OK
+    
 
     Set data = {}.%FromJSON(%request.Content)
 
