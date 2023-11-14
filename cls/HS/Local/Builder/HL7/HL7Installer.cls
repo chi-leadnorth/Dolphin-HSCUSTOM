@@ -67,7 +67,7 @@ XData FileOperation
 {
 <Item Name="HL7FileOperation" Category="" ClassName="EnsLib.HL7.Operation.FileOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="This is a default HL7 File Operation." LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="Filename">DOLPHIN</Setting>
-    <Setting Target="Adapter" Name="FilePath">C:\DOLPHIN PROJECT\out\</Setting>
+    <Setting Target="Adapter" Name="FilePath">HS.Local.Builder.HL7.Output</Setting>
   </Item>
 }
 
