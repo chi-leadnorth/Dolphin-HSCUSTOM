@@ -22,10 +22,9 @@ ClassMethod Create() As %Status
 
     try {
         set facilityId = data.FacilityId
-        set connectionType = data.ConnectionType
-        set namespace = data.Namespace
+        set schema = data.Schema
 
-        #; do 
+        do ##class(HS.Local.Builder.HL7.HL7Installer).AddHL7Pipeline(facilityId, schema)
         
         Set item.message = "HL7 interface created successfully"
     } catch {
