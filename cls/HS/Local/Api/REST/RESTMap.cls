@@ -82,7 +82,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 
 ClassMethod BuildInterface() As %Status
 {
-  Return ##class(HS.Local.Api.REST.service.FacilityService).Create()
+  Return ##class(HS.Local.Api.REST.service.HL7Service).Create()
 }
 
 /// Log in
