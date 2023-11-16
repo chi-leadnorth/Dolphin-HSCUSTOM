@@ -4,22 +4,18 @@ Class HS.Local.Builder.HL7.HL7Installer Extends (HS.HC.Util.Installer, HS.Util.I
 ClassMethod AddHL7Pipeline(pFacility As %String = "", pSchemaCategory As %String = "") As %Status
 {
 	try {
-		#; various things that need to be setup in a facility installation
 		Set tSC = $$$OK
 
 		If pFacility = "" { 
-			Read !, "ENTER the Facility ID: ", pFacility
+			Read !, "ENTER Production NAMESPACE: ", pFacility
 		
 		}
-        //YEAH
 		if pFacility = "" {
 			Write "Facility ID and OID require non-empty values"
 			$$$ThrowStatus($$$ERROR($$$GeneralError, "Facility ID and OID require non-empty values"))
 		}
 
 		
-		//Add items to HSROUTER
-        // call the InstallRouter or whatever....
 		Set tSC =  ..AddProductionItems(pFacility, "RouterItems")
 	} Catch ex {
 		Set tSC=ex.AsStatus()
@@ -33,7 +29,6 @@ ClassMethod InstallRouter() As %Status
 	Set tSC = $$$OK
 
 	
-	//Set up HSROUTER production
 	Set tSC =  ..AddProductionItems("TEAM2SANDBOX", "RouterItems")
     Set tSC =  ..AddProductionItems("TEAM2SANDBOX", "FileServiceItems")
     Set tSC =  ..AddProductionItems("TEAM2SANDBOX", "FileOperation")
@@ -41,8 +36,6 @@ ClassMethod InstallRouter() As %Status
 	quit tSC
 }
 
-/// XData for HSRouter import
-/// CNR: This item is just a dummy example - replace with your production items
 XData RouterItems
 {
 <Item Name="MsgRouter" Category="" ClassName="EnsLib.HL7.MsgRouter.RoutingEngine" PoolSize="1" Enabled="true" Foreground="false" Comment="This handles message routing logic." LogTraceEvents="false" Schedule="">
@@ -57,8 +50,8 @@ XData FileServiceItems
 <Item Name="HL7FileService" Category="" ClassName="EnsLib.HL7.Service.FileService" PoolSize="1" Enabled="true" Foreground="false" Comment="This is a default HL7 File Service." LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="TargetConfigNames">MsgRouter</Setting>
     <Setting Target="Host" Name="MessageSchemaCategory">2.8</Setting>
-    <Setting Target="Adapter" Name="ArchivePath">C:\DOLPHIN PROJECT\in\archive\</Setting>
-    <Setting Target="Adapter" Name="FilePath">C:\DOLPHIN PROJECT\in\</Setting>
+    <Setting Target="Adapter" Name="ArchivePath">C:\DOLPHIN_PROJECT\in\archive\</Setting>
+    <Setting Target="Adapter" Name="FilePath">C:\DOLPHIN_PROJECT\in\</Setting>
     <Setting Target="Adapter" Name="WorkPath"></Setting>
   </Item>
 }
@@ -71,8 +64,6 @@ XData FileOperation
   </Item>
 }
 
-/// XData for Gateway import
-/// XData for HSBUS import
 XData InstallIntro
 {
 <text>
@@ -85,10 +76,6 @@ into {p1}EG{FacilityId}\CCDIn (on HSROUTER)
 
 ClassMethod Install(pNamespace As %String, pFacility As %String) As %Library.Status
 {
-        // Set the target namespace
-        //Set $namespace = pNamespace
-        
-        // Install and configure InterSystems Cache and HL7 components for the given namespace
         Set status = ""
         Set status = ..AddHL7Pipeline(pFacility)
         If 'status {
@@ -97,44 +84,13 @@ ClassMethod Install(pNamespace As %String, pFacility As %String) As %Library.Sta
         }
         
         
-        //Write "HL7 Production has been set up in namespace: ", $namespace, !
-        
-        // You can add more configuration steps here
-        
-        // Create a new HL7 Service
-        #; Set hl7Service = ##class(HL7.Service).%New()
-        #; Set hl7Service.Name = "HL7Service"
-        #; Set hl7Service.Port = 12345
-        #; Set hl7Service.Start = 1
-        #; Set status = hl7Service.%Save()
-        
-        #; If 'status {
-        #;     Write "Failed to create HL7 Service.",!
-        #;     Quit
-        #; }
-        
         Write "HL7 Service has been created and configured in namespace: ", $namespace, !
         
-        // Create and configure your HL7 router, business services, and business processes
-        // Add code to configure your specific components here
-        
         Write "HL7 end-to-end setup completed in namespace: ", $namespace, !
-        
-        // Create and configure Facility
-        #; Set facility = ##class(Facility).%New()
-        #; Set facility.Name = facilityName
-        #; Set status = facility.%Save()
-        
-        #; If 'status {
-        #;     Write "Failed to create Facility.",!
-        #;     Quit
-        #; }
-        
+                
         Write "Facility '", facilityName, "' has been created in namespace: ", $namespace, !
 }
 
-/// CNR: All this down below are helper methods that you most likely don't need to change
-/// Add Production Items from XDATA block
 ClassMethod AddProductionItems(pNamespace As %String = "", pBlockItems As %String = "")
 {
 	try {
@@ -155,7 +111,6 @@ XData ProductionDefinition
 </Production>
 }
 
-/// Helper method frequently used in Install Kit classes to update productions
 ClassMethod ProductionMods(pNS As %String = {$namespace}, pItems As %String = "", pUpdate As %Boolean = 0, pProductionClass = "", pAddItemsString = "") As %Status
 {
 	try {
@@ -186,14 +141,12 @@ ClassMethod ProductionMods(pNS As %String = {$namespace}, pItems As %String = ""
 	Quit tSC
 }
 
-/// helper method used in installs
 ClassMethod getStream(pLocation As %String, Output pStream) As %Status
 {
 	If pLocation '[ "://" Set pLocation = "xdata://"_..%ClassName(1)_":"_pLocation
 	Quit ##class(HS.Util.XMLUtils).GetXDataAsStreamWithSubstitutions(pLocation,.pStream)
 }
 
-/// helper method used to update production items
 ClassMethod AddUpdateConfigItem(pItem As Ens.Config.Item, pToProd As Ens.Config.Production, pUpdate) As %Status
 {
 	#dim tItem As Ens.Config.Item
@@ -204,7 +157,7 @@ ClassMethod AddUpdateConfigItem(pItem As Ens.Config.Item, pToProd As Ens.Config.
 			Set tItem=pToProd.Items.GetAt(tI)
 			If tItem.ClassName=pItem.ClassName && (tItem.Name = pItem.Name) && (tItem.Comment = pItem.Comment) {Set tFound=1 Quit}
 		}
-		If tFound && 'pUpdate Quit   //already there, done if not updating it
+		If tFound && 'pUpdate Quit
 		If 'tFound {
 			Set tSC=pToProd.Items.Insert(pItem)
 			Quit
