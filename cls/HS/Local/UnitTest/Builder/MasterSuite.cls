@@ -22,50 +22,50 @@ ClassMethod TestSuiteBuilderGenerator(pFacilityID As %String = "", pFilePath As 
     Set tSC = $$$OK
 
     // If any of the parameters are empty, prompt for input
-    If pFacilityID = "" {
-        Read !, "ENTER the FacilityID: ", pFacilityID
-    }
-    if pFacilityID = "" {
-        Write "FacilityID cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "FacilityIDcannot be empty"))
-    }
+    #; If pFacilityID = "" {
+    #;     Read !, "ENTER the FacilityID: ", pFacilityID
+    #; }
+    #; if pFacilityID = "" {
+    #;     Write "FacilityID cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "FacilityIDcannot be empty"))
+    #; }
 
-    If pFilePath = "" {
-        Read !, "ENTER the File Path: ", pFilePath
-    }
-    if pFilePath = "" {
-        Write "File Path cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "File Path cannot be empty"))
-    }
-    If pFileName = "" {
-        Read !, "Enter the File Name: ", pFileName
-    }
-    if pFileName = "" {
-        Write "File Name cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "File Name cannot be empty"))
-    }
-    If pFacilityName = "" {
-        Read !, "ENTER the Facility Name: ", pFacilityName
-    }
-    if pFacilityName = "" {
-        Write "Facility Name cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "Facility Name cannot be empty"))
-    }
-    If pNamespace = "" {
-        Read !, "ENTER the Namespace Name: ", pNamespace
-    }
-    if pNamespace = "" {
-        Write "Namespace cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace cannot be empty"))
-    }
+    #; If pFilePath = "" {
+    #;     Read !, "ENTER the File Path: ", pFilePath
+    #; }
+    #; if pFilePath = "" {
+    #;     Write "File Path cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "File Path cannot be empty"))
+    #; }
+    #; If pFileName = "" {
+    #;     Read !, "Enter the File Name: ", pFileName
+    #; }
+    #; if pFileName = "" {
+    #;     Write "File Name cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "File Name cannot be empty"))
+    #; }
+    #; If pFacilityName = "" {
+    #;     Read !, "ENTER the Facility Name: ", pFacilityName
+    #; }
+    #; if pFacilityName = "" {
+    #;     Write "Facility Name cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "Facility Name cannot be empty"))
+    #; }
+    #; If pNamespace = "" {
+    #;     Read !, "ENTER the Namespace Name: ", pNamespace
+    #; }
+    #; if pNamespace = "" {
+    #;     Write "Namespace cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace cannot be empty"))
+    #; }
 
-    // Initialize pSelectedSubTransformNames as an empty list
-    Set pSelectedUnitTestNames = ""
+    #; // Initialize pSelectedSubTransformNames as an empty list
+    #; Set pSelectedUnitTestNames = ""
 
-    // Check if pSelectedSubTransformNames is empty or doesn't contain at least one item
-    If pSelectedUnitTestNames = "" {
-        Read !, "Enter the Desired UnitTestSubtransformNames (comma separated): ", pSelectedUnitTestNames
-    }
+    #; // Check if pSelectedSubTransformNames is empty or doesn't contain at least one item
+    #; If pSelectedUnitTestNames = "" {
+    #;     Read !, "Enter the Desired UnitTestSubtransformNames (comma separated): ", pSelectedUnitTestNames
+    #; }
 
     // Convert the input to a list
     Set pSelectedUnitTestNames = $LISTFROMSTRING(pSelectedUnitTestNames, ",")
@@ -95,7 +95,7 @@ ClassMethod TestSuiteBuilderGenerator(pFacilityID As %String = "", pFilePath As 
          write "The file has been opened"        
 
         // Parse the content from the XData block
-        //Chi & Morris 11/03/23
+        //Chi & Morris 11/03/23: Chi added this block to make it work (Pull from the XData Block)
         
         do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
         write "xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent"      
@@ -143,6 +143,7 @@ ClassMethod TestSuiteBuilderGenerator(pFacilityID As %String = "", pFilePath As 
         Set tSC = OutFile.Write(updatedContent)        
         Do OutFile.Close()
         Quit:$$$ISERR(tSC)
+        
     }
     Quit tSC
 }
@@ -151,6 +152,7 @@ Method WriteFile(pFilePath As %String, pContent As %String) As %Status
 {
     Try {
         // Open the file for writing
+        write pFilePath
         Set file = ##class(%File).%New(pFilePath)
         Set status = file.Open("WSN")
         If ($SYSTEM.Status.IsError(status)) {
@@ -196,15 +198,25 @@ ClassMethod searchAndReplace(pInput As %String, pSearch As %String, pReplace As 
 
 ClassMethod ReturnOutputFile(filename As %String) As %File
 {
+
         Set dir = ##class(%File).GetDirectory(filename)
+
         Do ##class(%File).CreateDirectoryChain(dir)
+
         Set fileObj = ##class(%File).%New(filename)
+
         Set status = fileObj.Open("WSN")
+
         If ($SYSTEM.Status.IsError(status)) {
+
             Do $system.Status.DisplayError(status)
+
             Quit $$$NULLOREF
+
         }
+
         Do fileObj.%Close()
+
         Quit fileObj
 }
 
