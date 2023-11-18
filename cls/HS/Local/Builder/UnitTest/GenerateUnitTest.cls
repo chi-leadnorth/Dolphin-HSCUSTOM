@@ -21,63 +21,63 @@ Parameter UnitTestMSHSubtransform = "%XML.Adaptor(XMLNAMESPACE = ""http://www.in
 
 // set content=pStream.Read(32000),content=$p(content,"<text>",2,99999),content=$p(content,"</text>")
 
-ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %String = "", pTestMethodName As %String = "", pUnitTestName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
+ClassMethod TestSuiteBuilder(pFilePath As %String = "", pFacilityName As %String = "", pTestMethodName As %String = "", pUnitTestName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
     Set tSC = $$$OK
 
-    // If any of the parameters are empty, prompt for input
-    If pFilePath = "" {
-        Read !, "ENTER the File Path: ", pFilePath
-    }
-    if pFilePath = "" {
-        Write "File Path cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "File Path cannot be empty"))
-    }
-    If pFacilityName = "" {
-        Read !, "ENTER the Facility Name: ", pFacilityName
-    }
-    if pFacilityName = "" {
-        Write "Facility Name cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "Facility Name cannot be empty"))
-    }
-    If pTestMethodName = "" {
-        Read !, "ENTER the ClassTestMethod Name: ", pTestMethodName
-    }
-    if pTestMethodName = "" {
-        Write "Test Method Name cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "Test Method Name cannot be empty"))
-    }
-    set pTestMethodName = pTestMethodName_"()"
+    #; // If any of the parameters are empty, prompt for input
+    #; If pFilePath = "" {
+    #;     Read !, "ENTER the File Path: ", pFilePath
+    #; }
+    #; if pFilePath = "" {
+    #;     Write "File Path cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "File Path cannot be empty"))
+    #; }
+    #; If pFacilityName = "" {
+    #;     Read !, "ENTER the Facility Name: ", pFacilityName
+    #; }
+    #; if pFacilityName = "" {
+    #;     Write "Facility Name cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "Facility Name cannot be empty"))
+    #; }
+    #; If pTestMethodName = "" {
+    #;     Read !, "ENTER the ClassTestMethod Name: ", pTestMethodName
+    #; }
+    #; if pTestMethodName = "" {
+    #;     Write "Test Method Name cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "Test Method Name cannot be empty"))
+    #; }
+    #; set pTestMethodName = pTestMethodName_"()"
 
-    If pUnitTestName = "" {
-        Read !, "ENTER the UnitTestName: ", pUnitTestName
-    }
-    if pUnitTestName = "" {
-        Write "UnitTestName cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "UnitTestName cannot be empty"))
-    }
-    If pNamespace = "" {
-        Read !, "ENTER the Namespace Name: ", pNamespace
-    }
-    if pNamespace = "" {
-        Write "Namespace cannot be empty"
-        $$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace cannot be empty"))
-    }
+    #; If pUnitTestName = "" {
+    #;     Read !, "ENTER the UnitTestName: ", pUnitTestName
+    #; }
+    #; if pUnitTestName = "" {
+    #;     Write "UnitTestName cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "UnitTestName cannot be empty"))
+    #; }
+    #; If pNamespace = "" {
+    #;     Read !, "ENTER the Namespace Name: ", pNamespace
+    #; }
+    #; if pNamespace = "" {
+    #;     Write "Namespace cannot be empty"
+    #;     $$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace cannot be empty"))
+    #; }
 
-    // Initialize pSelectedSubTransformNames as an empty list
-    Set pSelectedUnitTestNames = ""
+    #; // Initialize pSelectedSubTransformNames as an empty list
+    #; Set pSelectedUnitTestNames = ""
 
-    // Check if pSelectedSubTransformNames is empty or doesn't contain at least one item
-    If pSelectedUnitTestNames = "" {
-        Read !, "Enter the Desired UnitTestSubtransformNames (comma separated): ", pSelectedUnitTestNames
-    }
+    #; // Check if pSelectedSubTransformNames is empty or doesn't contain at least one item
+    #; If pSelectedUnitTestNames = "" {
+    #;     Read !, "Enter the Desired UnitTestSubtransformNames (comma separated): ", pSelectedUnitTestNames
+    #; }
 
     // Convert the input to a list
     Set pSelectedUnitTestNames = $LISTFROMSTRING(pSelectedUnitTestNames, ",")
 
     // Check if the list is still empty
     If $LISTLENGTH(pSelectedUnitTestNames) = 0 {
-        Write "Minimum of 1 Selection Required"
+        Write "Minimum of 1 Selection Required", !
         $$$ThrowStatus($$$ERROR($$$GeneralError, "Must use at least 1 UnitTestName"))
     }
 
@@ -138,7 +138,7 @@ ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %St
         Set parameters = "Parameter IGNOREMISSINGSOURCE = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter REPORTERRORS = 1;"_$c(13,10)_$c(13,10)
         Set parameters = parameters_"Parameter TREATEMPTYREPEATINGFIELDASNULL = 0;"_$c(13,10)_$c(13,10)
-        Set methodHeader = "Method "_pTestMethodName_$c(13,10)_"{"_$c(13,10)
+        Set methodHeader = "Method "_pTestMethodName_"()"_$c(13,10)_"{"_$c(13,10)
         Set xdataFooter = $c(13,10)_$c(13,10)_"}"_$c(13,10)_$c(13,10)_"}"
         // Combine the header, parameters, xdataHeader, and transformContent
         Set updatedContent = header_parameters_methodHeader_unitTestContent_xdataFooter       
