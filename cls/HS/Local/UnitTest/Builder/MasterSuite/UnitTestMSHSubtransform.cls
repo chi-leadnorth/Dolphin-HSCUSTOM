@@ -8,7 +8,7 @@ Method TestMSH()
 
   //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
    set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
-     //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
+    set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New() 
      //set InputMessage = ##class(EnsLib.HL7.Segment).%New() 
     #;  set InputMessage.MessageType="ORU_R01" 
