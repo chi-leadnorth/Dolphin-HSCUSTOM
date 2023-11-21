@@ -6,14 +6,11 @@ Method TestMSH()
 {
     //create a transformation class instance, input message sample
 
-  #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
-   set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
-     //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-     set InputMessage = ##class(EnsLib.HL7.Message).%New() 
-     //set InputMessage = ##class(EnsLib.HL7.Segment).%New() 
-    #;  set InputMessage.MessageType="ORU_R01" 
-    #;  set InputMessage.DocType="2.8:ADT_A01"         
-     set HL7Message=     
+      set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinMSH).%New()
+    
+      set InputMessage = ##class(EnsLib.HL7.Message).%New() 
+             
+      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
       "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_
@@ -32,35 +29,32 @@ Method TestMSH()
       "OBX|10|ST|&GDT|1|||||||P|||||P630889^DRABEK^EMMA"_$C(13,10)_
       "OBX|11|ST|&GDT|1|The epididymides are unremarkable in appearance bilaterally.||||||P|||||P630889^DRABEK^EMMA"_$C(13,10)    
       
-    set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc)
+      set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc)
     
-    //set tDocType=##class(EnsLib.HL7.Schema).ResolveSchemaTypeToDocType("2.3",.sc) $$$ThrowOnError(sc)      
+      //set tDocType=##class(EnsLib.HL7.Schema).ResolveSchemaTypeToDocType("2.3",.sc) $$$ThrowOnError(sc)      
     
-    set status = Transformation.Transform(InputMessage,.OutputMessage)
+      set status = Transformation.Transform(InputMessage,.OutputMessage)
     
-    set OutputMessage.DocType="2.8:ORU_R01"
-    //set OutputMessage.MessageType = "ORU"
-    write OutputMessage.OutputToString()
-    ; Access fields and segments in the HL7 message     
-    set SendingApplication = OutputMessage.GetValueAt("MSH:3")
-    set SendingFacility = OutputMessage.GetValueAt("MSH:4")    
-    set ReceivingApplication = OutputMessage.GetValueAt("MSH:5", "|") 
-    set ReceivingFacility = OutputMessage.GetValueAt("MSH:6", "|") 
-    set DateTimeofMessage = OutputMessage.GetValueAt("MSH:7", "|")
-    set MessageType = OutputMessage.GetValueAt("MSH:9", "|")
-    set MessageControllerID = OutputMessage.GetValueAt("MSH:10", "|")    
+      set OutputMessage.DocType="2.8:ORU_R01"
+      //set OutputMessage.MessageType = "ORU"
+      write OutputMessage.OutputToString()
+      ; Access fields and segments in the HL7 message     
+      set SendingApplication = OutputMessage.GetValueAt("MSH:3")
+      set SendingFacility = OutputMessage.GetValueAt("MSH:4")    
+      set ReceivingApplication = OutputMessage.GetValueAt("MSH:5", "|") 
+      set ReceivingFacility = OutputMessage.GetValueAt("MSH:6", "|") 
+      set DateTimeofMessage = OutputMessage.GetValueAt("MSH:7", "|")
+      set MessageType = OutputMessage.GetValueAt("MSH:9", "|")
+      set MessageControllerID = OutputMessage.GetValueAt("MSH:10", "|")    
         
-   ///Here we are logging in the values from the message 
-    Write "SendingApplication: ", OutputMessage.GetValueAt("MSH:3:"), !     
-    Write "DateTimeofMessage: ", OutputMessage.GetValueAt("MSH:7:"), !
-    Write "MessageType: ", OutputMessage.GetValueAt("MSH:9:"), !  
-    Write "MessageContollerID: ", OutputMessage.GetValueAt("MSH:10:"), !      
-
-     /// Write the Sending Facility
-
-    write $$$AssertEquals("LEADNORTHLLC", SendingFacility)
-    write $$$AssertEquals("CLOVERLEAF", ReceivingApplication)
-    write $$$AssertEquals("DTA-PHARMACY", ReceivingFacility)
+      ///Here we are logging in the values from the message 
+      Write "SendingApplication: ", OutputMessage.GetValueAt("MSH:3:"), !     
+      Write "DateTimeofMessage: ", OutputMessage.GetValueAt("MSH:7:"), !
+      Write "MessageType: ", OutputMessage.GetValueAt("MSH:9:"), !  
+      Write "MessageContollerID: ", OutputMessage.GetValueAt("MSH:10:"), !   
+      write $$$AssertEquals("LEADNORTHLLC", SendingFacility)
+      write $$$AssertEquals("CLOVERLEAF", ReceivingApplication)
+      write $$$AssertEquals("DTA-PHARMACY", ReceivingFacility)
       
      
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestMSHSubtransform", "/nodelete")

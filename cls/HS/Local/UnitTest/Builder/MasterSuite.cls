@@ -1,7 +1,7 @@
 Class HS.Local.UnitTest.Builder.MasterSuite Extends %RegisteredObject
 {
 
-// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder("1200","C:/Users/topfr/Desktop/DOLPHIN/MasterTestOutput","Test","Logan","HSCUSTOM","UnitTestMSHSubtransform,UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform,UnitTestORCSubtransform")
+// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder("1250","C:/Users/topfr/Desktop/DOLPHIN/MasterTestOutput","BuilderSuiteClass","MMCT","HSCUSTOM","UnitTestMSHSubtransform,UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform,UnitTestORCSubtransform")
 
 ClassMethod TestSuiteBuilder(pFacilityID As %String = "", pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
@@ -43,7 +43,7 @@ ClassMethod TestSuiteBuilder(pFacilityID As %String = "", pFilePath As %String =
                 }
             }
         }    
-
+        write "Whatever", !
         Set methodHeader = "Method "_"Test"_pSelectedUnitTestName_"()"_$c(13,10)_"{"_$c(13,10)        
         Set xdataFooter = $c(13,10)_$c(13,10)_"}"_$c(13,10)_$c(13,10)
         Set updatedContent = updatedContent_methodHeader_unitTestContent_xdataFooter_$c(13,10,13,10)
