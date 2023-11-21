@@ -4,7 +4,10 @@ Class HS.Local.UnitTest.Builder.MasterSuite.UnitTestPV1Subtransform Extends %Uni
 /// Creating the first method to test
 Method TestPV1()
 {
-    Set tSC = $$$OK
+    
+    #dim tSC As %Status = $$$OK
+	  #dim e As %Exception.AbstractException
+
     //create a transformation class instance
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPV1).%New()
@@ -36,6 +39,8 @@ Method TestPV1()
     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc) 
     
     set status = Transformation.Transform(InputMessage,.OutputMessage)
+    
+    ; The Schema need to be re-visited and changed to the ORU
     set OutputMessage.DocType="2.5.1:ADT_A01"     
     //set OutputMessage.DocType="2.5.1:ORU_R01"    
     write OutputMessage.OutputToString()
@@ -47,11 +52,12 @@ Method TestPV1()
         
    ///Here we are logging in the values from the message 
     
-    Write "PlaceofVisit: ", OutputMessage.GetValueAt("PV1:2"), ! 
-    Write "AttendingDoctor: ", OutputMessage.GetValueAt("PV1:7"), ! 
-    Write "VisitNumber: ", OutputMessage.GetValueAt("PV1:19"), ! 
-   
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
+    W !, "PlaceofVisit: ", OutputMessage.GetValueAt("PV1:2"), ! 
+    W !, "AttendingDoctor: ", OutputMessage.GetValueAt("PV1:7"), ! 
+    W !, "VisitNumber: ", OutputMessage.GetValueAt("PV1:19"), ! 
+    
+  
+    ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPV1Subtransform", "/nodelete")
 }
 
 XData UnitTestContent
