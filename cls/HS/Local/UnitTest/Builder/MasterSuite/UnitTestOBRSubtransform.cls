@@ -6,8 +6,8 @@ Method TestOBRSegment()
     //create a transformation class instance, input message sample to parse
 
     #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
-     set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
-     //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
+     //set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
+     set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
@@ -33,7 +33,7 @@ Method TestOBRSegment()
     set status = Transformation.Transform(InputMessage,.OutputMessage)
     
     set OutputMessage.DocType="2.8:ORU_R30"
-    write OutputMessage.OutputToString()
+    w !, OutputMessage.OutputToString()
     ; Access fields and segments in the HL7 message     
     set PlacerOrderNumber = OutputMessage.GetValueAt("OBR:2.1", "|")
     set FillerOrderNumber = OutputMessage.GetValueAt("OBR:3.1", "|")
@@ -42,12 +42,12 @@ Method TestOBRSegment()
     set OrderingProvider = OutputMessage.GetValueAt("OBR:16", "|")       
         
    ///Here we are logging in the values from the message 
-    Write "PlacerOrderNumber: ", OutputMessage.GetValueAt("OBR:2.1"), !
-    write "FillerOrderNumber: ", OutputMessage.GetValueAt("OBR:3.1"), !
-    Write "UniversalserviceIdentifier: ", OutputMessage.GetValueAt("OBR:4"), !
-    Write "RequestedDateTime: ", OutputMessage.GetValueAt("OBR:6"), !     
-    write "OrderingProvider: ", OutputMessage.GetValueAt("OBR:16"), ! 
-    write "ResultStatus: ", OutputMessage.GetValueAt("OBR:25"), ! 
+    w !, "PlacerOrderNumber: ", OutputMessage.GetValueAt("OBR:2.1"), !
+    w !, "FillerOrderNumber: ", OutputMessage.GetValueAt("OBR:3.1"), !
+    w !, "UniversalserviceIdentifier: ", OutputMessage.GetValueAt("OBR:4"), !
+    w !, "RequestedDateTime: ", OutputMessage.GetValueAt("OBR:6"), !     
+    w !, "OrderingProvider: ", OutputMessage.GetValueAt("OBR:16"), ! 
+    w !,"ResultStatus: ", OutputMessage.GetValueAt("OBR:25"), ! 
     
       
      

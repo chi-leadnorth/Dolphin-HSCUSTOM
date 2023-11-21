@@ -7,11 +7,11 @@ Method TestORCSegment()
 
     //create a transformation class instance
     #;  set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-    set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
+      set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
 
-     //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
 
-   // sample HL7 Input message
+      // sample HL7 Input message
      set InputMessage = ##class(EnsLib.HL7.Message).%New()
          
      set HL7Message=     
@@ -54,19 +54,19 @@ Method TestORCSegment()
           
         
    ///Here we are logging in the values from the message 
-    Write "OrderControl: ", OutputMessage.GetValueAt("ORC:1"), !
-    Write "PlaceOrderNumber: ", OutputMessage.GetValueAt("ORC:2"), !
-    Write "FillerOrderNumber: ", OutputMessage.GetValueAt("ORC:3"), !
-    Write "OrderType: ", OutputMessage.GetValueAt("ORC:5"), !
-    Write "DateofTransaction: ", OutputMessage.GetValueAt("ORC:9"), !
-    Write "EnteredBy: ", OutputMessage.GetValueAt("ORC:10"), !
-    Write "OrderingProvider: ", OutputMessage.GetValueAt("ORC:12"), !
+    w !, "OrderControl: ", OutputMessage.GetValueAt("ORC:1"), !
+    w !,"PlaceOrderNumber: ", OutputMessage.GetValueAt("ORC:2"), !
+    w !,"FillerOrderNumber: ", OutputMessage.GetValueAt("ORC:3"), !
+    w !,"OrderType: ", OutputMessage.GetValueAt("ORC:5"), !
+    w !,"DateofTransaction: ", OutputMessage.GetValueAt("ORC:9"), !
+    w !,"EnteredBy: ", OutputMessage.GetValueAt("ORC:10"), !
+    w !,"OrderingProvider: ", OutputMessage.GetValueAt("ORC:12"), !
 
 
-     write $$$AssertEquals("SC", OrderControl)
-     write $$$AssertEquals("Exam Began", OrderType)
-    
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestORCSubtransform", "/nodelete")
+    w !, $$$AssertEquals("SC", OrderControl)
+    w !, $$$AssertEquals("Exam Began", OrderType)
+  
+    ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestORCSubtransform", "/nodelete")
 }
 
 XData UnitTestContent
