@@ -7,14 +7,6 @@ ClassMethod Create() As %Status
     
 
     Set data = {}.%FromJSON(%request.Content)
-
-    #; if ('data.FacilityId || 'data.Name || 'data.Contact) {
-    #;     Set %response.Status = 400
-    #;     set st1 = $System.Status.Error(400,"Missing fields")
-    #;     Quit st1
-    #; }
-    #;  FacilityId, ConnectionType, Namespace
-
     
     Set %response.ContentType = ..#CONTENTTYPEJSON
     Set %response.Headers("Access-Control-Allow-Origin")="*"
@@ -22,10 +14,10 @@ ClassMethod Create() As %Status
     Set item = {}
 
     try {
-        set facilityId = data.FacilityId
+        set namespace = data.Namespace
         set schema = data.Schema
 
-        do ##class(HS.Local.Builder.HL7.HL7Installer).AddHL7Pipeline(facilityId, schema)
+        do ##class(HS.Local.Builder.HL7.HL7Installer).AddHL7Pipeline(namespace, schema)
         
         Set item.message = "HL7 interface created successfully"
     } catch {
@@ -39,6 +31,14 @@ ClassMethod Create() As %Status
     Write result.%ToJSON()
     Quit tSC
 }
+
+//Todo for later
+    // #; if ('data.FacilityId || 'data.Name || 'data.Contact) {
+    // #;     Set %response.Status = 400
+    // #;     set st1 = $System.Status.Error(400,"Missing fields")
+    // #;     Quit st1
+    // #; }
+    // #;  FacilityId, ConnectionType, Namespace
 
 }
 

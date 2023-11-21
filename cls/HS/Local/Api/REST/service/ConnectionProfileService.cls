@@ -62,12 +62,6 @@ ClassMethod Create() As %Status
     #dim tSC As %Status = $$$OK
 
     Set data = {}.%FromJSON(%request.Content)
-
-    if ('data.FacilityId || 'data.Name || 'data.Contact) {
-        Set %response.Status = 400
-        set st1 = $System.Status.Error(400,"Missing fields")
-        Quit st1
-    }
     
     Set qry = "INSERT INTO DOLPHIN_DB_ConnectionProfile (FacilityId, Name, Contact) VALUES ('"_data.FacilityId_"', '"_data.Name_"', '"_data.Contact_"')"
 
@@ -107,11 +101,6 @@ ClassMethod Update(id As %String) As %Status
     Set %response.Headers("Access-Control-Allow-Origin")="*"
 
     Set result = []
-
-    #; While rset.%Next() {
-        #; Set item = {}
-        #; Set item.message = "Item updated successfully"
-    #; }
 
     Set item = {}
     Set item.message = "This is not working yet"

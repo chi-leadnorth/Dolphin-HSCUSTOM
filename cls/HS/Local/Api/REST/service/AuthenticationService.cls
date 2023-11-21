@@ -1,8 +1,8 @@
 Class HS.Local.Api.REST.service.AuthenticationService Extends %CSP.REST
 {
 
-/*
-ClassMethod Login() As %Status
+
+ClassMethod LogIn() As %Status
 {
     Set qry = "SELECT * FROM DOLPHIN_DB_Connection.Details"
     #dim tSC As %Status = $$$OK
@@ -28,7 +28,7 @@ ClassMethod Login() As %Status
         Do result.%Push(item)
     }
 }
-*/
+
 
 // NH: LogOut method
 

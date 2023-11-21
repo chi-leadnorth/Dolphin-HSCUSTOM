@@ -99,7 +99,6 @@ ClassMethod Update(id As %String) As %Status
     #dim tSC As %Status = $$$OK
     #; Set qry = "DELETE FROM DOLPHIN_DB_Pipeline.Details WHERE Name = '"_id_"'"
 
-
     #; Set tStatement = ##class(%SQL.Statement).%New()  
     #; Set qStatus = tStatement.%Prepare(qry)
     #; If tSC'=1 {WRITE "%Prepare failed:" DO $System.Status.DisplayError(qStatus) QUIT}
@@ -109,11 +108,6 @@ ClassMethod Update(id As %String) As %Status
     Set %response.Headers("Access-Control-Allow-Origin")="*"
 
     Set result = []
-
-    #; While rset.%Next() {
-        #; Set item = {}
-        #; Set item.message = "Item updated successfully"
-    #; }
 
     Set item = {}
     Set item.message = "This is not working yet"

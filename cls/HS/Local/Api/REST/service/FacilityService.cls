@@ -66,13 +66,11 @@ ClassMethod Create() As %Status
 
     Set data = {}.%FromJSON(%request.Content)
 
-    if ('data.FacilityId || 'data.Name || 'data.Contact) {
-        Set %response.Status = 400
-        set st1 = $System.Status.Error(400,"Missing fields")
-        Quit st1
-    }
+    set FacilityId = data.FacilityId
+    set Name = data.Name
+    set Contact = data.Contact
 
-    Set qry = "INSERT INTO DOLPHIN_DB_Data.Facility (FacilityId, Name, Contact) VALUES ('"_data.FacilityId_"', '"_data.Name_"', '"_data.Contact_"')"
+    Set qry = "INSERT INTO DOLPHIN_DB_Data.Facility (FacilityId, Name, Contact) VALUES ('"_FacilityId_"', '"_Name_"', '"_Contact_"')"
 
 
     Set tStatement = ##class(%SQL.Statement).%New()  
@@ -110,12 +108,7 @@ ClassMethod Update(id As %String) As %Status
     Set %response.Headers("Access-Control-Allow-Origin")="*"
 
     Set result = []
-
-    #; While rset.%Next() {
-        #; Set item = {}
-        #; Set item.message = "Item updated successfully"
-    #; }
-
+    
     Set item = {}
     Set item.message = "This is not working yet"
 

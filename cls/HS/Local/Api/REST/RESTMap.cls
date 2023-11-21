@@ -20,7 +20,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/_spec" Method="GET" Call="SwaggerSpec" />
 
 <!-- Log in -->
-<!-- <Route Url="/login" Method="GET" Call="Login" /> -->
+<Route Url="/login" Method="GET" Call="LogIn" />
 
 <Route Url="/hl7/buildInterface" Method="POST" Call="BuildInterface" />
 
@@ -72,13 +72,13 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 </Routes>
 }
 
-// ClassMethod Login() As %Status
+ClassMethod LogIn() As %Status
 
-// {
+{
 
-//  Return ##class(HS.Local.Api.REST.service.AuthenticationService).Login()
+ Return ##class(HS.Local.Api.REST.service.AuthenticationService).LogIn()
 
-// }
+}
 
 ClassMethod BuildInterface() As %Status
 {

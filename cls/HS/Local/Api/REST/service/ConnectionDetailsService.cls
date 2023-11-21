@@ -73,12 +73,6 @@ ClassMethod Create() As %Status
 
     Set data = {}.%FromJSON(%request.Content)
     
-    if ('data.ConnectionName || 'data.HostName || 'data.Port || 'data.InputDirectory || 'data.FileName) {
-        Set %response.Status = 400
-        set st1 = $System.Status.Error(400,"Missing fields")
-        Quit st1
-    }
-    
     Set qry = "INSERT INTO DOLPHIN_DB_Connection.Details (ConnectionName, HostName, Port, InputDirectory, FileName) VALUES ('"_data.ConnectionName_"', '"_data.HostName_"', "_data.Port_", '"_data.InputDirectory_"', '"_data.FileName_"')"
 
 
@@ -119,11 +113,6 @@ ClassMethod Update(id As %String) As %Status
     Set %response.Headers("Access-Control-Allow-Origin")="*"
 
     Set result = []
-
-    #; While rset.%Next() {
-        #; Set item = {}
-        #; Set item.message = "Item updated successfully"
-    #; }
 
     Set item = {}
     Set item.message = "This is not working yet"
