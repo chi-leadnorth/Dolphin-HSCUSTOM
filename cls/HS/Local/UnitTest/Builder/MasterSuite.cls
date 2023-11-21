@@ -3,7 +3,7 @@ Class HS.Local.UnitTest.Builder.MasterSuite Extends %RegisteredObject
 
 // All of us
 
-// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder()
+// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder(1200,C:\Users\topfr\Desktop\DOLPHIN\MasterTestOutput,Test,Logan,HSCUSTOM,"UnitTestMSHSubtransform,UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform,UnitTestORCSubtransform")
 
 ClassMethod TestSuiteBuilder(pFacilityID As %String = "", pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
@@ -21,7 +21,7 @@ ClassMethod TestSuiteBuilder(pFacilityID As %String = "", pFilePath As %String =
 
     For i = 1:1:$LISTLENGTH(pSelectedUnitTestNames) {  
         Set pSelectedUnitTestName = $LIST(pSelectedUnitTestNames, i)
-        Write "Processing UnitTestName: ", pSelectedUnitTestName, !        
+        Write "Processing UnitTestName: ", pSelectedUnitTestName  ,!   
 
         do ##class(Ens.Util.URLStream).GetURLStream("xdata://" _ ..%ClassName(1)_"."_pSelectedUnitTestName_":UnitTestContent", .pStream)
         Set unitTestContent = ""

@@ -51,11 +51,9 @@ Method TestMSH()
     w !, "SendingApplication: ", OutputMessage.GetValueAt("MSH:3:"), !     
     w !, "DateTimeofMessage: ", OutputMessage.GetValueAt("MSH:7:"), !
     w !, "MessageType: ", OutputMessage.GetValueAt("MSH:9:"), !  
-    //Write "MessageContollerID: ", OutputMessage.GetValueAt("MSH:10:"), !
     w !, "MessageContollerID: ", OutputMessage.GetValueAt("MSH:10:"), !
     w !, $$$AssertEquals("LEADNORTHLLC", SendingFacility)
     w !, $$$AssertEquals("CLOVERLEAF", ReceivingApplication)
-    //write $$$AssertEquals("DTA-PHARMACY", ReceivingFacility)
     w !, $$$AssertEquals("DTA-PHARMACY", ReceivingFacility)
       
      

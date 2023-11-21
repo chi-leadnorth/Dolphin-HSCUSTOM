@@ -5,7 +5,8 @@ Method TestPID()
 {
     //create a transformation class instance, input message sample to parse
 
-      set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPID).%New()     
+    #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPID).%New()
+     set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
 
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
@@ -29,7 +30,7 @@ Method TestPID()
       "OBX|11|ST|&GDT|1|The epididymides are unremarkable in appearance bilaterally.||||||P|||||P630889^DRABEK^EMMA"_$C(13,10)    
       
     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc)
-        
+    //set tDocType=##class(EnsLib.HL7.Schema).ResolveSchemaTypeToDocType("2.3",.sc) $$$ThrowOnError(sc)     
     set status = Transformation.Transform(InputMessage,.OutputMessage)
     
     set OutputMessage.DocType="2.8:ORU_R30"
@@ -44,13 +45,13 @@ Method TestPID()
     Set PatientAccountNumber = OutputMessage.GetValueAt("PID:18")        
         
    ///Here we are logging in the values from the message 
-    w !, "PatientLastName: ", OutputMessage.GetValueAt("PID:5.1:"), !     
-    w !, "PatientFirstName: ", OutputMessage.GetValueAt("PID:5.2:"), !
-    w !, "PatientMiddleName: ", OutputMessage.GetValueAt("PID:5.3:"), !  
-    w !, "PatientDateofBirth: ", OutputMessage.GetValueAt("PID:7:"), !  
-    w !, "PatientGender: ", OutputMessage.GetValueAt("PID:8:"), ! 
-    w !,"PatientAddress: ", OutputMessage.GetValueAt("PID:11:"), !  
-    w !, "PatientAccountNumber: ", OutputMessage.GetValueAt("PID:18:"), !    
+    Write "PatientLastName: ", OutputMessage.GetValueAt("PID:5.1:"), !     
+    Write "PatientFirstName: ", OutputMessage.GetValueAt("PID:5.2:"), !
+    Write "PatientMiddleName: ", OutputMessage.GetValueAt("PID:5.3:"), !  
+    Write "PatientDateofBirth: ", OutputMessage.GetValueAt("PID:7:"), !  
+    Write "PatientGender: ", OutputMessage.GetValueAt("PID:8:"), ! 
+    Write "PatientAddress: ", OutputMessage.GetValueAt("PID:11:"), !  
+    Write "PatientAccountNumber: ", OutputMessage.GetValueAt("PID:18:"), !    
  
      ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPIDSubtransform", "/nodelete")
 }
