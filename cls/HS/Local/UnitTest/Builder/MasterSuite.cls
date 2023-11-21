@@ -1,6 +1,10 @@
 Class HS.Local.UnitTest.Builder.MasterSuite Extends %RegisteredObject
 {
 
+// All of us
+
+// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder()
+
 ClassMethod TestSuiteBuilder(pFacilityID As %String = "", pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
     Set tSC = $$$OK

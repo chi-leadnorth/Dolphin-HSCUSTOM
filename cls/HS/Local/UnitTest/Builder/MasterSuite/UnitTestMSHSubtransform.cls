@@ -5,11 +5,11 @@ Class HS.Local.UnitTest.Builder.MasterSuite.UnitTestMSHSubtransform Extends %Uni
 Method TestMSH()
 {
     //create a transformation class instance, input message sample
+      // Logan and Morris agreed to use the Leadnorth until futher discussion
 
       //set Transformation = ##class(TEAM2SANDBOXPKG.DolphinMSH).%New()
   
       set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-      
       set InputMessage = ##class(EnsLib.HL7.Message).%New() 
              
       set HL7Message=     
@@ -51,6 +51,7 @@ Method TestMSH()
     w !, "SendingApplication: ", OutputMessage.GetValueAt("MSH:3:"), !     
     w !, "DateTimeofMessage: ", OutputMessage.GetValueAt("MSH:7:"), !
     w !, "MessageType: ", OutputMessage.GetValueAt("MSH:9:"), !  
+    //Write "MessageContollerID: ", OutputMessage.GetValueAt("MSH:10:"), !
     w !, "MessageContollerID: ", OutputMessage.GetValueAt("MSH:10:"), !
     w !, $$$AssertEquals("LEADNORTHLLC", SendingFacility)
     w !, $$$AssertEquals("CLOVERLEAF", ReceivingApplication)
