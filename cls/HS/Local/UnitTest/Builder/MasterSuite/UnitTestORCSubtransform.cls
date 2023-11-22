@@ -5,16 +5,14 @@ Class HS.Local.UnitTest.Builder.MasterSuite.UnitTestORCSubtransform Extends %Uni
 Method TestORCSegment()
 {
 
-    //create a transformation class instance
-    #;  set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
-      set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
-
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+      //create a transformation class instance
+      set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
+      
 
       // sample HL7 Input message
-     set InputMessage = ##class(EnsLib.HL7.Message).%New()
+      set InputMessage = ##class(EnsLib.HL7.Message).%New()
          
-     set HL7Message=     
+      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
       "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_

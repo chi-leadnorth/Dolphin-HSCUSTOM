@@ -32,13 +32,19 @@ ClassMethod Create() As %Status
     Quit tSC
 }
 
-//Todo for later
-    // #; if ('data.FacilityId || 'data.Name || 'data.Contact) {
-    // #;     Set %response.Status = 400
-    // #;     set st1 = $System.Status.Error(400,"Missing fields")
-    // #;     Quit st1
-    // #; }
-    // #;  FacilityId, ConnectionType, Namespace
+// Todo for later
+
+// #; if ('data.FacilityId || 'data.Name || 'data.Contact) {
+
+// #;     Set %response.Status = 400
+
+// #;     set st1 = $System.Status.Error(400,"Missing fields")
+
+// #;     Quit st1
+
+// #; }
+
+// #;  FacilityId, ConnectionType, Namespace
 
 }
 

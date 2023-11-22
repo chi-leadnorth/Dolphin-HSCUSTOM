@@ -3,18 +3,16 @@ Class HS.Local.UnitTest.Builder.MasterSuite.UnitTestOBRSubtransform Extends %Uni
 
 Method TestOBRSegment()
 {
-    //create a transformation class instance, input message sample to parse
+      //create a transformation class instance, input message sample to parse
 
-    #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
-     //set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
      set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
      set HL7Message=     
-      "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
-      "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||DTA348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
+      "MSH|^~\&|EPICOLOGY|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
+      "PID|1|E2890060|E2890060^^^^EPICWENDY~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||DTA348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_
       "ORC|RE|81738228^EPC|OC11US18192^EPC||P||^^^201108062114^201108062147^STAT||201108080738|P249130^ROGERS^DIANE||P676146^ZWEIFELHOFER^CHRISTEN|3010014^^^3010^^^^^OCM EDOC-EMERGENCY|(280)454-7052||"_$C(13,10)_
-      "OBR|1|81738228^EPC|OC11US18192^EPC|IUS000063^US TESTICULAR^^^US TESTICULA||201108062115|||||O|||||P676146^ZWEIFELHOFER^CHRISTEN|(977)692-9023|309562814464||||201108080737||US|P||^^^201108062114^201108062147^STAT||||^Torsion||P094529^LEE^BENJAMIN^C^|P630889^DRABEK^EMMA|121732^MENDEZ TRANSCRIPTIONIST^MICHELE^^|201108062115|||||||||"_$C(13,10)_
+      "OBR|1|817382284455555^EPC|OC11US18192^EPC|IUS000063^US TESTICULAR^^^US TESTICULA||201108062115|||||O|||||P676146^ZWEIFELHOFER^CHRISTEN|(977)692-9023|309562814464||||201108080737||US|PM||^^^201108062114^201108062147^STAT||||^Torsion||P094529^LEE^BENJAMIN^C^|P630889^DRABEK^EMMA|121732^MENDEZ TRANSCRIPTIONIST^MICHELE^^|201108062115|||||||||"_$C(13,10)_
       "NTE|1||Indication:->Torsion||"_$C(13,10)_
       "OBX|1|ST|&GDT|1|TESTICULAR ULTRASOUND: 08/06/2011||||||P|||||P630889^DRABEK^EMMA"_$C(13,10)_
       "OBX|2|ST|&GDT|1|||||||P|||||P630889^DRABEK^EMMA"_$C(13,10)_
@@ -48,10 +46,8 @@ Method TestOBRSegment()
     w !, "RequestedDateTime: ", OutputMessage.GetValueAt("OBR:6"), !     
     w !, "OrderingProvider: ", OutputMessage.GetValueAt("OBR:16"), ! 
     w !,"ResultStatus: ", OutputMessage.GetValueAt("OBR:25"), ! 
-    
-      
-     
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestOBRSubtransform", "/nodelete")
+   
+   ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestOBRSubtransform", "/nodelete")
 }
 
 XData UnitTestContent

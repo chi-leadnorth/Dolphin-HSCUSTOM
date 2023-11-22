@@ -3,12 +3,11 @@ Class HS.Local.UnitTest.Builder.MasterSuite.UnitTestPIDSubtransform Extends %Uni
 
 Method TestPID()
 {
-    //create a transformation class instance, input message sample to parse
+      //create a transformation class instance, input message sample to parse
 
-    #;  set Transformation = ##class(TEAM2SANDBOXPKG.DolphinPID).%New()
-     set Transformation = ##class(HS.Local.HL7.Shared.MSH).%New()
+    
+     set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinPID).%New()
 
-     //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
@@ -45,15 +44,15 @@ Method TestPID()
     Set PatientAccountNumber = OutputMessage.GetValueAt("PID:18")        
         
    ///Here we are logging in the values from the message 
-    Write "PatientLastName: ", OutputMessage.GetValueAt("PID:5.1:"), !     
-    Write "PatientFirstName: ", OutputMessage.GetValueAt("PID:5.2:"), !
-    Write "PatientMiddleName: ", OutputMessage.GetValueAt("PID:5.3:"), !  
-    Write "PatientDateofBirth: ", OutputMessage.GetValueAt("PID:7:"), !  
-    Write "PatientGender: ", OutputMessage.GetValueAt("PID:8:"), ! 
-    Write "PatientAddress: ", OutputMessage.GetValueAt("PID:11:"), !  
-    Write "PatientAccountNumber: ", OutputMessage.GetValueAt("PID:18:"), !    
+    W !, "PatientLastName: ", OutputMessage.GetValueAt("PID:5.1:"), !     
+    W !, "PatientFirstName: ", OutputMessage.GetValueAt("PID:5.2:"), !
+    W !, "PatientMiddleName: ", OutputMessage.GetValueAt("PID:5.3:"), !  
+    W !, "PatientDateofBirth: ", OutputMessage.GetValueAt("PID:7:"), !  
+    W !, "PatientGender: ", OutputMessage.GetValueAt("PID:8:"), ! 
+    W !, "PatientAddress: ", OutputMessage.GetValueAt("PID:11:"), !  
+    W !, "PatientAccountNumber: ", OutputMessage.GetValueAt("PID:18:"), !    
  
-     ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPIDSubtransform", "/nodelete")
+    ///do ##class(%UnitTest.Manager).RunTest("mytests\UnitTestPIDSubtransform", "/nodelete")
 }
 
 XData UnitTestContent

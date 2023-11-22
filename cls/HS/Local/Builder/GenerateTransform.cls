@@ -1,6 +1,10 @@
 Class HS.Local.Builder.GenerateTransform Extends %RegisteredObject
 {
 
+// Do ##class(TEAM2SANDBOXPKG.DolphinBuilder.DolphinBuilder).GenerateDTLExportXML()
+
+// C:\DOLPHINTHINGS\BuilderTool\Testing\ConstructedItems
+
 Parameter DolphinMSH = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
 
 Parameter DolphinPID = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
@@ -9,14 +13,57 @@ Parameter DolphinPV1 = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.co
 
 Parameter DolphinSUBS = "%XML.Adaptor(XMLNAMESPACE = ""http://www.intersystems.com/dtl"")";
 
-/// Method to generate XML for a DTL transformation and save it to a local file.
+/// Method to generate Export XML for a DTL transformation and save it to a local file.
+/// Method to generate Export XML for a DTL transformation and save it to a local file.
 ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %String = "", pTransformName As %String = "", pNamespace As %String = "", pSelectedSubTransformNames As %List = "") As %Status
 {
     Set tSC = $$$OK
 
-    // Convert the input to a list (API's JSON payload delivers input as a string)
+    // If any of the parameters are empty, prompt for input
+    If pFilePath = "" {
+        Read !, "ENTER the File Path: ", pFilePath
+    }
+    if pFilePath = "" {
+        Write "File Path cannot be empty"
+        $$$ThrowStatus($$$ERROR($$$GeneralError, "File Path cannot be empty"))
+    }
+
+    If pFacilityName = "" {
+        Read !, "ENTER the Facility Name: ", pFacilityName
+    }
+    if pFacilityName = "" {
+        Write "Facility Name cannot be empty"
+        $$$ThrowStatus($$$ERROR($$$GeneralError, "Facility Name cannot be empty"))
+    }
+
+    If pTransformName = "" {
+        Read !, "ENTER the Transform Name: ", pTransformName
+    }
+    if pTransformName = "" {
+        Write "Transform Name cannot be empty"
+        $$$ThrowStatus($$$ERROR($$$GeneralError, "Transform Name cannot be empty"))
+    }
+
+    If pNamespace = "" {
+        Read !, "ENTER the Namespace Name: ", pNamespace
+    }
+    if pNamespace = "" {
+        Write "Namespace cannot be empty"
+        $$$ThrowStatus($$$ERROR($$$GeneralError, "Namespace cannot be empty"))
+    }
+
+    // Initialize pSelectedSubTransformNames as an empty list
+    Set pSelectedSubTransformNames = ""
+
+    // Check if pSelectedSubTransformNames is empty or doesn't contain at least one item
+    If pSelectedSubTransformNames = "" {
+        Read !, "Enter the Desired Subtransform Names (comma separated): ", pSelectedSubTransformNames
+    }
+
+    // Convert the input to a list
     Set pSelectedSubTransformNames = $LISTFROMSTRING(pSelectedSubTransformNames, ",")
 
+    // Check if the list is still empty
     If $LISTLENGTH(pSelectedSubTransformNames) = 0 {
         Write "Minimum of 1 Selection Required"
         $$$ThrowStatus($$$ERROR($$$GeneralError, "Must use at least 1 subtransformation"))
@@ -29,15 +76,18 @@ ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %St
     // Initialize updatedContent as an empty string
     Set updatedContent = ""
 
-    // Iterate over the selected subtransform names
     Set length = $LISTLENGTH(pSelectedSubTransformNames)
+
+    // Iterate over the selected subtransform names
     For i = 1:1:length {
         Set pSelectedSubTransformName = $LIST(pSelectedSubTransformNames, i)
         Write "Processing subtransform: ", pSelectedSubTransformName, !
 
         // Access the XData block directly based on pSelectedSubTransformName
         Set xdataBlock = ##class(%Dictionary.XDataDefinition).%OpenId(pSelectedSubTransformName)
-       
+
+        // Debug: Output the value of xdataBlock
+        Write "xdataBlock: ", xdataBlock, !
 
         // Check if the selected subtransform name is valid
         If '$data(xdataBlock) {
@@ -47,7 +97,7 @@ ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %St
 
         // Parse the content from the XData block
         Set tSC = ..getStream(pSelectedSubTransformName, .pStream)
-        
+        Write "pStream: ", pStream, !
 
         // Parse out the content from in between the <transform> tags
         Set transformContent = ""
@@ -77,19 +127,10 @@ ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %St
     // Append transformContent to updatedContent
     Set updatedContent = updatedContent_transformContent_$c(13,10)
     }
-
-    // Manipulate parameters to match intended output format based on current naming standards
-    Set pTransformName = pFacilityName_"ORUTransform"
-    Set pNamespace = "EG"_pFacilityName
-
-    /// Lots of string manipulation here in order to achieve the desired format for a functioning DTL class
-
     Set transformType = "sourceClass='EnsLib.HL7.Message' targetClass='EnsLib.HL7.Message' sourceDocType='2.8:ORU_R01' targetDocType='2.8:ORU_R01' create='new' language='objectscript' >"
-    
     // Set source to target only once by appending directly
     Set stCopy = "<assign value='source' property='target' action='set' />"
     Set updatedContent = "<transform "_transformType_$c(13,10)_stCopy_$c(13,10)_updatedContent_"</transform>"
-    
     // Generate the header and class definition
     Set header = "Class "_pNamespace_"."_pFacilityName_"."_pTransformName_" Extends Ens.DataTransformDTL [ DependsOn = EnsLib.HL7.Message ]"_$c(13,10)_"{"_$c(13,10)
     Set parameters = "Parameter IGNOREMISSINGSOURCE = 1;"_$c(13,10)_$c(13,10)
@@ -101,7 +142,11 @@ ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %St
     // Combine the header, parameters, xdataHeader, and transformContent
     Set updatedContent = header_parameters_xdataHeader_updatedContent_xdataFooter
 
-
+    // Replace placeholders with actual values
+    #; Set updatedContent = $replace(updatedContent, "{FacilityName}", pFacilityName)
+    #; Set updatedContent = $replace(updatedContent, "{TransformName}", pTransformName)
+    #; Set updatedContent = $replace(updatedContent, "{Namespace}", pNamespace)
+    
 
     // Write the updated content to the output file
     Set tSC = OutFile.Write(updatedContent)
@@ -113,11 +158,52 @@ ClassMethod GenerateDTLExportXML(pFilePath As %String = "", pFacilityName As %St
     Quit tSC
 }
 
-/// Custom methods used for content parsing/file creation
+Method WriteFile(pFilePath As %String, pContent As %String) As %Status
+{
+    Try {
+        // Open the file for writing
+        Set file = ##class(%File).%New(pFilePath)
+        Set status = file.Open("WSN")
+        If ($SYSTEM.Status.IsError(status)) {
+            Do $system.Status.DisplayError(status)
+            Quit:$$$ERROR($$$GeneralError, "Failed to open the file for writing")
+        }
+
+        // Write the content to the file
+        Set tSC = file.Write(pContent)
+        If $$$ISERR(tSC) {
+            Do $system.Status.DisplayError(tSC)
+        }
+
+        // Close the file
+        Set closeStatus = file.%Close()
+        If ($SYSTEM.Status.IsError(closeStatus)) {
+            Do $system.Status.DisplayError(closeStatus)
+            Quit:$$$ISOK(tSC)  // Return file write error if the close operation also fails
+        }
+    }
+    Catch ex {
+        Do file.%Close()
+        Set tSC = ex.AsStatus()
+    }
+
+    Quit tSC
+}
+
 ClassMethod getStream(pLocation As %String, ByRef pStream) As %Status
 {
     If pLocation '[ "://" Set pLocation = "xdata://"_..%ClassName(1)_":"_pLocation
     Quit ##class(HS.Util.XMLUtils).GetXDataAsStreamWithSubstitutions(pLocation, .pStream)
+}
+
+ClassMethod searchAndReplace(pInput As %String, pSearch As %String, pReplace As %String, ByRef pOutput As %String)
+{
+    If pInput[ pSearch {
+        Set pOutput = $p(pInput, pSearch, 1) _ pReplace _ $p(pInput, pSearch, 2)
+    }
+    Else {
+        Set pOutput = pInput
+    }
 }
 
 ClassMethod ReturnOutputFile(filename As %String) As %File
@@ -134,7 +220,6 @@ ClassMethod ReturnOutputFile(filename As %String) As %File
     Quit fileObj
 }
 
-/// XDATA blocks containing all subtransformation logic 
 XData DolphinMSH
 {
 <text>
