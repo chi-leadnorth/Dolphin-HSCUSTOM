@@ -1,4 +1,4 @@
-Class HS.Local.HL7.MemberEligibility.HL7MemberCheckProcess Extends (Ens.BusinessProcess, EnsLib.HL7.Util.IOFraming)
+Class HS.Local.MemberEligibility.HL7MemberCheckProcess Extends (Ens.BusinessProcess, EnsLib.HL7.Util.IOFraming)
 {
 
 /// Subscriber number location in message. Format expected: IN1:7
