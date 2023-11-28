@@ -1,7 +1,7 @@
 Class HS.Local.UnitTest.Builder.MasterSuite Extends %RegisteredObject
 {
 
-// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder("1255","C:/Users/topfr/Desktop/DOLPHIN/MasterTestOutput","NathanSuite","EGMACKEY","HSCUSTOM","UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform,UnitTestORCSubtransform")
+// do ##class(HS.Local.UnitTest.Builder.MasterSuite).TestSuiteBuilder("1055","C:/Users/topfr/Desktop/DOLPHIN/MasterTestOutput","MorrisSuite","EGMACKEY","HSCUSTOM","UnitTestMSHSubtransform,UnitTestPIDSubtransform,UnitTestPV1Subtransform,UnitTestOBRSubtransform,UnitTestORCSubtransform")
 
 ClassMethod TestSuiteBuilder(pFacilityID As %String = "", pFilePath As %String = "", pFileName As %String = "", pFacilityName As %String = "", pNamespace As %String = "", pSelectedUnitTestNames As %List = "") As %Status
 {
