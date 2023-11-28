@@ -9,7 +9,7 @@ Method TestMSH()
       set InputMessage = ##class(EnsLib.HL7.Message).%New() 
              
       set HL7Message=     
-      "MSH|^~\&|EPICA|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
+      "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
       "PID|1|E2890060|E2890060^^^^EPI~0009526875^^^O^MRN||MENDEZ^ALVIN||19420406|M||K|6494 CLINTON COURT^^PUEBLO^SC^22954^USA^^^ORANGE|ORANGE|(868)706-8760|||S||RT-348794|497-54-8410||Rodgers^Alycia^^||"_$C(13,10)_
       "PV1||E|EDOC^ER09^09^OCM^R^^^^^^||||P676146^ZWEIFELHOFER^CHRISTEN|||E/R|||||||||309562814464|||||||||||||||||||||||||20110806|||||||V"_$C(13,10)_
       "ORC|RE|81738228^EPC|OC11US18192^EPC||P||^^^201108062114^201108062147^STAT||201108080738|P249130^ROGERS^DIANE||P676146^ZWEIFELHOFER^CHRISTEN|3010014^^^3010^^^^^OCM EDOC-EMERGENCY|(280)454-7052||"_$C(13,10)_
@@ -32,6 +32,7 @@ Method TestMSH()
     set status = Transformation.Transform(InputMessage,.OutputMessage)
     
     set OutputMessage.DocType="2.8:ORU_R01"
+    
     
     w !, OutputMessage.OutputToString()
     ; Access fields and segments in the HL7 message     

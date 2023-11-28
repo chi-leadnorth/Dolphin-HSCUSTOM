@@ -3,7 +3,7 @@ Class HS.Local.UnitTest.Builder.MasterSuite.UnitTestOBRSubtransform Extends %Uni
 
 Method TestOBRSegment()
 {
-      //create a transformation class instance, input message sample to parse
+      //create a transformation class instance, input message sample to parse   
 
      set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
