@@ -9,7 +9,7 @@ Method TestPV1()
      
      set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinPV1).%New()
 
-     set InputMessage = ##class(EnsLib.HL7.Segment).%New()
+     set InputMessage = ##class(EnsLib.HL7.Message).%New()
          
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
