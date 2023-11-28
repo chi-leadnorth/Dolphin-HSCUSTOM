@@ -1,0 +1,84 @@
+Class HS.Local.HL7.MemberEligibility.HL7MemberCheckProcess Extends (Ens.BusinessProcess, EnsLib.HL7.Util.IOFraming)
+{
+
+/// Subscriber number location in message. Format expected: IN1:7
+Property SubscriberNumberLocation As %String;
+
+/// Subscriber number location in message. Format expected: DG1:7
+Property DateOfServiceLocation As %String;
+
+/// Configuration item(s) to which to send file stream messages
+Property TargetConfigNames As %String(MAXLEN = 1000);
+
+/// Store a set of searchable properties associated with each HL7 message processed. <br/>
+/// These records will be stored in the named SearchTable class, if any.
+Property SearchTableClass As %String(MAXLEN = 128) [ InitialExpression = "EnsLib.HL7.SearchTable" ];
+
+Parameter SETTINGS = "SubscriberNumberLocation:Basic,DateOfServiceLocation:Basic,TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
+
+Method OnRequest(pRequest As Ens.StreamContainer, Output pResponse As Ens.StreamContainer) As %Status
+{
+        Set tSC = $$$OK  
+        Try {
+            Set pResponse = ##class(Ens.StreamContainer).%New()
+            Set inputStream = pRequest.Stream
+
+            do ..GetLocationValue(inputStream, ..SubscriberNumberLocation, .subscriberNumber )
+            do ..GetLocationValue(inputStream, ..DateOfServiceLocation, .dateOfService )
+            do ..CheckMemberEligibility(subscriberNumber, dateOfService, .memberResult)
+            if memberResult {
+                ;Send the HL7 message to Targets
+                For iTarget=1:1:$L(..TargetConfigNames, ",") { 
+                    Set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
+	    	    
+			        Set tSC1=..SendRequestSync(tOneTarget,pRequest, .pResponse)  Set:$$$ISERR(tSC1) tSC=$$$ADDSC(tSC,tSC1)
+
+	            }
+            }
+            else {
+                $$$LOGINFO("Member Result not Found")
+            }
+
+        }
+        Catch ex {
+            // Handle any exceptions here
+            Set tSC = ex.AsStatus()
+		    $$$LOGERROR(tSC)
+        }
+        
+        Quit tSC
+}
+
+ClassMethod GetLocationValue(pStream As %Stream.Object, pLocation As %String, ByRef pValue As %String)
+{
+    Set pValue = ""
+    //parse location
+    Set SegmentId = $PIECE(pLocation, ":", 1)
+    Set LocationIndex = $PIECE(pLocation, ":", 2)
+    
+
+    While 'pStream.AtEnd {
+        Set line = pStream.ReadLine()
+        
+        If $Extract(line, 1, 3) = SegmentId {
+            //parse the line based on the pipes
+            $$$LOGINFO("Current line is: "_line)
+            Set FieldList = $LISTFROMSTRING(line, "|")
+
+            //Get from list or return empty
+            Set pValue = $LISTGET(FieldList, LocationIndex,"")
+        }
+    }
+    do pStream.Rewind()
+}
+
+ClassMethod CheckMemberEligibility(pSubscriberNumber, pDateOfService, ByRef pResult As %Boolean) As %Status
+{
+    $$$LOGINFO("Checking subscriber: "_pSubscriberNumber)
+    $$$LOGINFO("Checking date of serviced: "_pDateOfService)
+    Set pResult = 1
+    Quit $$$OK
+}
+
+
+}
