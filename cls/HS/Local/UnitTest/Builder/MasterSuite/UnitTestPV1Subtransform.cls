@@ -7,7 +7,7 @@ Method TestPV1()
       Set tSC = $$$OK
       //create a transformation class instance
      
-     set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinPID).%New()
+     set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinPV1).%New()
 
       // sample HL7 Input message
      set InputMessage = ##class(EnsLib.HL7.Message).%New()

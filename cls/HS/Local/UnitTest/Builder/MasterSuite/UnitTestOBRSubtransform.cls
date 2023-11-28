@@ -64,7 +64,7 @@ XData UnitTestContent
 <Implementation><![CDATA[
     //create a transformation class instance, input message sample to parse
 
-     set Transformation = ##class(TEAM2SANDBOXPKG.DolphinSUBS).%New()
+     set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinOBR).%New()
      //set Transformation = ##class(HS.LeadNorthTransforms.R01).%New()
      set InputMessage = ##class(EnsLib.HL7.Message).%New()          
      set HL7Message=     
