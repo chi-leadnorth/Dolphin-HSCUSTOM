@@ -9,8 +9,7 @@ Method TestPV1()
      
      set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinPV1).%New()
 
-      // sample HL7 Input message
-     set InputMessage = ##class(EnsLib.HL7.Message).%New()
+     set InputMessage = ##class(EnsLib.HL7.Segment).%New()
          
      set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
@@ -34,9 +33,9 @@ Method TestPV1()
     set InputMessage=##class(EnsLib.HL7.Message).ImportFromString(HL7Message,.sc) $$$ThrowOnError(sc) 
     
     set status = Transformation.Transform(InputMessage,.OutputMessage)
-    set OutputMessage.DocType="2.5.1:ADT_A01"     
-    //set OutputMessage.DocType="2.5.1:ORU_R01"    
+    set OutputMessage.DocType="2.5.1:ADT_A01"         
     W !, OutputMessage.OutputToString()
+
     ; Access fields and segments in the HL7 message  
     
     Set PlaceofVisit = OutputMessage.GetValueAt("PV1:2") 
