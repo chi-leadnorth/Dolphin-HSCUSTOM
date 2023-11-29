@@ -1,10 +1,11 @@
 Class HS.Local.MemberEligibility.HL7MemberCheckProcess Extends (Ens.BusinessProcess, EnsLib.HL7.Util.IOFraming)
 {
 
-/// Subscriber number location in message. Format expected: IN1:7
+
+/// Subscriber number location in message. Format expected: IN1:36
 Property SubscriberNumberLocation As %String;
 
-/// Subscriber number location in message. Format expected: DG1:7
+/// Subscriber number location in message. Format expected: PV1:44
 Property DateOfServiceLocation As %String;
 
 /// Configuration item(s) to which to send file stream messages
@@ -16,27 +17,35 @@ Property SearchTableClass As %String(MAXLEN = 128) [ InitialExpression = "EnsLib
 
 Parameter SETTINGS = "SubscriberNumberLocation:Basic,DateOfServiceLocation:Basic,TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
 
-Method OnRequest(pRequest As Ens.StreamContainer, Output pResponse As Ens.StreamContainer) As %Status
+Method OnRequest(pRequest As EnsLib.HL7.Message, Output pResponse As EnsLib.HL7.Message) As %Status
 {
         Set tSC = $$$OK  
         Try {
-            Set pResponse = ##class(Ens.StreamContainer).%New()
-            Set inputStream = pRequest.Stream
+            Set tSeparators = "|^~\&"_$Char(13,10)
+            Set inputStream = ##class(%Stream.GlobalCharacter).%New()
+            Set doOBXReorg = 0
+            Set savedOBX = ""
+            Set eventType = "" 
+            
+            do pRequest.OutputToLibraryStream(.inputStream, tSeparators) 
+
+            do inputStream.Rewind()
 
             do ..GetLocationValue(inputStream, ..SubscriberNumberLocation, .subscriberNumber )
             do ..GetLocationValue(inputStream, ..DateOfServiceLocation, .dateOfService )
-            do ..CheckMemberEligibility(subscriberNumber, dateOfService, .memberResult)
-            if memberResult {
-                ;Send the HL7 message to Targets
+            do ..BuildMemberEligibilityRequest(subscriberNumber, dateOfService, .searchRequest)
+            if searchRequest {
+                ;Send the Patient Search message to Target
                 For iTarget=1:1:$L(..TargetConfigNames, ",") { 
                     Set tOneTarget=$ZStrip($P(..TargetConfigNames,",",iTarget),"<>W")  Continue:""=tOneTarget
 	    	    
-			        Set tSC1=..SendRequestSync(tOneTarget,pRequest, .pResponse)  Set:$$$ISERR(tSC1) tSC=$$$ADDSC(tSC,tSC1)
+			        Set tSC1=..SendRequestSync(tOneTarget,searchRequest, .pResponse)  Set:$$$ISERR(tSC1) tSC=$$$ADDSC(tSC,tSC1)
 
 	            }
+                //Check pResponse and send message to next target if check returns positive result
             }
             else {
-                $$$LOGINFO("Member Result not Found")
+                $$$LOGINFO("Member Eligibility request not built")
             }
 
         }
@@ -56,6 +65,10 @@ ClassMethod GetLocationValue(pStream As %Stream.Object, pLocation As %String, By
     Set SegmentId = $PIECE(pLocation, ":", 1)
     Set LocationIndex = $PIECE(pLocation, ":", 2)
     
+    //handle different numbering in MSH vs other segments
+    if SegmentId '= "MSH" {
+        Set LocationIndex = LocationIndex+1
+    }
 
     While 'pStream.AtEnd {
         Set line = pStream.ReadLine()
@@ -72,13 +85,17 @@ ClassMethod GetLocationValue(pStream As %Stream.Object, pLocation As %String, By
     do pStream.Rewind()
 }
 
-ClassMethod CheckMemberEligibility(pSubscriberNumber, pDateOfService, ByRef pResult As %Boolean) As %Status
+ClassMethod BuildMemberEligibilityRequest(pSubscriberNumber, pDateOfService, ByRef pResult As HS.Message.PatientSearchRequest) As %Status
 {
     $$$LOGINFO("Checking subscriber: "_pSubscriberNumber)
     $$$LOGINFO("Checking date of serviced: "_pDateOfService)
-    Set pResult = 1
+    Set pResult = ##class(HS.Message.PatientSearchRequest).%New()
+
+    //Set standard properties
+    Set pResult.MRN = pSubscriberNumber
+    //Set custom properties using key, value pairs in AdditionalInfo property
+    Do pResult.AdditionalInfo.SetAt(pDateOfService,"DateOfService")
     Quit $$$OK
 }
-
 
 }
