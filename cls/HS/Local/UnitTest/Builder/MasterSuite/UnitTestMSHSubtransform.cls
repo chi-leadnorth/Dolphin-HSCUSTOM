@@ -6,7 +6,7 @@ Method TestMSH()
 {
     //create a transformation class instance, input message sample  
       set Transformation = ##class(HS.Local.HL7.Subtransfom.DolphinMSH).%New()
-      set InputMessage = ##class(EnsLib.HL7.Message).%New() 
+      set InputMessage = ##class(EnsLib.HL7.Segment).%New() 
              
       set HL7Message=     
       "MSH|^~\&|EPIC|MHS|||20110808073803|121732|ORU^R01|99273|P|2.3|||"_$C(13,10)_
@@ -31,10 +31,10 @@ Method TestMSH()
       
     set status = Transformation.Transform(InputMessage,.OutputMessage)
     
-    set OutputMessage.DocType="2.8:ORU_R01"
-    
+    set OutputMessage.DocType="2.8:ORU_R01"   
     
     w !, OutputMessage.OutputToString()
+
     ; Access fields and segments in the HL7 message     
     set SendingApplication = OutputMessage.GetValueAt("MSH:3")
     set SendingFacility = OutputMessage.GetValueAt("MSH:4")    
